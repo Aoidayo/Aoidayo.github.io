@@ -3,8 +3,9 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: HexoWithButterfly
-subtitle: ""
+title: "Aoidayo"
+subtitle:
+  - "早安(๑╹◡╹)ﾉ"
 description: ""
 keywords:
 author: Aoidayo
@@ -125,7 +126,6 @@ deploy:
   repo: git@github.com:Aoidayo/Aoidayo.github.io.git
   branch: main
 
-# 注入cssjs
-inject:
-  head:
-    - <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/static-butterfly/dist/css/index.min.css">
+# 双栏
+butterfly_article_double_row:
+  enable: true
