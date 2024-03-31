@@ -8,3 +8,6 @@ tags:
 # hexo 分支测试
 
 测试github的分支仓库
+
+![image-20240331102819840](./hexo-branch/image-20240331102819840.png)
+
