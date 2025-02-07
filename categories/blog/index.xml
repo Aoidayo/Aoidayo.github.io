@@ -7,73 +7,65 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>© 2025 Aoidayo</copyright>
-    <lastBuildDate>Wed, 07 Feb 2125 15:38:16 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Feb 2025 15:38:16 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>使用hugo</title>
       <link>https://blog.aoidayo.site/blog/use-hugo/</link>
-      <pubDate>Wed, 07 Feb 2125 15:38:16 +0800</pubDate>
+      <pubDate>Fri, 07 Feb 2025 15:38:16 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/use-hugo/</guid>
-      <description>&lt;h2 class=&#34;relative group&#34;&gt;使用hugo 
-    &lt;div id=&#34;%E4%BD%BF%E7%94%A8hugo&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;参考 
+    &lt;div id=&#34;%E5%8F%82%E8%80%83&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
     
     &lt;span
         class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
         &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E4%BD%BF%E7%94%A8hugo&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E5%8F%82%E8%80%83&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
     &lt;/span&gt;        
     
 &lt;/h2&gt;
-
-
-&lt;h3 class=&#34;relative group&#34;&gt;Hugo规则 
-    &lt;div id=&#34;hugo%E8%A7%84%E5%88%99&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#hugo%E8%A7%84%E5%88%99&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;标题&lt;/code&gt;和&lt;code&gt;正文&lt;/code&gt;之间必须有空行&lt;/li&gt;
-&lt;li&gt;一级标题无法被文章右侧的大纲TOC渲染&lt;/li&gt;
-&lt;li&gt;代码块必须注明语言才能使用&lt;code&gt;enableCodeCopy&lt;/code&gt;, 以 &lt;a href=&#34;#kill-process&#34;&gt;kill process&lt;/a&gt; 为例&lt;/li&gt;
-&lt;li&gt;Hugo渲染规则，默认只渲染过去的文章没当前文章不渲染
+&lt;li&gt;Hugo安装
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://hoganzinger.github.io/p/hugo%E6%96%87%E7%AB%A0%E7%BC%BA%E5%A4%B1/&#34; target=&#34;_blank&#34;&gt;hugo文章缺失&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;在&lt;code&gt;hugo.yaml&lt;/code&gt;根级加入&lt;code&gt;buildFuture: true&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;本篇文章定义发布时间为&lt;span style=&#39;color:pink&#39;&gt;一千年以后&lt;/span&gt;, 如果你可以看到，就说明yaml在工作。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://zhuanlan.zhihu.com/p/440175312&#34; target=&#34;_blank&#34;&gt;零成本搭建个人博客：hugo安装 - 知乎&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://gohugo.io/installation/linux/&#34; target=&#34;_blank&#34;&gt;Hugo安装官方文档&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/gohugoio/hugo/releases&#34; target=&#34;_blank&#34;&gt;Hugo原仓库&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://gohugo.io/getting-started/quick-start/&#34; target=&#34;_blank&#34;&gt;Hugo使用参考文档&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;主题
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://blowfish.page/&#34; target=&#34;_blank&#34;&gt;blowfish&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用blowfish主题的博客示例
+&lt;ul&gt;
+&lt;li&gt;前三个有github参考可以用于参考&lt;/li&gt;
+&lt;li&gt;捣鼓静态博客时在github上抄别人的配置，比费劲巴拉的看教程文档来的舒服。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/Ast3risk-ops/website&#34; target=&#34;_blank&#34;&gt;Ast3risk-ops/website&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/utrodus/utrodus.com&#34; target=&#34;_blank&#34;&gt;一位印尼前端的博客&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://enoshima-escar.zen96k.mydns.jp/&#34; target=&#34;_blank&#34;&gt;江ノ島エスカー&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://ohdmire.github.io/posts/loopcount/#%E6%A4%8D%E6%A0%91%E9%97%AE%E9%A2%98&#34; target=&#34;_blank&#34;&gt;详解程序中循环次数的判断 · Ohdmire&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;GithubActions
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://cloud.tencent.com/developer/article/2262171&#34; target=&#34;_blank&#34;&gt;自动部署&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://smc.im/post/deploy-hugo-blog-with-github-actions/&#34; target=&#34;_blank&#34;&gt;使用 Github Actions 自动部署 hugo 博客 | Choi&amp;rsquo;s Notes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://martinlwx.github.io/zh-cn/use-github-actions-to-automate-hugo-build/&#34; target=&#34;_blank&#34;&gt;使用 GitHub Actions 自动化 Hugo 博客部署 - MartinLwx&amp;rsquo;s Blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.lixueduan.com/posts/blog/01-github-action-deploy-hugo/&#34; target=&#34;_blank&#34;&gt;基于 Github Action 自动构建 Hugo 博客 -&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;问题：
+&lt;a href=&#34;https://www.bilibili.com/opus/908761972570325045&#34; target=&#34;_blank&#34;&gt;Hugo主题blowfish搜索功能失效的解决办法之一 - 哔哩哔哩&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;CDN
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.hetong-re4per.com/posts/cdn-for-your-github-page/&#34; target=&#34;_blank&#34;&gt;使用双线 DNS 和 CDN 加速你的 GitHub Page · 瞳のBlog&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-
-
-&lt;h3 class=&#34;relative group&#34;&gt;blowfish 
-    &lt;div id=&#34;blowfish&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#blowfish&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h3&gt;
-
-
-&lt;h4 class=&#34;relative group&#34;&gt;simplecode 
-    &lt;div id=&#34;simplecode&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#simplecode&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h4&gt;
-&lt;p&gt;blowfish的simplecode，参考&lt;a href=&#34;https://blowfish.page/docs/shortcodes/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;&lt;/p&gt;</description>
+&lt;p&gt;Hugo和Blowfish使用固定版本如下，方便后面维护&lt;/p&gt;</description>
       
     </item>
     
