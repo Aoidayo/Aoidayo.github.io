@@ -32,6 +32,12 @@
 &lt;li&gt;&lt;a href=&#34;https://gohugo.io/installation/linux/&#34; target=&#34;_blank&#34;&gt;Hugo安装官方文档&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://github.com/gohugoio/hugo/releases&#34; target=&#34;_blank&#34;&gt;Hugo原仓库&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://gohugo.io/getting-started/quick-start/&#34; target=&#34;_blank&#34;&gt;Hugo使用参考文档&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;加密
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.tantalum.life/posts/encrypted-blog-posts/&#34; target=&#34;_blank&#34;&gt;Hugo | 为博客文章添加密码 – Zoe&amp;rsquo;s Dumpster.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/adityatelange/hugo_enc&#34; target=&#34;_blank&#34;&gt;hugo-enc&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;主题
@@ -66,7 +72,7 @@
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Hugo和Blowfish使用固定版本如下，方便后面维护&lt;/p&gt;</description>
-      
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/use-hugo/feature.jpg" />
     </item>
     
     <item>
