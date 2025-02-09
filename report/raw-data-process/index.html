@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>Blog History &middot; Aoidayo</title>
-  <meta name="title" content="Blog History &middot; Aoidayo" />
+  <title>数据清洗 &middot; Aoidayo</title>
+  <meta name="title" content="数据清洗 &middot; Aoidayo" />
   
   
-  <meta name="keywords" content="Hugo, " />
+  <meta name="keywords" content="ST, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/blog-history/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/report/raw-data-process/" />
   
   
   
@@ -67,33 +67,23 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/blog-history/">
+  <meta property="og:url" content="https://blog.aoidayo.site/report/raw-data-process/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="Blog History">
-  <meta property="og:description" content="FrameWork # Typecho 24/1/? # wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。
-因为权限问题弃用。
-Hello Hexo 24/4/14 # 第一个博客在github.io上使用Hexo和GithubActions搭建。
-Github原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。
-这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。
-我尝试过如下几种静博框架的不同主题：
-Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。">
+  <meta property="og:title" content="数据清洗">
+  <meta property="og:description" content="Refer # 轨迹数据集 ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle 城市拓扑、路网/POI/城市边界 城市拓扑 OSM API (OpenStreetMap) 本质上 osmnx 和 overpass API 都是使用OSM的api获取 osmnx 可以用于获取最新时间的路网数据 Overpass API Overpass 官网 | Overpass by Private.coffee OSM历史数据服务 GeoFabrik 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。 Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园 城市边界 osmnx 直接获取 GADM，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。 level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息 不能单shp文件读取 GeoFabrik可以获取部分 shapefile road shapefile的highway枚举值说明 路网清洗 zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM) 数据集 # 我们能拿到的数据集分为两种：">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
-    <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2025-01-04T15:38:16+08:00">
+    <meta property="article:section" content="report">
+    <meta property="article:published_time" content="2025-02-09T15:38:16+08:00">
     <meta property="article:modified_time" content="2025-02-09T07:04:36+00:00">
-    <meta property="article:tag" content="Hugo">
+    <meta property="article:tag" content="ST">
+    <meta property="og:image" content="https://blog.aoidayo.site/report/raw-data-process/feature.png">
 
   
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Blog History">
-  <meta name="twitter:description" content="FrameWork # Typecho 24/1/? # wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。
-因为权限问题弃用。
-Hello Hexo 24/4/14 # 第一个博客在github.io上使用Hexo和GithubActions搭建。
-Github原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。
-这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。
-我尝试过如下几种静博框架的不同主题：
-Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://blog.aoidayo.site/report/raw-data-process/feature.png">
+  <meta name="twitter:title" content="数据清洗">
+  <meta name="twitter:description" content="Refer # 轨迹数据集 ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle 城市拓扑、路网/POI/城市边界 城市拓扑 OSM API (OpenStreetMap) 本质上 osmnx 和 overpass API 都是使用OSM的api获取 osmnx 可以用于获取最新时间的路网数据 Overpass API Overpass 官网 | Overpass by Private.coffee OSM历史数据服务 GeoFabrik 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。 Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园 城市边界 osmnx 直接获取 GADM，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。 level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息 不能单shp文件读取 GeoFabrik可以获取部分 shapefile road shapefile的highway枚举值说明 路网清洗 zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM) 数据集 # 我们能拿到的数据集分为两种：">
 
   
   <script type="application/ld+json">
@@ -101,26 +91,26 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "Blog History",
-    "headline": "Blog History",
+    "name": "数据清洗",
+    "headline": "数据清洗",
     
-    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003eFrameWork \n    \u003cdiv id=\u0022framework\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#framework\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\n\n\u003ch3 class=\u0022relative group\u0022\u003eTypecho 24\/1\/? \n    \u003cdiv id=\u0022typecho-241\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#typecho-241\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\u003cp\u003ewordpress的精简版本，用docker装容易产生\u003ccode\u003enginx的user:www-data\u003c\/code\u003e 权限问题，在使用时必须没写完一篇文章就\u003ccode\u003esudo chmod -Rf 777 typecho\/\u003c\/code\u003e一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\u003c\/p\u003e\n\u003cp\u003e因为权限问题弃用。\u003c\/p\u003e\n\n\n\u003ch3 class=\u0022relative group\u0022\u003eHello Hexo 24\/4\/14 \n    \u003cdiv id=\u0022hello-hexo-24414\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#hello-hexo-24414\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\u003cp\u003e第一个博客在github.io上使用Hexo和GithubActions搭建。\u003c\/p\u003e\n\u003cp\u003eGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\u003c\/p\u003e\n\u003cp\u003e这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 \u003ccode\u003eclone\u003c\/code\u003e一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 \u003ccode\u003esimple starter\u003c\/code\u003e再搭配一个接入github评论的 \u003ccode\u003emkdocs\u003c\/code\u003e让大家来讨论，这就是前端的奇奇怪怪之处吧。\u003c\/p\u003e\n\u003cp\u003e我尝试过如下几种静博框架的不同主题：\u003c\/p\u003e\n\u003cul\u003e\n\u003cli\u003eHexo\n\u003cul\u003e\n\u003cli\u003eButterfly\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003eHugo\n\u003cul\u003e\n\u003cli\u003eBlowfish\u003c\/li\u003e\n\u003cli\u003eStack\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003eJekyll\n\u003cul\u003e\n\u003cli\u003etmaize-blog\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003c\/ul\u003e\n\n\n\u003ch3 class=\u0022relative group\u0022\u003eHello Hugo 24\/4\/14 \n    \u003cdiv id=\u0022hello-hugo-24414\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#hello-hugo-24414\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\u003cp\u003eHugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\u003c\/p\u003e",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003eRefer \n    \u003cdiv id=\u0022refer\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#refer\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cul\u003e\n\u003cli\u003e轨迹数据集\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/www.kaggle.com\/competitions\/pkdd-15-predict-taxi-service-trajectory-i\/data\u0022 target=\u0022_blank\u0022\u003eECML\/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e城市拓扑、路网\/POI\/城市边界\n\u003cul\u003e\n\u003cli\u003e\u003cstrong\u003e城市拓扑\u003c\/strong\u003e\u003c\/li\u003e\n\u003cli\u003eOSM API (OpenStreetMap)\n\u003cul\u003e\n\u003cli\u003e本质上 \u003ccode\u003eosmnx\u003c\/code\u003e 和 \u003ccode\u003eoverpass API\u003c\/code\u003e 都是使用OSM的api获取\u003c\/li\u003e\n\u003cli\u003e\u003ccode\u003eosmnx\u003c\/code\u003e 可以用于获取最新时间的路网数据\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003eOverpass API\u003c\/strong\u003e \u003ca href=\u0022https:\/\/overpass.kumi.systems\/#about\u0022 target=\u0022_blank\u0022\u003eOverpass 官网 | Overpass by Private.coffee\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003eOSM历史数据服务\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/download.geofabrik.de\/\u0022 target=\u0022_blank\u0022\u003eGeoFabrik\u003c\/a\u003e 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。\u003c\/li\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/www.cnblogs.com\/bltstop\/p\/18090135\u0022 target=\u0022_blank\u0022\u003eFabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003e城市边界\u003c\/strong\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ccode\u003eosmnx\u003c\/code\u003e 直接获取\u003c\/li\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/gadm.org\/index.html\u0022 target=\u0022_blank\u0022\u003eGADM\u003c\/a\u003e，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。\n\u003cul\u003e\n\u003cli\u003elevel0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息\u003c\/li\u003e\n\u003cli\u003e不能单shp文件读取\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003eGeoFabrik可以获取部分\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003eshapefile\u003c\/strong\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/wiki.openstreetmap.org\/wiki\/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF\u0022 target=\u0022_blank\u0022\u003eroad shapefile的highway枚举值说明\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003e路网清洗\u003c\/strong\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/github.com\/zdsjjtTLG\/TrackIt\u0022 target=\u0022_blank\u0022\u003ezdsjjtTLG\/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003c\/ul\u003e\n\n\n\u003ch2 class=\u0022relative group\u0022\u003e数据集 \n    \u003cdiv id=\u0022%E6%95%B0%E6%8D%AE%E9%9B%86\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E6%95%B0%E6%8D%AE%E9%9B%86\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e我们能拿到的数据集分为两种：\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/blog-history\/",
+    "url" : "https:\/\/blog.aoidayo.site\/report\/raw-data-process\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2025",
-    "dateCreated": "2025-01-04T15:38:16\u002b08:00",
-    "datePublished": "2025-01-04T15:38:16\u002b08:00",
+    "dateCreated": "2025-02-09T15:38:16\u002b08:00",
+    "datePublished": "2025-02-09T15:38:16\u002b08:00",
     
     "dateModified": "2025-02-09T07:04:36\u002b00:00",
     
-    "keywords": ["Hugo"],
+    "keywords": ["ST"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "72"
+    "wordCount": "217"
   }]
   </script>
 
@@ -432,12 +422,6 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
   
   
   
- 
-  
-   
-  
- 
-
 
 
 <div id="hero" class="h-[150px] md:h-[200px]"></div>
@@ -446,7 +430,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
 
     
     <div class="fixed inset-x-0 top-0 h-[800px] single_hero_background nozoom"
-    style="background-image:url(/img/background_hu_7dc26c48510ea4b0.png);">
+    style="background-image:url(/report/raw-data-process/feature_hu_195406089c25c3f8.png);">
     
 
 
@@ -490,8 +474,8 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
   <li class="inline ">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/"
-      >blog</a
+      href="/report/"
+      >report</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -499,8 +483,8 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/blog-history/"
-      >Blog History</a
+      href="/report/raw-data-process/"
+      >数据清洗</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -509,7 +493,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      Blog History
+      数据清洗
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -554,7 +538,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2025-01-04T15:38:16&#43;08:00">2025年01月04日 15時38分</time><span class="px-2 text-primary-500">&middot;</span><span>72 字</span><span class="px-2 text-primary-500">&middot;</span><span title="预计阅读">1 分钟</span>
+  <time datetime="2025-02-09T15:38:16&#43;08:00">2025年02月09日 15時38分</time><span class="px-2 text-primary-500">&middot;</span><span>217 字</span><span class="px-2 text-primary-500">&middot;</span><span title="预计阅读">2 分钟</span>
   
 
   
@@ -681,26 +665,26 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#framework">FrameWork</a>
+    <li><a href="#refer">Refer</a></li>
+    <li><a href="#数据集">数据集</a></li>
+    <li><a href="#城市拓扑路网poi城市边界">城市拓扑、路网/POI/城市边界</a>
       <ul>
-        <li><a href="#typecho-241">Typecho 24/1/?</a></li>
-        <li><a href="#hello-hexo-24414">Hello Hexo 24/4/14</a></li>
-        <li><a href="#hello-hugo-24414">Hello Hugo 24/4/14</a></li>
-        <li><a href="#hello-wordpress-245">Hello Wordpress 24/5/?</a></li>
-        <li><a href="#hello-halo-241012">Hello Halo 24/10/12</a></li>
+        <li>
+          <ul>
+            <li><a href="#shapefile">shapefile</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
-    <li><a href="#deployment">DeployMent</a>
+    <li><a href="#路网清洗">路网清洗</a>
       <ul>
-        <li><a href="#旅游地图-24111">旅游地图 24/11/1</a></li>
-        <li><a href="#nas导航-24111">Nas导航 24/11/1</a></li>
+        <li><a href="#恢复uv信息">恢复uv信息</a></li>
+        <li><a href="#修复路网">修复路网</a></li>
       </ul>
     </li>
-    <li><a href="#transfer">Transfer</a>
-      <ul>
-        <li><a href="#博客迁移-25123">博客迁移 25/1/23</a></li>
-      </ul>
-    </li>
+    <li><a href="#轨迹清洗">轨迹清洗</a></li>
+    <li><a href="#地图匹配">地图匹配</a></li>
+    <li><a href="#poi-k近邻">POI k近邻</a></li>
   </ul>
 </nav>
   </div>
@@ -714,26 +698,26 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#framework">FrameWork</a>
+    <li><a href="#refer">Refer</a></li>
+    <li><a href="#数据集">数据集</a></li>
+    <li><a href="#城市拓扑路网poi城市边界">城市拓扑、路网/POI/城市边界</a>
       <ul>
-        <li><a href="#typecho-241">Typecho 24/1/?</a></li>
-        <li><a href="#hello-hexo-24414">Hello Hexo 24/4/14</a></li>
-        <li><a href="#hello-hugo-24414">Hello Hugo 24/4/14</a></li>
-        <li><a href="#hello-wordpress-245">Hello Wordpress 24/5/?</a></li>
-        <li><a href="#hello-halo-241012">Hello Halo 24/10/12</a></li>
+        <li>
+          <ul>
+            <li><a href="#shapefile">shapefile</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
-    <li><a href="#deployment">DeployMent</a>
+    <li><a href="#路网清洗">路网清洗</a>
       <ul>
-        <li><a href="#旅游地图-24111">旅游地图 24/11/1</a></li>
-        <li><a href="#nas导航-24111">Nas导航 24/11/1</a></li>
+        <li><a href="#恢复uv信息">恢复uv信息</a></li>
+        <li><a href="#修复路网">修复路网</a></li>
       </ul>
     </li>
-    <li><a href="#transfer">Transfer</a>
-      <ul>
-        <li><a href="#博客迁移-25123">博客迁移 25/1/23</a></li>
-      </ul>
-    </li>
+    <li><a href="#轨迹清洗">轨迹清洗</a></li>
+    <li><a href="#地图匹配">地图匹配</a></li>
+    <li><a href="#poi-k近邻">POI k近邻</a></li>
   </ul>
 </nav>
   </div>
@@ -817,180 +801,279 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
         <div class="article-content max-w-prose mb-20">
           
 
-<h2 class="relative group">FrameWork 
-    <div id="framework" class="anchor"></div>
+<h2 class="relative group">Refer 
+    <div id="refer" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#framework" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#refer" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-
-
-<h3 class="relative group">Typecho 24/1/? 
-    <div id="typecho-241" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#typecho-241" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>wordpress的精简版本，用docker装容易产生<code>nginx的user:www-data</code> 权限问题，在使用时必须没写完一篇文章就<code>sudo chmod -Rf 777 typecho/</code>一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。</p>
-<p>因为权限问题弃用。</p>
-
-
-<h3 class="relative group">Hello Hexo 24/4/14 
-    <div id="hello-hexo-24414" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#hello-hexo-24414" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>第一个博客在github.io上使用Hexo和GithubActions搭建。</p>
-<p>Github原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。</p>
-<p>这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 <code>clone</code>一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 <code>simple starter</code>再搭配一个接入github评论的 <code>mkdocs</code>让大家来讨论，这就是前端的奇奇怪怪之处吧。</p>
-<p>我尝试过如下几种静博框架的不同主题：</p>
 <ul>
-<li>Hexo
+<li>轨迹数据集
 <ul>
-<li>Butterfly</li>
+<li><a href="https://www.kaggle.com/competitions/pkdd-15-predict-taxi-service-trajectory-i/data" target="_blank">ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle</a></li>
 </ul>
 </li>
-<li>Hugo
+<li>城市拓扑、路网/POI/城市边界
 <ul>
-<li>Blowfish</li>
-<li>Stack</li>
+<li><strong>城市拓扑</strong></li>
+<li>OSM API (OpenStreetMap)
+<ul>
+<li>本质上 <code>osmnx</code> 和 <code>overpass API</code> 都是使用OSM的api获取</li>
+<li><code>osmnx</code> 可以用于获取最新时间的路网数据</li>
+<li><strong>Overpass API</strong> <a href="https://overpass.kumi.systems/#about" target="_blank">Overpass 官网 | Overpass by Private.coffee</a></li>
 </ul>
 </li>
-<li>Jekyll
+<li>OSM历史数据服务
 <ul>
-<li>tmaize-blog</li>
+<li><a href="https://download.geofabrik.de/" target="_blank">GeoFabrik</a> 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。</li>
+<li><a href="https://www.cnblogs.com/bltstop/p/18090135" target="_blank">Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园</a></li>
+</ul>
+</li>
+<li><strong>城市边界</strong>
+<ul>
+<li><code>osmnx</code> 直接获取</li>
+<li><a href="https://gadm.org/index.html" target="_blank">GADM</a>，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。
+<ul>
+<li>level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息</li>
+<li>不能单shp文件读取</li>
+</ul>
+</li>
+<li>GeoFabrik可以获取部分</li>
+</ul>
+</li>
+<li><strong>shapefile</strong>
+<ul>
+<li><a href="https://wiki.openstreetmap.org/wiki/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF" target="_blank">road shapefile的highway枚举值说明</a></li>
 </ul>
 </li>
 </ul>
+</li>
+<li><strong>路网清洗</strong>
+<ul>
+<li><a href="https://github.com/zdsjjtTLG/TrackIt" target="_blank">zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)</a></li>
+</ul>
+</li>
+</ul>
 
 
-<h3 class="relative group">Hello Hugo 24/4/14 
-    <div id="hello-hugo-24414" class="anchor"></div>
+<h2 class="relative group">数据集 
+    <div id="%E6%95%B0%E6%8D%AE%E9%9B%86" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#hello-hugo-24414" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。</p>
-<p>总之Hugo我很喜欢，但是配置和使用太麻烦了。</p>
-<p>顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。</p>
-
-
-<h3 class="relative group">Hello Wordpress 24/5/? 
-    <div id="hello-wordpress-245" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#hello-wordpress-245" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>Wordpress的<code>Sakurairo</code>很好，但是太重了，我的小带宽承受不了。</p>
-
-
-<h3 class="relative group">Hello Halo 24/10/12 
-    <div id="hello-halo-241012" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#hello-halo-241012" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。</p>
-<p>抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。</p>
-
-
-<h2 class="relative group">DeployMent 
-    <div id="deployment" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#deployment" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E6%95%B0%E6%8D%AE%E9%9B%86" aria-label="锚点">#</a>
     </span>        
     
 </h2>
+<p>我们能拿到的数据集分为两种：</p>
+<ul>
+<li>最原始的数据，轨迹数据以<strong>GPS点原始信息</strong>保留（lng,lat,timestamp,driver_id,user_id or order_id）</li>
+<li>论文二次处理的数据集，轨迹数据的<strong>GPS点原始信息</strong>多半在经过降采样/地图匹配转换后丢失，不一定保留。
+<ul>
+<li>恢复GPS点粒度的POI信息困难，只能得到路段粒度的POI信息</li>
+</ul>
+</li>
+</ul>
 
 
-<h3 class="relative group">旅游地图 24/11/1 
-    <div id="%E6%97%85%E6%B8%B8%E5%9C%B0%E5%9B%BE-24111" class="anchor"></div>
+<h2 class="relative group">城市拓扑、路网/POI/城市边界 
+    <div id="%E5%9F%8E%E5%B8%82%E6%8B%93%E6%89%91%E8%B7%AF%E7%BD%91poi%E5%9F%8E%E5%B8%82%E8%BE%B9%E7%95%8C" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E6%97%85%E6%B8%B8%E5%9C%B0%E5%9B%BE-24111" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%9F%8E%E5%B8%82%E6%8B%93%E6%89%91%E8%B7%AF%E7%BD%91poi%E5%9F%8E%E5%B8%82%E8%BE%B9%E7%95%8C" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>偶尔看看部署的这个小玩具，可以想起旅游的快乐时光。</p>
+</h2>
+<p>目前不管是 <code>osmnx</code> 还是 <code>overpassApi</code>，简单的获取城市的boundary体验还不错，但是在框定较大范围的bbox或者boundary后获取数据的体验都不是很好，常给你报 <code>ConnectTimeout</code> 错误。</p>
+<p>作为openstreetmap的替代平台，GeoFabrik有几个<strong>优点</strong>：</p>
+<ul>
+<li>支持下载历史数据，最大限度的保留城市拓扑和poi信息</li>
+<li>支持下载<strong>部分城市的边界范围</strong>数据
+<strong>缺点</strong>就是一般只能下载<strong>国家</strong>级别的路网数据，需要你再框一次才能得到<strong>城市</strong>路网。</li>
+</ul>
+<p>关于其他可见 <a href="#Refer">参考</a> 。</p>
+
+
+<h4 class="relative group">shapefile 
+    <div id="shapefile" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#shapefile" aria-label="锚点">#</a>
+    </span>        
+    
+</h4>
+<p>包含这几种后缀的数据</p>
+<ul>
+<li><strong>.shp</strong>：几何数据</li>
+<li><strong>.shx</strong>：几何索引</li>
+<li><strong>.dbf</strong>：属性数据</li>
+<li><strong>.prj</strong>：坐标系信息</li>
+<li><strong>.cpg</strong>：字符编码</li>
+</ul>
+<p>shp方面包含如下：</p>
+<ul>
+<li>Point
+<ul>
+<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_places_free_1</strong>：包含城市、小镇、村庄等行政或聚居点的位置信息。</mark>
+<ul>
+<li>因数据而异，可能没有包含所有的place信息。</li>
+</ul>
+</li>
+<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_pois_free_1</strong>：兴趣点（Points of Interest，POI）数据，如餐厅、商店、景点等。</mark></li>
+<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_traffic_free_1</strong>：交通相关设施，如交通信号灯、停车标志、人行横道等。</mark></li>
+</ul>
+</li>
+<li>Line
+<ul>
+<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_roads_free_1</strong>：道路网络数据，包括高速公路、主干道、街道、小路、自行车道、人行道等。</mark></li>
+</ul>
+</li>
+<li>PolyGon
+<ul>
+<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_places_a_free_1</strong>：地点的多边形数据，如城市、小镇、村庄等的边界。</mark></li>
+<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_pois_a_free_1</strong>：兴趣点的多边形数据。</mark></li>
+</ul>
+</li>
+</ul>
+<p>需要注意的是，road_shapefile中包含大量的冗余数据（没有必要添加的路段类型fclass），拿porto市举例：</p>
 
     <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/map2.png" alt="map2.png" />
-      
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250209144000050.png" alt="image-20250209144000050" />
+      <figcaption><span style='color:#ED508F'>原始</span> Porto Road Shapefile</figcaption>
+    </figure>
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./feature.png" alt="image-20250209144109677" />
+      <figcaption><span style='color:#ED508F'>Libcity</span> porto road geo/rel</figcaption>
+    </figure>
+<p>对比libcity处理的porto市路网数据，可以发现现有路网中存在许多冗余数据（比如porto市的最南边），所以需要进行路网数据的清洗。</p>
+<p>因为每个国家的情况不同，国内外的路段保留类型不建议使用相同的策略，对于国外的路网数据，保留如下字段：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">reserved_fclass</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;motorway&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;trunk&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&#34;primary&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&#34;secondary&#34;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&#34;tertiary&#34;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&#34;unclassified&#34;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&#34;residential&#34;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&#34;motorway_link&#34;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&#34;trunk_link&#34;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&#34;primary_link&#34;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&#34;secondary_link&#34;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&#34;tertiary_link&#34;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">&#34;living_street&#34;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&#34;road&#34;</span><span class="p">:</span> <span class="mi">13</span><span class="p">}</span>
+</span></span></code></pre></div><p>过滤后得到的路网稍显合理，但是仍需要进一步处理。</p>
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250209144235702.png" alt="image-20250209144235702" />
+      <figcaption><span style='color:#ED508F'>Filtered</span> Porto RoadMap</figcaption>
     </figure>
 
 
-<h3 class="relative group">Nas导航 24/11/1 
-    <div id="nas%E5%AF%BC%E8%88%AA-24111" class="anchor"></div>
+<h2 class="relative group">路网清洗 
+    <div id="%E8%B7%AF%E7%BD%91%E6%B8%85%E6%B4%97" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#nas%E5%AF%BC%E8%88%AA-24111" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>copy一个学弟的导航页，用来重定向到我的nas服务。</p>
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/navi2.png" alt="navi2.png" />
-      <figcaption><span style='color:#ED508F'>Photo by <a href="https://www.mi.com/xiaomi-14" target="_blank">Xiaomi 14</a></span></figcaption>
-    </figure>
-
-
-<h2 class="relative group">Transfer 
-    <div id="transfer" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#transfer" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E8%B7%AF%E7%BD%91%E6%B8%85%E6%B4%97" aria-label="锚点">#</a>
     </span>        
     
 </h2>
 
 
-<h3 class="relative group">博客迁移 25/1/23 
-    <div id="%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB-25123" class="anchor"></div>
+<h3 class="relative group">恢复uv信息 
+    <div id="%E6%81%A2%E5%A4%8Duv%E4%BF%A1%E6%81%AF" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB-25123" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E6%81%A2%E5%A4%8Duv%E4%BF%A1%E6%81%AF" aria-label="锚点">#</a>
     </span>        
     
 </h3>
-<p>其实更早，大概在<code>25/1/11</code>左右就已经迁移到家里的服务器上了。</p>
-<p>因为没有给80和443端口，所以只能用端口访问了😭。</p>
+<p>建图不光需要路网的线层信息，同样需要点层信息，这里的点指的是路段OD、uv。
+osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数据，所以只能通过取路段的OD来作为uv。</p>
+<p>原始road shapefile（统一WGS-84,EPSG:4326坐标系操作）</p>
+<ul>
+<li>提取路段OD为uv</li>
+<li>映射 <code>set(uv)</code> 建立点层</li>
+<li>建立基础的点层和线层</li>
+</ul>
+
+
+<h3 class="relative group">修复路网 
+    <div id="%E4%BF%AE%E5%A4%8D%E8%B7%AF%E7%BD%91" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E4%BF%AE%E5%A4%8D%E8%B7%AF%E7%BD%91" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>路网在恢复uv信息后需要清理环路、自边、自相交、联通性问题，同时进行拓扑优化和路网重塑，规整线层和点层。</p>
+<ul>
+<li>构建点层信息
+<ul>
+<li>自己构建：使用在恢复uv信息中得到的node构建点层</li>
+<li>GoTrakIt：使用第三方包从线层构建点层</li>
+</ul>
+</li>
+<li>清理线层的环路、自边、自相交</li>
+<li>处理标准路网的连通性问题</li>
+<li>重映射点层</li>
+<li>最后对路网做拓扑优化和路网重塑</li>
+</ul>
+<p>最后得到构建路网的必须数据： <code>road</code> 和 <code>node</code> ，即 <code>rel</code> 和 <code>geo</code> 。</p>
+
+
+<h2 class="relative group">轨迹清洗 
+    <div id="%E8%BD%A8%E8%BF%B9%E6%B8%85%E6%B4%97" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E8%BD%A8%E8%BF%B9%E6%B8%85%E6%B4%97" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<ul>
+<li>行程切分</li>
+<li>停留点删除</li>
+<li>轨迹点上下采样</li>
+<li>滑动窗口平均/卡尔曼滤波平滑</li>
+</ul>
+
+
+<h2 class="relative group">地图匹配 
+    <div id="%E5%9C%B0%E5%9B%BE%E5%8C%B9%E9%85%8D" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%9C%B0%E5%9B%BE%E5%8C%B9%E9%85%8D" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<ul>
+<li>FMM：<a href="https://github.com/Aoidayo/fmm-py3" target="_blank">fmm-py3: FMM for python3</a></li>
+<li>ST-MapMatching：<a href="https://github.com/wenke727/ST-MapMatching" target="_blank">wenke727/ST-MapMatching: 基于时间和空间特性的全局地图匹配算法，基础路网可根据 bbox 下载并处理得到</a></li>
+<li>GoTrackIt：<a href="https://github.com/zdsjjtTLG/TrackIt" target="_blank">zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)</a></li>
+</ul>
+
+
+<h2 class="relative group">POI k近邻 
+    <div id="poi-k%E8%BF%91%E9%82%BB" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#poi-k%E8%BF%91%E9%82%BB" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<ul>
+<li>可以获取 <a href="#shapefile">Point和Polygon类型的POI数据</a>（点、多边形面）</li>
+<li>处理时为了方便起见，可以统一将坐标系投影到平面坐标系，作k近邻计算。</li>
+<li>见仁见智：路段 k近邻POI/GPS k近邻POI</li>
+</ul>
 
           
           
@@ -998,7 +1081,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
             <strong class="block mt-8">
               <a target="_blank" 
               class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-              href="mailto:?subject=Reply%20to%20Blog%20History">
+              href="mailto:?subject=Reply%20to%20%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97">
                 Reply by Email
               </a>
             </strong>
@@ -1016,7 +1099,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://blog.aoidayo.site/blog/blog-history/&amp;title=Blog%20History"
+      href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://blog.aoidayo.site/report/raw-data-process/&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title="分享到 LinkedIn"
       aria-label="分享到 LinkedIn"
       >
@@ -1035,7 +1118,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://twitter.com/intent/tweet/?url=https://blog.aoidayo.site/blog/blog-history/&amp;text=Blog%20History"
+      href="https://twitter.com/intent/tweet/?url=https://blog.aoidayo.site/report/raw-data-process/&amp;text=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title="分享到 Twitter"
       aria-label="分享到 Twitter"
       >
@@ -1053,7 +1136,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://bsky.app/intent/compose?text=Blog%20History&#43;https://blog.aoidayo.site/blog/blog-history/"
+      href="https://bsky.app/intent/compose?text=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97&#43;https://blog.aoidayo.site/report/raw-data-process/"
       title=""
       aria-label=""
       >
@@ -1071,7 +1154,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://s2f.kytta.dev/?text=Blog%20History%20https://blog.aoidayo.site/blog/blog-history/"
+      href="https://s2f.kytta.dev/?text=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97%20https://blog.aoidayo.site/report/raw-data-process/"
       title=""
       aria-label=""
       >
@@ -1090,7 +1173,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://reddit.com/submit/?url=https://blog.aoidayo.site/blog/blog-history/&amp;resubmit=true&amp;title=Blog%20History"
+      href="https://reddit.com/submit/?url=https://blog.aoidayo.site/report/raw-data-process/&amp;resubmit=true&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title="提交到 Reddit"
       aria-label="提交到 Reddit"
       >
@@ -1109,7 +1192,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.aoidayo.site/blog/blog-history/&amp;description=Blog%20History"
+      href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.aoidayo.site/report/raw-data-process/&amp;description=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title="钉到 Pinterest"
       aria-label="钉到 Pinterest"
       >
@@ -1128,7 +1211,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://www.facebook.com/sharer/sharer.php?u=https://blog.aoidayo.site/blog/blog-history/&amp;quote=Blog%20History"
+      href="https://www.facebook.com/sharer/sharer.php?u=https://blog.aoidayo.site/report/raw-data-process/&amp;quote=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title="分享到 Facebook"
       aria-label="分享到 Facebook"
       >
@@ -1147,7 +1230,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="mailto:?body=https://blog.aoidayo.site/blog/blog-history/&amp;subject=Blog%20History"
+      href="mailto:?body=https://blog.aoidayo.site/report/raw-data-process/&amp;subject=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title="通过电子邮件发送"
       aria-label="通过电子邮件发送"
       >
@@ -1166,7 +1249,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://api.whatsapp.com/send?text=https://blog.aoidayo.site/blog/blog-history/&amp;resubmit=true&amp;title=Blog%20History"
+      href="https://api.whatsapp.com/send?text=https://blog.aoidayo.site/report/raw-data-process/&amp;resubmit=true&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title=""
       aria-label=""
       >
@@ -1185,7 +1268,7 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://t.me/share/url?url=https://blog.aoidayo.site/blog/blog-history/&amp;resubmit=true&amp;title=Blog%20History"
+      href="https://t.me/share/url?url=https://blog.aoidayo.site/report/raw-data-process/&amp;resubmit=true&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
       title=""
       aria-label=""
       >
@@ -1217,8 +1300,8 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
           
         
       <script>
-        var oid = "views_blog\/blog-history\/index.md"
-        var oid_likes = "likes_blog\/blog-history\/index.md"
+        var oid = "views_report\/raw-data-process\/index.md"
+        var oid_likes = "likes_report\/raw-data-process\/index.md"
       </script>
       
       
@@ -1229,43 +1312,6 @@ Hexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 # Hugo�
   <footer class="pt-8 max-w-prose print:hidden">
 
     
-  
-    
-    
-    
-    <div class="pt-8">
-      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
-      <div class="flex justify-between pt-3">
-        <span>
-          
-        </span>
-        <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/use-hugo/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >使用hugo</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-01-07T15:38:16&#43;08:00">2025年01月07日 15時38分</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-            </a>
-          
-        </span>
-      </div>
-    </div>
   
 
 

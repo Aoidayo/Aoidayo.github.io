@@ -10,9 +10,88 @@
     <atom:link href="https://blog.aoidayo.site/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>数据清洗</title>
+      <link>https://blog.aoidayo.site/report/raw-data-process/</link>
+      <pubDate>Sun, 09 Feb 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/report/raw-data-process/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;Refer 
+    &lt;div id=&#34;refer&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#refer&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;轨迹数据集
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.kaggle.com/competitions/pkdd-15-predict-taxi-service-trajectory-i/data&#34; target=&#34;_blank&#34;&gt;ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;城市拓扑、路网/POI/城市边界
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;城市拓扑&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;OSM API (OpenStreetMap)
+&lt;ul&gt;
+&lt;li&gt;本质上 &lt;code&gt;osmnx&lt;/code&gt; 和 &lt;code&gt;overpass API&lt;/code&gt; 都是使用OSM的api获取&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 可以用于获取最新时间的路网数据&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Overpass API&lt;/strong&gt; &lt;a href=&#34;https://overpass.kumi.systems/#about&#34; target=&#34;_blank&#34;&gt;Overpass 官网 | Overpass by Private.coffee&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;OSM历史数据服务
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://download.geofabrik.de/&#34; target=&#34;_blank&#34;&gt;GeoFabrik&lt;/a&gt; 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.cnblogs.com/bltstop/p/18090135&#34; target=&#34;_blank&#34;&gt;Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;城市边界&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 直接获取&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://gadm.org/index.html&#34; target=&#34;_blank&#34;&gt;GADM&lt;/a&gt;，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。
+&lt;ul&gt;
+&lt;li&gt;level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息&lt;/li&gt;
+&lt;li&gt;不能单shp文件读取&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;GeoFabrik可以获取部分&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;shapefile&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://wiki.openstreetmap.org/wiki/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF&#34; target=&#34;_blank&#34;&gt;road shapefile的highway枚举值说明&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;路网清洗&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/zdsjjtTLG/TrackIt&#34; target=&#34;_blank&#34;&gt;zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;数据集 
+    &lt;div id=&#34;%E6%95%B0%E6%8D%AE%E9%9B%86&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%95%B0%E6%8D%AE%E9%9B%86&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;我们能拿到的数据集分为两种：&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/report/raw-data-process/feature.png" />
+    </item>
+    
+    <item>
       <title>使用hugo</title>
       <link>https://blog.aoidayo.site/blog/use-hugo/</link>
-      <pubDate>Fri, 07 Feb 2025 15:38:16 +0800</pubDate>
+      <pubDate>Tue, 07 Jan 2025 15:38:16 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/use-hugo/</guid>
       <description>&lt;h2 class=&#34;relative group&#34;&gt;参考 
@@ -78,7 +157,7 @@
     <item>
       <title>Blog History</title>
       <link>https://blog.aoidayo.site/blog/blog-history/</link>
-      <pubDate>Tue, 04 Feb 2025 15:38:16 +0800</pubDate>
+      <pubDate>Sat, 04 Jan 2025 15:38:16 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/blog-history/</guid>
       <description>&lt;h2 class=&#34;relative group&#34;&gt;FrameWork 
