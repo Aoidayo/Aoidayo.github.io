@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>数据清洗 &middot; Aoidayo</title>
-  <meta name="title" content="数据清洗 &middot; Aoidayo" />
+  <title>Git 清除.git仓库历史记录中的高占用内存文件 &middot; Aoidayo</title>
+  <meta name="title" content="Git 清除.git仓库历史记录中的高占用内存文件 &middot; Aoidayo" />
   
   
-  <meta name="keywords" content="ST, " />
+  <meta name="keywords" content="Git使用, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/report/raw-data-process/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/git-big/" />
   
   
   
@@ -67,23 +67,27 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/report/raw-data-process/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/git-big/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="数据清洗">
-  <meta property="og:description" content="Refer # 轨迹数据集 ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle 城市拓扑、路网/POI/城市边界 城市拓扑 OSM API (OpenStreetMap) 本质上 osmnx 和 overpass API 都是使用OSM的api获取 osmnx 可以用于获取最新时间的路网数据 Overpass API Overpass 官网 | Overpass by Private.coffee OSM历史数据服务 GeoFabrik 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。 Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园 城市边界 osmnx 直接获取 GADM，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。 level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息 不能单shp文件读取 GeoFabrik可以获取部分 shapefile road shapefile的highway枚举值说明 路网清洗 zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM) 数据集 # 我们能拿到的数据集分为两种：">
+  <meta property="og:title" content="Git 清除.git仓库历史记录中的高占用内存文件">
+  <meta property="og:description" content="前言 # 最近使用Git管理Unity项目，误将Unity的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有12MB&#43;, 对于一个Git仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。
+工具 # 推荐使用git filter-repo，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比git自带的git filter-branch更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如Unity的3d-fbx文件，模型pt文件等等）。
+git filter-repo：newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement) 验证清理效果：git 自带命令 查看git仓库占用空间：git count-objects -vH 常用方法 # A. filter-repo # # 1. 文件夹 # 保留my_folder下面的所有文件, 删除其他所有文件 git filter-repo --path my_folder # --invert-paths 反转. 删除my_folder下面的所有文件 git filter-repo --path my_folder --invert-paths --force # 2. 文件 # --path-glob &lt;file.name&gt; 删除指定文件 git filter-repo --path-glob xxx.mp4 --invert-paths --force # 3. 占用空间 git filter-repo --strip-blobs-bigger-than 100K git filter-repo --strip-blobs-bigger-than 1M git filter-repo --strip-blobs-bigger-than 1G # 清理引用和缓存 git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive # 可能清理完成之后，把remote也给清除了，这里重置 git remote add origin git@github.com:Aoidayo/xxx.git # push git push origin --force --all git push origin --force --tags B. 验证 # git rev-list 查看高占用文件， 剩余文件大小分布 git count-objects -vH git log &lt;file/dir&gt; # 1. git rev-list # 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象） git rev-list --objects --all | grep -f &lt;(git verify-pack -v .git/objects/pack/*.idx | grep blob | sort -k 3 -n | cut -f 1 -d &#34; &#34;|tail -10) # 剩余文件大小分布 (B) git rev-list --objects --all | awk &#39;{print $1}&#39; | git cat-file --batch-check=&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39; | awk &#39;/^blob/ {print $3, $4}&#39; | sort -n # 2. git count-objects -vH &#39;&#39;&#39; git count-objects -vH count: 19 size: 25.71 KiB in-pack: 283 packs: 1 size-pack: 9.30 MiB prune-packable: 0 garbage: 0 size-garbage: 0 bytes &#39;&#39;&#39; # 3. git log &lt;file/dir&gt; $ git log RopeUpDown\ # 没有输出表示已经清理干净了 # 输出 和当前文件或者目录有关的commit history &#39;&#39;&#39; &gt; commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main) Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 21:17:38 2025 &#43;0800 fix(remove filo): add ignore commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13 Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 20:57:55 2025 &#43;0800 Rope Up Down &#39;&#39;&#39; 附录 # 参考：">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
-    <meta property="article:section" content="report">
-    <meta property="article:published_time" content="2025-02-09T15:38:16+08:00">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-02-28T22:15:00+08:00">
     <meta property="article:modified_time" content="2025-02-28T14:45:39+00:00">
-    <meta property="article:tag" content="ST">
-    <meta property="og:image" content="https://blog.aoidayo.site/report/raw-data-process/feature.png">
+    <meta property="article:tag" content="Git使用">
+    <meta property="og:image" content="https://blog.aoidayo.site/blog/git-big/feature.png">
 
   
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/report/raw-data-process/feature.png">
-  <meta name="twitter:title" content="数据清洗">
-  <meta name="twitter:description" content="Refer # 轨迹数据集 ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle 城市拓扑、路网/POI/城市边界 城市拓扑 OSM API (OpenStreetMap) 本质上 osmnx 和 overpass API 都是使用OSM的api获取 osmnx 可以用于获取最新时间的路网数据 Overpass API Overpass 官网 | Overpass by Private.coffee OSM历史数据服务 GeoFabrik 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。 Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园 城市边界 osmnx 直接获取 GADM，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。 level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息 不能单shp文件读取 GeoFabrik可以获取部分 shapefile road shapefile的highway枚举值说明 路网清洗 zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM) 数据集 # 我们能拿到的数据集分为两种：">
+  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/git-big/feature.png">
+  <meta name="twitter:title" content="Git 清除.git仓库历史记录中的高占用内存文件">
+  <meta name="twitter:description" content="前言 # 最近使用Git管理Unity项目，误将Unity的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有12MB&#43;, 对于一个Git仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。
+工具 # 推荐使用git filter-repo，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比git自带的git filter-branch更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如Unity的3d-fbx文件，模型pt文件等等）。
+git filter-repo：newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement) 验证清理效果：git 自带命令 查看git仓库占用空间：git count-objects -vH 常用方法 # A. filter-repo # # 1. 文件夹 # 保留my_folder下面的所有文件, 删除其他所有文件 git filter-repo --path my_folder # --invert-paths 反转. 删除my_folder下面的所有文件 git filter-repo --path my_folder --invert-paths --force # 2. 文件 # --path-glob &lt;file.name&gt; 删除指定文件 git filter-repo --path-glob xxx.mp4 --invert-paths --force # 3. 占用空间 git filter-repo --strip-blobs-bigger-than 100K git filter-repo --strip-blobs-bigger-than 1M git filter-repo --strip-blobs-bigger-than 1G # 清理引用和缓存 git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive # 可能清理完成之后，把remote也给清除了，这里重置 git remote add origin git@github.com:Aoidayo/xxx.git # push git push origin --force --all git push origin --force --tags B. 验证 # git rev-list 查看高占用文件， 剩余文件大小分布 git count-objects -vH git log &lt;file/dir&gt; # 1. git rev-list # 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象） git rev-list --objects --all | grep -f &lt;(git verify-pack -v .git/objects/pack/*.idx | grep blob | sort -k 3 -n | cut -f 1 -d &#34; &#34;|tail -10) # 剩余文件大小分布 (B) git rev-list --objects --all | awk &#39;{print $1}&#39; | git cat-file --batch-check=&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39; | awk &#39;/^blob/ {print $3, $4}&#39; | sort -n # 2. git count-objects -vH &#39;&#39;&#39; git count-objects -vH count: 19 size: 25.71 KiB in-pack: 283 packs: 1 size-pack: 9.30 MiB prune-packable: 0 garbage: 0 size-garbage: 0 bytes &#39;&#39;&#39; # 3. git log &lt;file/dir&gt; $ git log RopeUpDown\ # 没有输出表示已经清理干净了 # 输出 和当前文件或者目录有关的commit history &#39;&#39;&#39; &gt; commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main) Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 21:17:38 2025 &#43;0800 fix(remove filo): add ignore commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13 Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 20:57:55 2025 &#43;0800 Rope Up Down &#39;&#39;&#39; 附录 # 参考：">
 
   
   <script type="application/ld+json">
@@ -91,26 +95,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "数据清洗",
-    "headline": "数据清洗",
+    "name": "Git 清除.git仓库历史记录中的高占用内存文件",
+    "headline": "Git 清除.git仓库历史记录中的高占用内存文件",
     
-    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003eRefer \n    \u003cdiv id=\u0022refer\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#refer\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cul\u003e\n\u003cli\u003e轨迹数据集\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/www.kaggle.com\/competitions\/pkdd-15-predict-taxi-service-trajectory-i\/data\u0022 target=\u0022_blank\u0022\u003eECML\/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e城市拓扑、路网\/POI\/城市边界\n\u003cul\u003e\n\u003cli\u003e\u003cstrong\u003e城市拓扑\u003c\/strong\u003e\u003c\/li\u003e\n\u003cli\u003eOSM API (OpenStreetMap)\n\u003cul\u003e\n\u003cli\u003e本质上 \u003ccode\u003eosmnx\u003c\/code\u003e 和 \u003ccode\u003eoverpass API\u003c\/code\u003e 都是使用OSM的api获取\u003c\/li\u003e\n\u003cli\u003e\u003ccode\u003eosmnx\u003c\/code\u003e 可以用于获取最新时间的路网数据\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003eOverpass API\u003c\/strong\u003e \u003ca href=\u0022https:\/\/overpass.kumi.systems\/#about\u0022 target=\u0022_blank\u0022\u003eOverpass 官网 | Overpass by Private.coffee\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003eOSM历史数据服务\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/download.geofabrik.de\/\u0022 target=\u0022_blank\u0022\u003eGeoFabrik\u003c\/a\u003e 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。\u003c\/li\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/www.cnblogs.com\/bltstop\/p\/18090135\u0022 target=\u0022_blank\u0022\u003eFabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003e城市边界\u003c\/strong\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ccode\u003eosmnx\u003c\/code\u003e 直接获取\u003c\/li\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/gadm.org\/index.html\u0022 target=\u0022_blank\u0022\u003eGADM\u003c\/a\u003e，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。\n\u003cul\u003e\n\u003cli\u003elevel0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息\u003c\/li\u003e\n\u003cli\u003e不能单shp文件读取\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003eGeoFabrik可以获取部分\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003eshapefile\u003c\/strong\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/wiki.openstreetmap.org\/wiki\/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF\u0022 target=\u0022_blank\u0022\u003eroad shapefile的highway枚举值说明\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003cli\u003e\u003cstrong\u003e路网清洗\u003c\/strong\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/github.com\/zdsjjtTLG\/TrackIt\u0022 target=\u0022_blank\u0022\u003ezdsjjtTLG\/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003c\/li\u003e\n\u003c\/ul\u003e\n\n\n\u003ch2 class=\u0022relative group\u0022\u003e数据集 \n    \u003cdiv id=\u0022%E6%95%B0%E6%8D%AE%E9%9B%86\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E6%95%B0%E6%8D%AE%E9%9B%86\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e我们能拿到的数据集分为两种：\u003c\/p\u003e",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003e前言 \n    \u003cdiv id=\u0022%E5%89%8D%E8%A8%80\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%89%8D%E8%A8%80\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e最近使用Git管理Unity项目，误将Unity的\u003ccode\u003eFilo Cables\u003c\/code\u003e包\u003ccode\u003ecommit\u0026amp;push\u003c\/code\u003e到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有\u003ccode\u003e12MB\u002b\u003c\/code\u003e, 对于一个Git仓库来说还是太大了，所以需要即时从\u003ccode\u003e.git\u003c\/code\u003e中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。\u003c\/p\u003e\n\n\n\u003ch2 class=\u0022relative group\u0022\u003e工具 \n    \u003cdiv id=\u0022%E5%B7%A5%E5%85%B7\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%B7%A5%E5%85%B7\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e推荐使用\u003ccode\u003egit filter-repo\u003c\/code\u003e，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比git自带的\u003ccode\u003egit filter-branch\u003c\/code\u003e更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如Unity的3d-fbx文件，模型pt文件等等）。\u003c\/p\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ccode\u003egit filter-repo\u003c\/code\u003e：\u003ca href=\u0022https:\/\/github.com\/newren\/git-filter-repo\/tree\/main\u0022 target=\u0022_blank\u0022\u003enewren\/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement)\u003c\/a\u003e\u003c\/li\u003e\n\u003cli\u003e验证清理效果：\u003ccode\u003egit 自带命令\u003c\/code\u003e\u003c\/li\u003e\n\u003cli\u003e查看git仓库占用空间：\u003ccode\u003egit count-objects -vH\u003c\/code\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\n    \u003cfigure\u003e\n      \u003cimg class=\u0022my-0 rounded-md\u0022 loading=\u0022lazy\u0022 src=\u0022.\/assets\/image-20250228223219471.png\u0022 alt=\u0022image-20250228223219471\u0022 \/\u003e\n      \n    \u003c\/figure\u003e\n\n\n\u003ch3 class=\u0022relative group\u0022\u003e常用方法 \n    \u003cdiv id=\u0022%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\n\n\u003ch4 class=\u0022relative group\u0022\u003eA. filter-repo \n    \u003cdiv id=\u0022a-filter-repo\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#a-filter-repo\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h4\u003e\n\u003cdiv class=\u0022highlight\u0022\u003e\u003cpre tabindex=\u00220\u0022 class=\u0022chroma\u0022\u003e\u003ccode class=\u0022language-bash\u0022 data-lang=\u0022bash\u0022\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 1. 文件夹\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 保留my_folder下面的所有文件, 删除其他所有文件\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit filter-repo --path my_folder\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# --invert-paths 反转. 删除my_folder下面的所有文件\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit filter-repo --path my_folder --invert-paths --force\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 2. 文件\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# --path-glob \u0026lt;file.name\u0026gt; 删除指定文件\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit filter-repo --path-glob xxx.mp4 --invert-paths --force\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 3. 占用空间\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit filter-repo --strip-blobs-bigger-than 100K\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit filter-repo --strip-blobs-bigger-than 1M\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit filter-repo --strip-blobs-bigger-than 1G\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 清理引用和缓存\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit reflog expire --expire\u003cspan class=\u0022o\u0022\u003e=\u003c\/span\u003enow --all \u003cspan class=\u0022o\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e git gc --prune\u003cspan class=\u0022o\u0022\u003e=\u003c\/span\u003enow --aggressive\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 可能清理完成之后，把remote也给清除了，这里重置\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit remote add origin git@github.com:Aoidayo\/xxx.git\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# push\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit push origin --force --all\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit push origin --force --tags\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/code\u003e\u003c\/pre\u003e\u003c\/div\u003e\n\n\u003ch4 class=\u0022relative group\u0022\u003eB. 验证 \n    \u003cdiv id=\u0022b-%E9%AA%8C%E8%AF%81\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#b-%E9%AA%8C%E8%AF%81\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h4\u003e\n\u003cul\u003e\n\u003cli\u003e\u003ccode\u003egit rev-list\u003c\/code\u003e 查看高占用文件， 剩余文件大小分布\u003c\/li\u003e\n\u003cli\u003e\u003ccode\u003egit count-objects -vH\u003c\/code\u003e\u003c\/li\u003e\n\u003cli\u003e\u003ccode\u003egit log \u0026lt;file\/dir\u0026gt;\u003c\/code\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003cdiv class=\u0022highlight\u0022\u003e\u003cpre tabindex=\u00220\u0022 class=\u0022chroma\u0022\u003e\u003ccode class=\u0022language-bash\u0022 data-lang=\u0022bash\u0022\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 1. git rev-list\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象）\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit rev-list --objects --all \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e grep -f \u0026lt;\u003cspan class=\u0022o\u0022\u003e(\u003c\/span\u003egit verify-pack -v .git\/objects\/pack\/*.idx \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e grep blob \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e sort -k \u003cspan class=\u0022m\u0022\u003e3\u003c\/span\u003e -n \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e cut -f \u003cspan class=\u0022m\u0022\u003e1\u003c\/span\u003e -d \u003cspan class=\u0022s2\u0022\u003e\u0026#34; \u0026#34;\u003c\/span\u003e\u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003etail -10\u003cspan class=\u0022o\u0022\u003e)\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 剩余文件大小分布 (B)\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003egit rev-list --objects --all \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e awk \u003cspan class=\u0022s1\u0022\u003e\u0026#39;{print $1}\u0026#39;\u003c\/span\u003e \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e git cat-file --batch-check\u003cspan class=\u0022o\u0022\u003e=\u003c\/span\u003e\u003cspan class=\u0022s1\u0022\u003e\u0026#39;%(objecttype) %(objectname) %(objectsize) %(rest)\u0026#39;\u003c\/span\u003e \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e awk \u003cspan class=\u0022s1\u0022\u003e\u0026#39;\/^blob\/ {print $3, $4}\u0026#39;\u003c\/span\u003e \u003cspan class=\u0022p\u0022\u003e|\u003c\/span\u003e sort -n\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 2. git count-objects -vH\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\u0026#39;\u0026#39;\u0026#39;\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003egit count-objects -vH\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003ecount: 19\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003esize: 25.71 KiB\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003ein-pack: 283\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003epacks: 1\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003esize-pack: 9.30 MiB\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003eprune-packable: 0\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003egarbage: 0\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003esize-garbage: 0 bytes\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\u0026#39;\u0026#39;\u0026#39;\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 3. git log \u0026lt;file\/dir\u0026gt;\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e$ git log RopeUpDown\u003cspan class=\u0022se\u0022\u003e\\\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022se\u0022\u003e\u003c\/span\u003e\u003cspan class=\u0022c1\u0022\u003e# 没有输出表示已经清理干净了\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022c1\u0022\u003e# 输出 和当前文件或者目录有关的commit history\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\u0026#39;\u0026#39;\u0026#39;\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\u0026gt;\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003ecommit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -\u0026gt; main)\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003eAuthor: aoi \u0026lt;2908496836@qq.com\u0026gt;\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003eDate:   Fri Feb 28 21:17:38 2025 \u002b0800\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e    fix(remove filo): add ignore\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003ecommit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003eAuthor: aoi \u0026lt;2908496836@qq.com\u0026gt;\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003eDate:   Fri Feb 28 20:57:55 2025 \u002b0800\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e    Rope Up Down\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan class=\u0022line\u0022\u003e\u003cspan class=\u0022cl\u0022\u003e\u003cspan class=\u0022s1\u0022\u003e\u0026#39;\u0026#39;\u0026#39;\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/code\u003e\u003c\/pre\u003e\u003c\/div\u003e\n\n\u003ch2 class=\u0022relative group\u0022\u003e附录 \n    \u003cdiv id=\u0022%E9%99%84%E5%BD%95\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E9%99%84%E5%BD%95\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e参考：\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/report\/raw-data-process\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/git-big\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2025",
-    "dateCreated": "2025-02-09T15:38:16\u002b08:00",
-    "datePublished": "2025-02-09T15:38:16\u002b08:00",
+    "dateCreated": "2025-02-28T22:15:00\u002b08:00",
+    "datePublished": "2025-02-28T22:15:00\u002b08:00",
     
     "dateModified": "2025-02-28T14:45:39\u002b00:00",
     
-    "keywords": ["ST"],
+    "keywords": ["Git使用"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "218"
+    "wordCount": "277"
   }]
   </script>
 
@@ -430,7 +434,7 @@
 
     
     <div class="fixed inset-x-0 top-0 h-[800px] single_hero_background nozoom"
-    style="background-image:url(/report/raw-data-process/feature_hu_195406089c25c3f8.png);">
+    style="background-image:url(/blog/git-big/feature_hu_6121b68d022fae06.png);">
     
 
 
@@ -474,8 +478,8 @@
   <li class="inline ">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/report/"
-      >report</a
+      href="/blog/"
+      >blog</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -483,8 +487,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/report/raw-data-process/"
-      >数据清洗</a
+      href="/blog/git-big/"
+      >Git 清除.git仓库历史记录中的高占用内存文件</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -493,7 +497,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      数据清洗
+      Git 清除.git仓库历史记录中的高占用内存文件
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -538,7 +542,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2025-02-09T15:38:16&#43;08:00">2025年02月09日 15時38分</time><span class="px-2 text-primary-500">&middot;</span><span>218 字</span><span class="px-2 text-primary-500">&middot;</span><span title="预计阅读">2 分钟</span>
+  <time datetime="2025-02-28T22:15:00&#43;08:00">2025年02月28日 22時15分</time><span class="px-2 text-primary-500">&middot;</span><span>277 字</span><span class="px-2 text-primary-500">&middot;</span><span title="预计阅读">2 分钟</span>
   
 
   
@@ -665,26 +669,18 @@
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#refer">Refer</a></li>
-    <li><a href="#数据集">数据集</a></li>
-    <li><a href="#城市拓扑路网poi城市边界">城市拓扑、路网/POI/城市边界</a>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#工具">工具</a>
       <ul>
-        <li>
+        <li><a href="#常用方法">常用方法</a>
           <ul>
-            <li><a href="#shapefile">shapefile</a></li>
+            <li><a href="#a-filter-repo">A. filter-repo</a></li>
+            <li><a href="#b-验证">B. 验证</a></li>
           </ul>
         </li>
       </ul>
     </li>
-    <li><a href="#路网清洗">路网清洗</a>
-      <ul>
-        <li><a href="#恢复uv信息">恢复uv信息</a></li>
-        <li><a href="#修复路网">修复路网</a></li>
-      </ul>
-    </li>
-    <li><a href="#轨迹清洗">轨迹清洗</a></li>
-    <li><a href="#地图匹配">地图匹配</a></li>
-    <li><a href="#poi-k近邻">POI k近邻</a></li>
+    <li><a href="#附录">附录</a></li>
   </ul>
 </nav>
   </div>
@@ -698,26 +694,18 @@
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#refer">Refer</a></li>
-    <li><a href="#数据集">数据集</a></li>
-    <li><a href="#城市拓扑路网poi城市边界">城市拓扑、路网/POI/城市边界</a>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#工具">工具</a>
       <ul>
-        <li>
+        <li><a href="#常用方法">常用方法</a>
           <ul>
-            <li><a href="#shapefile">shapefile</a></li>
+            <li><a href="#a-filter-repo">A. filter-repo</a></li>
+            <li><a href="#b-验证">B. 验证</a></li>
           </ul>
         </li>
       </ul>
     </li>
-    <li><a href="#路网清洗">路网清洗</a>
-      <ul>
-        <li><a href="#恢复uv信息">恢复uv信息</a></li>
-        <li><a href="#修复路网">修复路网</a></li>
-      </ul>
-    </li>
-    <li><a href="#轨迹清洗">轨迹清洗</a></li>
-    <li><a href="#地图匹配">地图匹配</a></li>
-    <li><a href="#poi-k近邻">POI k近邻</a></li>
+    <li><a href="#附录">附录</a></li>
   </ul>
 </nav>
   </div>
@@ -801,279 +789,157 @@
         <div class="article-content max-w-prose mb-20">
           
 
-<h2 class="relative group">Refer 
-    <div id="refer" class="anchor"></div>
+<h2 class="relative group">前言 
+    <div id="%E5%89%8D%E8%A8%80" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#refer" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%89%8D%E8%A8%80" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-<ul>
-<li>轨迹数据集
-<ul>
-<li><a href="https://www.kaggle.com/competitions/pkdd-15-predict-taxi-service-trajectory-i/data" target="_blank">ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle</a></li>
-</ul>
-</li>
-<li>城市拓扑、路网/POI/城市边界
-<ul>
-<li><strong>城市拓扑</strong></li>
-<li>OSM API (OpenStreetMap)
-<ul>
-<li>本质上 <code>osmnx</code> 和 <code>overpass API</code> 都是使用OSM的api获取</li>
-<li><code>osmnx</code> 可以用于获取最新时间的路网数据</li>
-<li><strong>Overpass API</strong> <a href="https://overpass.kumi.systems/#about" target="_blank">Overpass 官网 | Overpass by Private.coffee</a></li>
-</ul>
-</li>
-<li>OSM历史数据服务
-<ul>
-<li><a href="https://download.geofabrik.de/" target="_blank">GeoFabrik</a> 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。</li>
-<li><a href="https://www.cnblogs.com/bltstop/p/18090135" target="_blank">Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园</a></li>
-</ul>
-</li>
-<li><strong>城市边界</strong>
-<ul>
-<li><code>osmnx</code> 直接获取</li>
-<li><a href="https://gadm.org/index.html" target="_blank">GADM</a>，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。
-<ul>
-<li>level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息</li>
-<li>不能单shp文件读取</li>
-</ul>
-</li>
-<li>GeoFabrik可以获取部分</li>
-</ul>
-</li>
-<li><strong>shapefile</strong>
-<ul>
-<li><a href="https://wiki.openstreetmap.org/wiki/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF" target="_blank">road shapefile的highway枚举值说明</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><strong>路网清洗</strong>
-<ul>
-<li><a href="https://github.com/zdsjjtTLG/TrackIt" target="_blank">zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)</a></li>
-</ul>
-</li>
-</ul>
+<p>最近使用Git管理Unity项目，误将Unity的<code>Filo Cables</code>包<code>commit&amp;push</code>到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有<code>12MB+</code>, 对于一个Git仓库来说还是太大了，所以需要即时从<code>.git</code>中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。</p>
 
 
-<h2 class="relative group">数据集 
-    <div id="%E6%95%B0%E6%8D%AE%E9%9B%86" class="anchor"></div>
+<h2 class="relative group">工具 
+    <div id="%E5%B7%A5%E5%85%B7" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E6%95%B0%E6%8D%AE%E9%9B%86" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%B7%A5%E5%85%B7" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-<p>我们能拿到的数据集分为两种：</p>
+<p>推荐使用<code>git filter-repo</code>，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比git自带的<code>git filter-branch</code>更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如Unity的3d-fbx文件，模型pt文件等等）。</p>
 <ul>
-<li>最原始的数据，轨迹数据以<strong>GPS点原始信息</strong>保留（lng,lat,timestamp,driver_id,user_id or order_id）</li>
-<li>论文二次处理的数据集，轨迹数据的<strong>GPS点原始信息</strong>多半在经过降采样/地图匹配转换后丢失，不一定保留。
-<ul>
-<li>恢复GPS点粒度的POI信息困难，只能得到路段粒度的POI信息</li>
-</ul>
-</li>
+<li><code>git filter-repo</code>：<a href="https://github.com/newren/git-filter-repo/tree/main" target="_blank">newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement)</a></li>
+<li>验证清理效果：<code>git 自带命令</code></li>
+<li>查看git仓库占用空间：<code>git count-objects -vH</code></li>
 </ul>
 
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250228223219471.png" alt="image-20250228223219471" />
+      
+    </figure>
 
-<h2 class="relative group">城市拓扑、路网/POI/城市边界 
-    <div id="%E5%9F%8E%E5%B8%82%E6%8B%93%E6%89%91%E8%B7%AF%E7%BD%91poi%E5%9F%8E%E5%B8%82%E8%BE%B9%E7%95%8C" class="anchor"></div>
+
+<h3 class="relative group">常用方法 
+    <div id="%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%9F%8E%E5%B8%82%E6%8B%93%E6%89%91%E8%B7%AF%E7%BD%91poi%E5%9F%8E%E5%B8%82%E8%BE%B9%E7%95%8C" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" aria-label="锚点">#</a>
     </span>        
     
-</h2>
-<p>目前不管是 <code>osmnx</code> 还是 <code>overpassApi</code>，简单的获取城市的boundary体验还不错，但是在框定较大范围的bbox或者boundary后获取数据的体验都不是很好，常给你报 <code>ConnectTimeout</code> 错误。</p>
-<p>作为openstreetmap的替代平台，GeoFabrik有几个<strong>优点</strong>：</p>
-<ul>
-<li>支持下载历史数据，最大限度的保留城市拓扑和poi信息</li>
-<li>支持下载<strong>部分城市的边界范围</strong>数据
-<strong>缺点</strong>就是一般只能下载<strong>国家</strong>级别的路网数据，需要你再框一次才能得到<strong>城市</strong>路网。</li>
-</ul>
-<p>关于其他可见 <a href="#Refer">参考</a> 。</p>
+</h3>
 
 
-<h4 class="relative group">shapefile 
-    <div id="shapefile" class="anchor"></div>
+<h4 class="relative group">A. filter-repo 
+    <div id="a-filter-repo" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#shapefile" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#a-filter-repo" aria-label="锚点">#</a>
     </span>        
     
 </h4>
-<p>包含这几种后缀的数据</p>
-<ul>
-<li><strong>.shp</strong>：几何数据</li>
-<li><strong>.shx</strong>：几何索引</li>
-<li><strong>.dbf</strong>：属性数据</li>
-<li><strong>.prj</strong>：坐标系信息</li>
-<li><strong>.cpg</strong>：字符编码</li>
-</ul>
-<p>shp方面包含如下：</p>
-<ul>
-<li>Point
-<ul>
-<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_places_free_1</strong>：包含城市、小镇、村庄等行政或聚居点的位置信息。</mark>
-<ul>
-<li>因数据而异，可能没有包含所有的place信息。</li>
-</ul>
-</li>
-<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_pois_free_1</strong>：兴趣点（Points of Interest，POI）数据，如餐厅、商店、景点等。</mark></li>
-<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_traffic_free_1</strong>：交通相关设施，如交通信号灯、停车标志、人行横道等。</mark></li>
-</ul>
-</li>
-<li>Line
-<ul>
-<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_roads_free_1</strong>：道路网络数据，包括高速公路、主干道、街道、小路、自行车道、人行道等。</mark></li>
-</ul>
-</li>
-<li>PolyGon
-<ul>
-<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_places_a_free_1</strong>：地点的多边形数据，如城市、小镇、村庄等的边界。</mark></li>
-<li><mark style="background: #FFB8EBA6;"><strong>gis_osm_pois_a_free_1</strong>：兴趣点的多边形数据。</mark></li>
-</ul>
-</li>
-</ul>
-<p>需要注意的是，road_shapefile中包含大量的冗余数据（没有必要添加的路段类型fclass），拿porto市举例：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. 文件夹</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 保留my_folder下面的所有文件, 删除其他所有文件</span>
+</span></span><span class="line"><span class="cl">git filter-repo --path my_folder
+</span></span><span class="line"><span class="cl"><span class="c1"># --invert-paths 反转. 删除my_folder下面的所有文件</span>
+</span></span><span class="line"><span class="cl">git filter-repo --path my_folder --invert-paths --force
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 文件</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># --path-glob &lt;file.name&gt; 删除指定文件</span>
+</span></span><span class="line"><span class="cl">git filter-repo --path-glob xxx.mp4 --invert-paths --force
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. 占用空间</span>
+</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 100K
+</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1M
+</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1G
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 清理引用和缓存</span>
+</span></span><span class="line"><span class="cl">git reflog expire --expire<span class="o">=</span>now --all <span class="o">&amp;&amp;</span> git gc --prune<span class="o">=</span>now --aggressive
+</span></span><span class="line"><span class="cl"><span class="c1"># 可能清理完成之后，把remote也给清除了，这里重置</span>
+</span></span><span class="line"><span class="cl">git remote add origin git@github.com:Aoidayo/xxx.git
+</span></span><span class="line"><span class="cl"><span class="c1"># push</span>
+</span></span><span class="line"><span class="cl">git push origin --force --all
+</span></span><span class="line"><span class="cl">git push origin --force --tags
+</span></span></code></pre></div>
 
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250209144000050.png" alt="image-20250209144000050" />
-      <figcaption><span style='color:#ED508F'>原始</span> Porto Road Shapefile</figcaption>
-    </figure>
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./feature.png" alt="image-20250209144109677" />
-      <figcaption><span style='color:#ED508F'>Libcity</span> porto road geo/rel</figcaption>
-    </figure>
-<p>对比libcity处理的porto市路网数据，可以发现现有路网中存在许多冗余数据（比如porto市的最南边），所以需要进行路网数据的清洗。</p>
-<p>因为每个国家的情况不同，国内外的路段保留类型不建议使用相同的策略，对于国外的路网数据，保留如下字段：</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">reserved_fclass</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;motorway&#34;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&#34;trunk&#34;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&#34;primary&#34;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&#34;secondary&#34;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&#34;tertiary&#34;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&#34;unclassified&#34;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&#34;residential&#34;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&#34;motorway_link&#34;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&#34;trunk_link&#34;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&#34;primary_link&#34;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s2">&#34;secondary_link&#34;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&#34;tertiary_link&#34;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">&#34;living_street&#34;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&#34;road&#34;</span><span class="p">:</span> <span class="mi">13</span><span class="p">}</span>
-</span></span></code></pre></div><p>过滤后得到的路网稍显合理，但是仍需要进一步处理。</p>
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250209144235702.png" alt="image-20250209144235702" />
-      <figcaption><span style='color:#ED508F'>Filtered</span> Porto RoadMap</figcaption>
-    </figure>
-
-
-<h2 class="relative group">路网清洗 
-    <div id="%E8%B7%AF%E7%BD%91%E6%B8%85%E6%B4%97" class="anchor"></div>
+<h4 class="relative group">B. 验证 
+    <div id="b-%E9%AA%8C%E8%AF%81" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E8%B7%AF%E7%BD%91%E6%B8%85%E6%B4%97" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#b-%E9%AA%8C%E8%AF%81" aria-label="锚点">#</a>
+    </span>        
+    
+</h4>
+<ul>
+<li><code>git rev-list</code> 查看高占用文件， 剩余文件大小分布</li>
+<li><code>git count-objects -vH</code></li>
+<li><code>git log &lt;file/dir&gt;</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. git rev-list</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象）</span>
+</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> grep -f &lt;<span class="o">(</span>git verify-pack -v .git/objects/pack/*.idx <span class="p">|</span> grep blob <span class="p">|</span> sort -k <span class="m">3</span> -n <span class="p">|</span> cut -f <span class="m">1</span> -d <span class="s2">&#34; &#34;</span><span class="p">|</span>tail -10<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 剩余文件大小分布 (B)</span>
+</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> awk <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> git cat-file --batch-check<span class="o">=</span><span class="s1">&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;/^blob/ {print $3, $4}&#39;</span> <span class="p">|</span> sort -n
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. git count-objects -vH</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">git count-objects -vH
+</span></span></span><span class="line"><span class="cl"><span class="s1">count: 19
+</span></span></span><span class="line"><span class="cl"><span class="s1">size: 25.71 KiB
+</span></span></span><span class="line"><span class="cl"><span class="s1">in-pack: 283
+</span></span></span><span class="line"><span class="cl"><span class="s1">packs: 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">size-pack: 9.30 MiB
+</span></span></span><span class="line"><span class="cl"><span class="s1">prune-packable: 0
+</span></span></span><span class="line"><span class="cl"><span class="s1">garbage: 0
+</span></span></span><span class="line"><span class="cl"><span class="s1">size-garbage: 0 bytes
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. git log &lt;file/dir&gt;</span>
+</span></span><span class="line"><span class="cl">$ git log RopeUpDown<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="c1"># 没有输出表示已经清理干净了</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 输出 和当前文件或者目录有关的commit history</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main)
+</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 21:17:38 2025 +0800
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">    fix(remove filo): add ignore
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13
+</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 20:57:55 2025 +0800
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">    Rope Up Down
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span></code></pre></div>
+
+<h2 class="relative group">附录 
+    <div id="%E9%99%84%E5%BD%95" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E9%99%84%E5%BD%95" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-
-
-<h3 class="relative group">恢复uv信息 
-    <div id="%E6%81%A2%E5%A4%8Duv%E4%BF%A1%E6%81%AF" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E6%81%A2%E5%A4%8Duv%E4%BF%A1%E6%81%AF" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>建图不光需要路网的线层信息，同样需要点层信息，这里的点指的是路段OD、uv。
-osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数据，所以只能通过取路段的OD来作为uv。</p>
-<p>原始road shapefile（统一WGS-84,EPSG:4326坐标系操作）</p>
+<p>参考：</p>
 <ul>
-<li>提取路段OD为uv</li>
-<li>映射 <code>set(uv)</code> 建立点层</li>
-<li>建立基础的点层和线层</li>
-</ul>
-
-
-<h3 class="relative group">修复路网 
-    <div id="%E4%BF%AE%E5%A4%8D%E8%B7%AF%E7%BD%91" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E4%BF%AE%E5%A4%8D%E8%B7%AF%E7%BD%91" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>路网在恢复uv信息后需要清理环路、自边、自相交、联通性问题，同时进行拓扑优化和路网重塑，规整线层和点层。</p>
-<ul>
-<li>构建点层信息
-<ul>
-<li>自己构建：使用在恢复uv信息中得到的node构建点层</li>
-<li>GoTrakIt：使用第三方包从线层构建点层</li>
-</ul>
-</li>
-<li>清理线层的环路、自边、自相交</li>
-<li>处理标准路网的连通性问题</li>
-<li>重映射点层</li>
-<li>最后对路网做拓扑优化和路网重塑</li>
-</ul>
-<p>最后得到构建路网的必须数据： <code>road</code> 和 <code>node</code> ，即 <code>rel</code> 和 <code>geo</code> 。</p>
-
-
-<h2 class="relative group">轨迹清洗 
-    <div id="%E8%BD%A8%E8%BF%B9%E6%B8%85%E6%B4%97" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E8%BD%A8%E8%BF%B9%E6%B8%85%E6%B4%97" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<ul>
-<li>行程切分</li>
-<li>停留点删除</li>
-<li>轨迹点上下采样</li>
-<li>滑动窗口平均/卡尔曼滤波平滑</li>
-</ul>
-
-
-<h2 class="relative group">地图匹配 
-    <div id="%E5%9C%B0%E5%9B%BE%E5%8C%B9%E9%85%8D" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%9C%B0%E5%9B%BE%E5%8C%B9%E9%85%8D" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<ul>
-<li>FMM：<a href="https://github.com/Aoidayo/fmm-py3" target="_blank">fmm-py3: FMM for python3</a></li>
-<li>ST-MapMatching：<a href="https://github.com/wenke727/ST-MapMatching" target="_blank">wenke727/ST-MapMatching: 基于时间和空间特性的全局地图匹配算法，基础路网可根据 bbox 下载并处理得到</a></li>
-<li>GoTrackIt：<a href="https://github.com/zdsjjtTLG/TrackIt" target="_blank">zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)</a></li>
-</ul>
-
-
-<h2 class="relative group">POI k近邻 
-    <div id="poi-k%E8%BF%91%E9%82%BB" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#poi-k%E8%BF%91%E9%82%BB" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<ul>
-<li>可以获取 <a href="#shapefile">Point和Polygon类型的POI数据</a>（点、多边形面）</li>
-<li>处理时为了方便起见，可以统一将坐标系投影到平面坐标系，作k近邻计算。</li>
-<li>见仁见智：路段 k近邻POI/GPS k近邻POI</li>
-<li>k近邻可以在collate_fn中实现</li>
+<li><a href="https://www.bilibili.com/video/BV1C841117TD/?vd_source=a3b7a95f2cd97322455e13ec98e4c6d4" target="_blank">GitFAQ-如何删除提交记录中的大文件_哔哩哔哩_bilibili</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/377661967" target="_blank">Git清理.git文件夹中的大文件及.gitignore简单使用 - 知乎</a></li>
+<li>DS</li>
 </ul>
 
           
@@ -1082,7 +948,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
             <strong class="block mt-8">
               <a target="_blank" 
               class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-              href="mailto:?subject=Reply%20to%20%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97">
+              href="mailto:?subject=Reply%20to%20Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6">
                 Reply by Email
               </a>
             </strong>
@@ -1100,7 +966,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://blog.aoidayo.site/report/raw-data-process/&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://blog.aoidayo.site/blog/git-big/&amp;title=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title="分享到 LinkedIn"
       aria-label="分享到 LinkedIn"
       >
@@ -1119,7 +985,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://twitter.com/intent/tweet/?url=https://blog.aoidayo.site/report/raw-data-process/&amp;text=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://twitter.com/intent/tweet/?url=https://blog.aoidayo.site/blog/git-big/&amp;text=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title="分享到 Twitter"
       aria-label="分享到 Twitter"
       >
@@ -1137,7 +1003,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://bsky.app/intent/compose?text=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97&#43;https://blog.aoidayo.site/report/raw-data-process/"
+      href="https://bsky.app/intent/compose?text=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6&#43;https://blog.aoidayo.site/blog/git-big/"
       title=""
       aria-label=""
       >
@@ -1155,7 +1021,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://s2f.kytta.dev/?text=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97%20https://blog.aoidayo.site/report/raw-data-process/"
+      href="https://s2f.kytta.dev/?text=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6%20https://blog.aoidayo.site/blog/git-big/"
       title=""
       aria-label=""
       >
@@ -1174,7 +1040,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://reddit.com/submit/?url=https://blog.aoidayo.site/report/raw-data-process/&amp;resubmit=true&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://reddit.com/submit/?url=https://blog.aoidayo.site/blog/git-big/&amp;resubmit=true&amp;title=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title="提交到 Reddit"
       aria-label="提交到 Reddit"
       >
@@ -1193,7 +1059,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.aoidayo.site/report/raw-data-process/&amp;description=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://pinterest.com/pin/create/bookmarklet/?url=https://blog.aoidayo.site/blog/git-big/&amp;description=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title="钉到 Pinterest"
       aria-label="钉到 Pinterest"
       >
@@ -1212,7 +1078,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://www.facebook.com/sharer/sharer.php?u=https://blog.aoidayo.site/report/raw-data-process/&amp;quote=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://www.facebook.com/sharer/sharer.php?u=https://blog.aoidayo.site/blog/git-big/&amp;quote=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title="分享到 Facebook"
       aria-label="分享到 Facebook"
       >
@@ -1231,7 +1097,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="mailto:?body=https://blog.aoidayo.site/report/raw-data-process/&amp;subject=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="mailto:?body=https://blog.aoidayo.site/blog/git-big/&amp;subject=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title="通过电子邮件发送"
       aria-label="通过电子邮件发送"
       >
@@ -1250,7 +1116,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://api.whatsapp.com/send?text=https://blog.aoidayo.site/report/raw-data-process/&amp;resubmit=true&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://api.whatsapp.com/send?text=https://blog.aoidayo.site/blog/git-big/&amp;resubmit=true&amp;title=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title=""
       aria-label=""
       >
@@ -1269,7 +1135,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
       <a
       target="_blank"
       class="m-1 rounded bg-neutral-300 p-1.5 text-neutral-700 hover:bg-primary-500 hover:text-neutral dark:bg-neutral-700 dark:text-neutral-300 dark:hover:bg-primary-400 dark:hover:text-neutral-800"
-      href="https://t.me/share/url?url=https://blog.aoidayo.site/report/raw-data-process/&amp;resubmit=true&amp;title=%e6%95%b0%e6%8d%ae%e6%b8%85%e6%b4%97"
+      href="https://t.me/share/url?url=https://blog.aoidayo.site/blog/git-big/&amp;resubmit=true&amp;title=Git%20%e6%b8%85%e9%99%a4.git%e4%bb%93%e5%ba%93%e5%8e%86%e5%8f%b2%e8%ae%b0%e5%bd%95%e4%b8%ad%e7%9a%84%e9%ab%98%e5%8d%a0%e7%94%a8%e5%86%85%e5%ad%98%e6%96%87%e4%bb%b6"
       title=""
       aria-label=""
       >
@@ -1301,8 +1167,8 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
           
         
       <script>
-        var oid = "views_report\/raw-data-process\/index.md"
-        var oid_likes = "likes_report\/raw-data-process\/index.md"
+        var oid = "views_blog\/git-big\/index.md"
+        var oid_likes = "likes_blog\/git-big\/index.md"
       </script>
       
       
@@ -1313,6 +1179,43 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
   <footer class="pt-8 max-w-prose print:hidden">
 
     
+  
+    
+    
+    
+    <div class="pt-8">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
+      <div class="flex justify-between pt-3">
+        <span>
+          
+            <a class="flex group mr-3" href="/blog/use-hugo/">
+              <span
+                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
+                >&larr;</span
+              >
+              <span
+                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
+                >&rarr;</span
+              >
+              <span class="flex flex-col">
+                <span
+                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
+                  >使用hugo</span
+                >
+                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
+                  
+                    <time datetime="2025-01-07T15:38:16&#43;08:00">2025年01月07日 15時38分</time>
+                  
+                </span>
+              </span>
+            </a>
+          
+        </span>
+        <span>
+          
+        </span>
+      </div>
+    </div>
   
 
 
