@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>Git 清除.git仓库历史记录中的高占用内存文件 &middot; Aoidayo</title>
-  <meta name="title" content="Git 清除.git仓库历史记录中的高占用内存文件 &middot; Aoidayo" />
+  <title>Miniforge：Conda solving enviroment终结者 &middot; Aoidayo</title>
+  <meta name="title" content="Miniforge：Conda solving enviroment终结者 &middot; Aoidayo" />
   
   
-  <meta name="keywords" content="Git使用, " />
+  <meta name="keywords" content="ST, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/git-big/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/conda-or-mamba/" />
   
   
   
@@ -67,23 +67,23 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/git-big/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/conda-or-mamba/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="Git 清除.git仓库历史记录中的高占用内存文件">
-  <meta property="og:description" content="前言 # 最近使用Git管理Unity项目，误将Unity的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有12MB&#43;, 对于一个Git仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。">
+  <meta property="og:title" content="Miniforge：Conda solving enviroment终结者">
+  <meta property="og:description" content="引言 # conda在不启用libmamba时下载小包的速度就非常慢，一直 solving enviroment... 容易让人狂躁，更不用说用它来安装 pytorch。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2025-02-28T22:15:00+08:00">
+    <meta property="article:published_time" content="2025-03-19T22:00:16+08:00">
     <meta property="article:modified_time" content="2025-03-19T14:13:54+00:00">
-    <meta property="article:tag" content="Git使用">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/git-big/feature.png">
+    <meta property="article:tag" content="ST">
+    <meta property="og:image" content="https://blog.aoidayo.site/blog/conda-or-mamba/feature.png">
 
   
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/git-big/feature.png">
-  <meta name="twitter:title" content="Git 清除.git仓库历史记录中的高占用内存文件">
-  <meta name="twitter:description" content="前言 # 最近使用Git管理Unity项目，误将Unity的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有12MB&#43;, 对于一个Git仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。">
+  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/conda-or-mamba/feature.png">
+  <meta name="twitter:title" content="Miniforge：Conda solving enviroment终结者">
+  <meta name="twitter:description" content="引言 # conda在不启用libmamba时下载小包的速度就非常慢，一直 solving enviroment... 容易让人狂躁，更不用说用它来安装 pytorch。">
 
   
   <script type="application/ld+json">
@@ -91,26 +91,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "Git 清除.git仓库历史记录中的高占用内存文件",
-    "headline": "Git 清除.git仓库历史记录中的高占用内存文件",
+    "name": "Miniforge：Conda solving enviroment终结者",
+    "headline": "Miniforge：Conda solving enviroment终结者",
     
-    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003e前言 \n    \u003cdiv id=\u0022%E5%89%8D%E8%A8%80\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%89%8D%E8%A8%80\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e最近使用Git管理Unity项目，误将Unity的\u003ccode\u003eFilo Cables\u003c\/code\u003e包\u003ccode\u003ecommit\u0026amp;push\u003c\/code\u003e到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有\u003ccode\u003e12MB\u002b\u003c\/code\u003e, 对于一个Git仓库来说还是太大了，所以需要即时从\u003ccode\u003e.git\u003c\/code\u003e中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。\u003c\/p\u003e",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003e引言 \n    \u003cdiv id=\u0022%E5%BC%95%E8%A8%80\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%BC%95%E8%A8%80\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003econda在不启用libmamba时下载小包的速度就非常慢，一直 \u003ccode\u003esolving enviroment...\u003c\/code\u003e 容易让人狂躁，更不用说用它来安装 \u003ccode\u003epytorch\u003c\/code\u003e。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/git-big\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/conda-or-mamba\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2025",
-    "dateCreated": "2025-02-28T22:15:00\u002b08:00",
-    "datePublished": "2025-02-28T22:15:00\u002b08:00",
+    "dateCreated": "2025-03-19T22:00:16\u002b08:00",
+    "datePublished": "2025-03-19T22:00:16\u002b08:00",
     
     "dateModified": "2025-03-19T14:13:54\u002b00:00",
     
-    "keywords": ["Git使用"],
+    "keywords": ["ST"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "872"
+    "wordCount": "1308"
   }]
   </script>
 
@@ -430,7 +430,7 @@
 
     
     <div class="fixed inset-x-0 top-0 h-[800px] single_hero_background nozoom"
-    style="background-image:url(/blog/git-big/feature_hu_6121b68d022fae06.png);">
+    style="background-image:url(/blog/conda-or-mamba/feature_hu_3571b2de77d96d6d.png);">
     
 
 
@@ -483,8 +483,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/git-big/"
-      >Git 清除.git仓库历史记录中的高占用内存文件</a
+      href="/blog/conda-or-mamba/"
+      >Miniforge：Conda solving enviroment终结者</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -493,7 +493,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      Git 清除.git仓库历史记录中的高占用内存文件
+      Miniforge：Conda solving enviroment终结者
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -536,7 +536,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2025-02-28T22:15:00&#43;08:00">2025年02月28日 22時15分</time><span class="px-2 text-primary-500">&middot;</span><span>872 字</span>
+  <time datetime="2025-03-19T22:00:16&#43;08:00">2025年03月19日 22時00分</time><span class="px-2 text-primary-500">&middot;</span><span>1308 字</span>
   
 
   
@@ -663,18 +663,10 @@
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#前言">前言</a></li>
-    <li><a href="#工具">工具</a>
-      <ul>
-        <li><a href="#常用方法">常用方法</a>
-          <ul>
-            <li><a href="#a-filter-repo">A. filter-repo</a></li>
-            <li><a href="#b-验证">B. 验证</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-    <li><a href="#附录">附录</a></li>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#换源">换源</a></li>
+    <li><a href="#基本命令流">基本命令流</a></li>
   </ul>
 </nav>
   </div>
@@ -688,18 +680,10 @@
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#前言">前言</a></li>
-    <li><a href="#工具">工具</a>
-      <ul>
-        <li><a href="#常用方法">常用方法</a>
-          <ul>
-            <li><a href="#a-filter-repo">A. filter-repo</a></li>
-            <li><a href="#b-验证">B. 验证</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-    <li><a href="#附录">附录</a></li>
+    <li><a href="#引言">引言</a></li>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#换源">换源</a></li>
+    <li><a href="#基本命令流">基本命令流</a></li>
   </ul>
 </nav>
   </div>
@@ -783,159 +767,181 @@
         <div class="article-content max-w-prose mb-20">
           
 
-<h2 class="relative group">前言 
-    <div id="%E5%89%8D%E8%A8%80" class="anchor"></div>
+<h2 class="relative group">引言 
+    <div id="%E5%BC%95%E8%A8%80" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%89%8D%E8%A8%80" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%BC%95%E8%A8%80" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-<p>最近使用Git管理Unity项目，误将Unity的<code>Filo Cables</code>包<code>commit&amp;push</code>到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有<code>12MB+</code>, 对于一个Git仓库来说还是太大了，所以需要即时从<code>.git</code>中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。</p>
+<p>conda在不启用libmamba时下载小包的速度就非常慢，一直 <code>solving enviroment...</code> 容易让人狂躁，更不用说用它来安装 <code>pytorch</code>。</p>
+<p>作为替换，可以在 <code>阿里云的pytorch wheels镜像</code> 上下载需要的pytorch，然后再使用 <code>pip</code> 安装，当然后续可能还需要安装 <code>mkl</code> 等依赖，虽然速度尚可，但是还需要手动解决依赖问题，还是有不小的麻烦的。</p>
+<p>conda也清楚自己的依赖解析问题，他们在最新版的<code>conda</code>中引入<code>mamba</code>项目的核心库——用<code>c++</code>重写的依赖项求解器<code>libsolv</code>，<code>conda</code>现在可以通过如下命令开启<code>libmamba</code>作为<code>dependency solver</code>, 支持<code>conda</code>包的高效依赖解析，并行下载与更快速的环境创建。同时，<code>conda</code>也支持直接下载<code>mamba</code>，作为当前环境中下包的一种替换方式。</p>
+<p><code>conda </code>启用<code>libmamba</code>作为依赖求解器 / 通过以下方法启用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 在base环境中安装conda-libmamba-solver</span>
+</span></span><span class="line"><span class="cl">conda install -n base conda-libmamba-solver
+</span></span><span class="line"><span class="cl">conda config --set solver libmamba
+</span></span><span class="line"><span class="cl"><span class="c1"># or</span>
+</span></span><span class="line"><span class="cl">conda install numpy --solver<span class="o">=</span>libmamba
+</span></span></code></pre></div><p><code>conda </code>启用<code>mamba</code>作为替代 / 通过以下方法启用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">conda config --set custom_channels.conda-forge https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span><span class="line"><span class="cl">conda install -n base -c conda-forge mamba
+</span></span><span class="line"><span class="cl"><span class="c1"># or</span>
+</span></span><span class="line"><span class="cl">conda install -c conda-forge mamba
+</span></span><span class="line"><span class="cl">mamba install numpy
+</span></span></code></pre></div><p>上面的方法不错，当然有一个问题就出现了，<code>conda</code>下<code>mamba</code>的时候又在 <code>solving environment</code> 了怎么办？这个问题太地狱了。</p>
+<p>当然有解决方法，可以使用 <code>mamba/micromamba</code> 这两个类似于 <code>conda/miniconda</code> 的包管理器作为替代，只有一个问题，就是纯血 <code>mamaba</code> 不支持 <code>pycharm</code> 调试。</p>
+<p>不过这个问题也有解决方法，就是使用 <code>miniforge</code>，这个仅仅只内置 <code>conda-forge</code> 源的最小 <code>conda+mamba</code> 发行版，将 <code>mamba</code> 完美继承到 <code>conda</code> 里面，可以 <code>conda</code> 和 <code>mamba</code> 命令互换，几乎0学习成本，而且安装也很方便。</p>
+<p>最后再提一嘴 <code>mamba</code> 原作者正在维护的 <code>pixi</code>，这个工具更加类似于 <code>venv</code>，一个项目创建一个虚拟环境，和 <code>conda/mamba</code> 不是一个赛道的，而且 <code>pixi</code> 换源/镜像非常麻烦，现在不是很成熟。另外作为 <code>pip</code> 的替代品 <code>uv</code>，现在已经相当好用了，可以用<code>conda</code>或者<code>mamba</code>直接安装，因为 <code>pip</code> 的速度尚可，所以关于 <code>uv</code> 的介绍以后有机会再写吧。</p>
 
 
-<h2 class="relative group">工具 
-    <div id="%E5%B7%A5%E5%85%B7" class="anchor"></div>
+<h2 class="relative group">安装 
+    <div id="%E5%AE%89%E8%A3%85" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%B7%A5%E5%85%B7" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%AE%89%E8%A3%85" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-<p>推荐使用<code>git filter-repo</code>，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比git自带的<code>git filter-branch</code>更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如Unity的3d-fbx文件，模型pt文件等等）。</p>
+<p>如果已经装了一些包管理器，先卸载</p>
+<p>如果已经安装了<code>micromamba</code>，则卸载需要注意: <code>micromamba</code>如果是用cmd安装的，默认会安装在 <code>C:/User/YourName</code> 下面, 需要同时删除可执行文件和所有envs.</p>
+<p>关于miniforge:</p>
 <ul>
-<li><code>git filter-repo</code>：<a href="https://github.com/newren/git-filter-repo/tree/main" target="_blank">newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement)</a></li>
-<li>验证清理效果：<code>git 自带命令</code></li>
-<li>查看git仓库占用空间：<code>git count-objects -vH</code></li>
+<li>安装
+<ul>
+<li>miniforge/conda-forge官网 <a href="https://github.com/conda-forge/miniforge" target="_blank">conda-forge/miniforge: A conda-forge distribution.</a></li>
+<li>miniforge github repo页面 <a href="https://conda-forge.org/download/" target="_blank">conda-forge | community-driven packaging for conda | conda-forge | community-driven packaging for conda</a></li>
+</ul>
+</li>
+<li>guide，同时参考mamba和conda
+<ul>
+<li><a href="https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html" target="_blank">micromamba</a></li>
+<li>conda</li>
+</ul>
+</li>
 </ul>
 
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250228223219471.png" alt="image-20250228223219471" />
-      
-    </figure>
+  
 
 
-<h3 class="relative group">常用方法 
-    <div id="%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" class="anchor"></div>
+
+<div
+  
+    class="flex px-4 py-3 rounded-md bg-primary-100 dark:bg-primary-900"
+  >
+
+  <span
+    
+      class="text-primary-400 ltr:pr-3 rtl:pl-3 flex items-center"
+    >
+
+    
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/></svg>
+
+  </span>
+
+
+  </span>
+
+  <span
+    
+      class="dark:text-neutral-300"
+    ><p><strong>windows</strong>安装时需要注意：</p>
+<ul>
+<li>安装时 Install 选项 JustForMe, 否则会出现创建环境下载包时权限不够,无法写入文件</li>
+<li>手动添加miniforge的path</li>
+</ul></span>
+</div>
+
+
+
+<h2 class="relative group">换源 
+    <div id="%E6%8D%A2%E6%BA%90" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E6%8D%A2%E6%BA%90" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-
-
-<h4 class="relative group">A. filter-repo 
-    <div id="a-filter-repo" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#a-filter-repo" aria-label="锚点">#</a>
-    </span>        
-    
-</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. 文件夹</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 保留my_folder下面的所有文件, 删除其他所有文件</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path my_folder
-</span></span><span class="line"><span class="cl"><span class="c1"># --invert-paths 反转. 删除my_folder下面的所有文件</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path my_folder --invert-paths --force
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 2. 文件</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># --path-glob &lt;file.name&gt; 删除指定文件</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path-glob xxx.mp4 --invert-paths --force
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 3. 占用空间</span>
-</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 100K
-</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1M
-</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1G
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 清理引用和缓存</span>
-</span></span><span class="line"><span class="cl">git reflog expire --expire<span class="o">=</span>now --all <span class="o">&amp;&amp;</span> git gc --prune<span class="o">=</span>now --aggressive
-</span></span><span class="line"><span class="cl"><span class="c1"># 可能清理完成之后，把remote也给清除了，这里重置</span>
-</span></span><span class="line"><span class="cl">git remote add origin git@github.com:Aoidayo/xxx.git
-</span></span><span class="line"><span class="cl"><span class="c1"># push</span>
-</span></span><span class="line"><span class="cl">git push origin --force --all
-</span></span><span class="line"><span class="cl">git push origin --force --tags
+</h2>
+<p>使用mamba时需要使用pytorch和nvidia仓库的镜像源来下载 <code>pytorch-cuda及其依赖</code>，前者的国内镜像仓库很多，后者的镜像仓库国内只有南方科技大学和cernet校园联合镜像站mirrorz提供，<strong>所以一旦这两个哥们不提供支持了，mamba在国内也就废了</strong>。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1">#  添加 pytorch 镜像</span>
+</span></span><span class="line"><span class="cl">conda config --set custom_channels.pytorch https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span><span class="line"><span class="cl"><span class="c1">#  添加 nvidia 镜像</span>
+</span></span><span class="line"><span class="cl">conda config --set custom_channels.nvidia https://mirrors.cernet.edu.cn/anaconda-extra/cloud/
+</span></span></code></pre></div><p><code>.condarc</code></p>
+<ul>
+<li>windows : <code>C:\Users\ffs</code></li>
+<li>linux : <code>~/.condarc</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">show_channel_urls: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">channels:
+</span></span><span class="line"><span class="cl">  - defaults
+</span></span><span class="line"><span class="cl">default_channels:
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/menpo/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+</span></span><span class="line"><span class="cl">custom_channels:
+</span></span><span class="line"><span class="cl">  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span><span class="line"><span class="cl">  nvidia: https://mirrors.cernet.edu.cn/anaconda-extra/cloud/
+</span></span><span class="line"><span class="cl">  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span></code></pre></div><p>or</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">channels:
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/menpo/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+</span></span><span class="line"><span class="cl">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+</span></span><span class="line"><span class="cl">show_channel_urls: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">custom_channels:
+</span></span><span class="line"><span class="cl">  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span><span class="line"><span class="cl">  nvidia: https://mirrors.cernet.edu.cn/anaconda-extra/cloud/
+</span></span><span class="line"><span class="cl">  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span></code></pre></div><p>linux使用命令写入</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cat <span class="s">&lt;&lt;&#39;EOF&#39; &gt; ~/.condarc
+</span></span></span><span class="line"><span class="cl"><span class="s">channels:
+</span></span></span><span class="line"><span class="cl"><span class="s">  - defaults
+</span></span></span><span class="line"><span class="cl"><span class="s">show_channel_urls: true
+</span></span></span><span class="line"><span class="cl"><span class="s">default_channels:
+</span></span></span><span class="line"><span class="cl"><span class="s">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+</span></span></span><span class="line"><span class="cl"><span class="s">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/menpo/
+</span></span></span><span class="line"><span class="cl"><span class="s">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/bioconda/
+</span></span></span><span class="line"><span class="cl"><span class="s">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+</span></span></span><span class="line"><span class="cl"><span class="s">  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+</span></span></span><span class="line"><span class="cl"><span class="s">custom_channels:
+</span></span></span><span class="line"><span class="cl"><span class="s">  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span></span><span class="line"><span class="cl"><span class="s">  nvidia: https://mirrors.cernet.edu.cn/anaconda-extra/cloud/
+</span></span></span><span class="line"><span class="cl"><span class="s">  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
 </span></span></code></pre></div>
 
-<h4 class="relative group">B. 验证 
-    <div id="b-%E9%AA%8C%E8%AF%81" class="anchor"></div>
+<h2 class="relative group">基本命令流 
+    <div id="%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E6%B5%81" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#b-%E9%AA%8C%E8%AF%81" aria-label="锚点">#</a>
-    </span>        
-    
-</h4>
-<ul>
-<li><code>git rev-list</code> 查看高占用文件， 剩余文件大小分布</li>
-<li><code>git count-objects -vH</code></li>
-<li><code>git log &lt;file/dir&gt;</code></li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. git rev-list</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象）</span>
-</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> grep -f &lt;<span class="o">(</span>git verify-pack -v .git/objects/pack/*.idx <span class="p">|</span> grep blob <span class="p">|</span> sort -k <span class="m">3</span> -n <span class="p">|</span> cut -f <span class="m">1</span> -d <span class="s2">&#34; &#34;</span><span class="p">|</span>tail -10<span class="o">)</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 剩余文件大小分布 (B)</span>
-</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> awk <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> git cat-file --batch-check<span class="o">=</span><span class="s1">&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;/^blob/ {print $3, $4}&#39;</span> <span class="p">|</span> sort -n
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 2. git count-objects -vH</span>
-</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">git count-objects -vH
-</span></span></span><span class="line"><span class="cl"><span class="s1">count: 19
-</span></span></span><span class="line"><span class="cl"><span class="s1">size: 25.71 KiB
-</span></span></span><span class="line"><span class="cl"><span class="s1">in-pack: 283
-</span></span></span><span class="line"><span class="cl"><span class="s1">packs: 1
-</span></span></span><span class="line"><span class="cl"><span class="s1">size-pack: 9.30 MiB
-</span></span></span><span class="line"><span class="cl"><span class="s1">prune-packable: 0
-</span></span></span><span class="line"><span class="cl"><span class="s1">garbage: 0
-</span></span></span><span class="line"><span class="cl"><span class="s1">size-garbage: 0 bytes
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 3. git log &lt;file/dir&gt;</span>
-</span></span><span class="line"><span class="cl">$ git log RopeUpDown<span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="c1"># 没有输出表示已经清理干净了</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 输出 和当前文件或者目录有关的commit history</span>
-</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main)
-</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 21:17:38 2025 +0800
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">    fix(remove filo): add ignore
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13
-</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 20:57:55 2025 +0800
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">    Rope Up Down
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
-</span></span></code></pre></div>
-
-<h2 class="relative group">附录 
-    <div id="%E9%99%84%E5%BD%95" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E9%99%84%E5%BD%95" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E6%B5%81" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-<p>参考：</p>
-<ul>
-<li><a href="https://www.bilibili.com/video/BV1C841117TD/?vd_source=a3b7a95f2cd97322455e13ec98e4c6d4" target="_blank">GitFAQ-如何删除提交记录中的大文件_哔哩哔哩_bilibili</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/377661967" target="_blank">Git清理.git文件夹中的大文件及.gitignore简单使用 - 知乎</a></li>
-<li>DS</li>
-</ul>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mamba create -n mamba <span class="nv">python</span><span class="o">=</span>3.9
+</span></span><span class="line"><span class="cl">conda search pytorch-cuda<span class="o">=</span>11.8
+</span></span><span class="line"><span class="cl"><span class="c1"># mamba install pytorch-cuda=11.8=&lt;build_version&gt; -c nvidia -c pytorch</span>
+</span></span><span class="line"><span class="cl">mamba install pytorch-cuda<span class="o">=</span>11.8<span class="o">=</span>h8dd9ede_2 -c nvidia -c pytorch
+</span></span><span class="line"><span class="cl"><span class="c1"># conda search pytorch=2.3.0 --info</span>
+</span></span><span class="line"><span class="cl">mamba install <span class="nv">pytorch</span><span class="o">=</span>2.3.0<span class="o">=</span>py3.9_cuda11.8_cudnn8_0
+</span></span></code></pre></div>
           
           
           
@@ -949,6 +955,91 @@
         
 
 
+<h2 class="mt-8 text-2xl font-extrabold mb-10">相关文章</h2>
+<section class="w-full grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+  
+  
+
+  <a href="/report/raw-data-process/" class="min-w-full">
+    
+    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
+        
+        <div class="w-full thumbnail_card_related nozoom" style="background-image:url(/report/raw-data-process/feature_hu_c2450aceb26f3b27.png);"></div>
+        
+      
+
+      <div class="px-6 py-4">
+
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/report/raw-data-process/">数据清洗</div>
+        
+
+        <div class="text-sm text-neutral-500 dark:text-neutral-400">
+          
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2025-02-09T15:38:16&#43;08:00">2025年02月09日 15時38分</time><span class="px-2 text-primary-500">&middot;</span><span>2060 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+
+
+
+        </div>
+
+        
+      </div>
+      <div class="px-6 pt-4 pb-2">
+
+      </div>
+    </div>
+  </a>
+
+  
+</section>
+
   
       </div>
      
@@ -960,8 +1051,8 @@
           
         
       <script>
-        var oid = "views_blog\/git-big\/index.md"
-        var oid_likes = "likes_blog\/git-big\/index.md"
+        var oid = "views_blog\/conda-or-mamba\/index.md"
+        var oid_likes = "likes_blog\/conda-or-mamba\/index.md"
       </script>
       
       
@@ -981,7 +1072,7 @@
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="flex group mr-3" href="/blog/use-hugo/">
+            <a class="flex group mr-3" href="/blog/24-sum/">
               <span
                 class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
                 >&larr;</span
@@ -993,23 +1084,6 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >使用hugo</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-01-07T15:38:16&#43;08:00">2025年01月07日 15時38分</time>
-                  
-                </span>
-              </span>
-            </a>
-          
-        </span>
-        <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/24-sum/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
                   >24年年终总结</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
@@ -1018,15 +1092,10 @@
                   
                 </span>
               </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
             </a>
+          
+        </span>
+        <span>
           
         </span>
       </div>
