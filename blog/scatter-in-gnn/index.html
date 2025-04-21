@@ -76,7 +76,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
     <meta property="article:published_time" content="2025-04-21T20:25:21+08:00">
-    <meta property="article:modified_time" content="2025-04-21T13:23:26+00:00">
+    <meta property="article:modified_time" content="2025-04-21T14:13:42+00:00">
     <meta property="article:tag" content="ST">
     <meta property="og:image" content="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg">
 
@@ -107,7 +107,7 @@
     "dateCreated": "2025-04-21T20:25:21\u002b08:00",
     "datePublished": "2025-04-21T20:25:21\u002b08:00",
     
-    "dateModified": "2025-04-21T13:23:26\u002b00:00",
+    "dateModified": "2025-04-21T14:13:42\u002b00:00",
     
     "keywords": ["ST"],
     
@@ -917,7 +917,7 @@
 <p>$$
 \alpha_{i,j} = \frac{\exp(LeakyReLU(e_{i,j}))}{\sum \limits_{k \in N(i)} \exp(LeakyReLU(e_{i,k})) }
 $$</p>
-<p>其中，分母部分聚合节点 $i$ 所有邻边相似度系数的运算可以用 <code>scatter_add</code> 简洁优雅的实现。</p>
+<p>其中，分母部分聚合节点 \(i\) 所有邻边相似度系数的运算可以用 <code>scatter_add</code> 简洁优雅的实现。</p>
 <blockquote>
 <p>\(h_i^{&rsquo;}\) 的加权邻域聚合</p></blockquote>
 <p>$$
