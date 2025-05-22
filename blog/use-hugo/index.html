@@ -75,7 +75,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
     <meta property="article:published_time" content="2025-01-07T15:38:16+08:00">
-    <meta property="article:modified_time" content="2025-05-22T02:02:57+00:00">
+    <meta property="article:modified_time" content="2025-05-22T03:02:10+00:00">
     <meta property="article:tag" content="Hugo">
     <meta property="og:image" content="https://blog.aoidayo.site/blog/use-hugo/feature.jpg">
 
@@ -105,7 +105,7 @@
     "dateCreated": "2025-01-07T15:38:16\u002b08:00",
     "datePublished": "2025-01-07T15:38:16\u002b08:00",
     
-    "dateModified": "2025-05-22T02:02:57\u002b00:00",
+    "dateModified": "2025-05-22T03:02:10\u002b00:00",
     
     "keywords": ["Hugo"],
     
@@ -454,12 +454,51 @@
   
 
   <header id="single_header" class="mt-5 max-w-prose">
-      <div class="post-password">
+    
+<div class="post-password">
+  
+  <script src="/js/sweetalert2@11.js"></script>
+  <script>
+    (function() {
+      
+      Swal.fire({
+        title: '🔒 密码验证',
+        text: '这篇文章受密码保护，请输入访问密码：',
+        input: 'password',
+        padding: "3em",
+        color: "#716add",
         
-        <script>
-          (function(){
-                    if (prompt('请输入文章密码') != "cumtb617"){
-                alert('密码错误！');
+        backdrop: `
+            rgba( 62, 60, 70,0.999)
+            url("/images/nyan-cat.gif")
+            center top / auto auto 
+            no-repeat
+        `,  
+        allowOutsideClick: false,
+        inputAttributes: {
+          autocapitalize: 'off',
+          autocorrect: 'off'
+        },
+        showCancelButton: false,
+        confirmButtonText: '确认',
+        background: '#f8f9fa',
+        preConfirm: (inputPassword) => {
+          if (inputPassword !== 'cumtb617') {
+            
+            Swal.fire({
+              icon: 'error',
+              title: '密码错误',
+              text: '请检查后重试！',
+              confirmButtonColor: '#dc3545',
+              backdrop: `
+                rgba( 62, 60, 70,0.999)
+                url("/images/nyan-cat.gif")
+                center top / auto auto 
+                no-repeat
+                `,  
+              allowOutsideClick: false,
+              willClose: () => {
+                
                 if (history.length === 1) {
                   window.opener = null;
                   window.open('', '_self');
@@ -468,10 +507,17 @@
                   history.back();
                 }
               }
-          })();
-        </script>
-        
-    </div>
+            });
+            return false;
+          }
+          
+          return true;
+        }
+      });
+    })();
+  </script>
+  
+</div>
 
     
     <ol class="text-sm text-neutral-500 dark:text-neutral-400 print:hidden">
