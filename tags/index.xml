@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>© 2025 Aoidayo</copyright>
-    <lastBuildDate>Mon, 21 Apr 2025 20:25:21 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 22 May 2025 15:38:16 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Hugo</title>
+      <link>https://blog.aoidayo.site/tags/hugo/</link>
+      <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/tags/hugo/</guid>
+      <description></description>
+      
+    </item>
     
     <item>
       <title>ST</title>
@@ -35,16 +45,6 @@
       <pubDate>Fri, 28 Feb 2025 22:15:00 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/tags/git%E4%BD%BF%E7%94%A8/</guid>
-      <description></description>
-      
-    </item>
-    
-    <item>
-      <title>Hugo</title>
-      <link>https://blog.aoidayo.site/tags/hugo/</link>
-      <pubDate>Tue, 07 Jan 2025 15:38:16 +0800</pubDate>
-      
-      <guid>https://blog.aoidayo.site/tags/hugo/</guid>
       <description></description>
       
     </item>

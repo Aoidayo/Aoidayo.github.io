@@ -10,6 +10,63 @@
     <atom:link href="https://blog.aoidayo.site/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Hugo 加密</title>
+      <link>https://blog.aoidayo.site/blog/encrypt/</link>
+      <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/encrypt/</guid>
+      <description>&lt;p&gt;Some text is required to be placed here.&lt;/p&gt;
+
+
+&lt;h1 class=&#34;relative group&#34;&gt;You cannot see me unless you&amp;rsquo;ve got the password! 
+    &lt;div id=&#34;you-cannot-see-me-unless-youve-got-the-password&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#you-cannot-see-me-unless-youve-got-the-password&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h1&gt;
+&lt;p&gt;This is the content you want to encrypt!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Do remember to close the &lt;code&gt;hugo-encryptor&lt;/code&gt; shortcodes tag:&lt;/strong&gt;&lt;/p&gt;
+
+
+&lt;h1 class=&#34;relative group&#34;&gt;测试图片 
+    &lt;div id=&#34;%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h1&gt;
+
+    &lt;figure&gt;
+      &lt;img class=&#34;my-0 rounded-md&#34; loading=&#34;lazy&#34; src=&#34;./assets/index/Clipboard%20-%202025-05-02%2022.50.47.png&#34; alt=&#34;Clipboard - 2025-05-02 22.50.47&#34; /&gt;
+      
+    &lt;/figure&gt;
+
+
+&lt;h1 class=&#34;relative group&#34;&gt;测试latex 
+    &lt;div id=&#34;%E6%B5%8B%E8%AF%95latex&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%B5%8B%E8%AF%95latex&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h1&gt;
+&lt;p&gt;一个简单的latex块
+$$
+\frac{LeakyRelu(e_{ij})}{\sum_{k=1,k\in N(i)}LeakyRelu(eik)}
+$$&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>GNN中的scatter离散运算</title>
       <link>https://blog.aoidayo.site/blog/scatter-in-gnn/</link>
       <pubDate>Mon, 21 Apr 2025 20:25:21 +0800</pubDate>
