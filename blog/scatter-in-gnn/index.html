@@ -76,7 +76,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
     <meta property="article:published_time" content="2025-04-21T20:25:21+08:00">
-    <meta property="article:modified_time" content="2025-05-22T03:02:10+00:00">
+    <meta property="article:modified_time" content="2025-05-24T10:15:22+00:00">
     <meta property="article:tag" content="ST">
     <meta property="og:image" content="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg">
 
@@ -96,7 +96,7 @@
     "name": "GNN中的scatter离散运算",
     "headline": "GNN中的scatter离散运算",
     
-    "abstract": "\u003cp\u003ePyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。\u003c\/p\u003e\n\u003cp\u003e我们以GAT为例，说明scatter在GAT中的应用：一是相似度系数的归一，二是 \\(h_i^{\u0026rsquo;}\\) 的加权邻域聚合。\u003c\/p\u003e",
+    "abstract": "\u003cstyle\u003e\n.aplayer-title {\n      color: #60A5FA !important;\n    }\n\u003c\/style\u003e\n\u003cmeting-js\n  server=\u0022netease\u0022\n  type=\u0022song\u0022\n  id=\u00222666749200\u0022\n  fixed=\u0022true\u0022\n  autoplay=\u0022true\u0022\n  loop=\u0022all\u0022\n  order=\u0022list\u0022\n  theme=\u0022#60A5FA\u0022\n\u003e\u003c\/meting-js\u003e\n\u003cp\u003ePyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。\u003c\/p\u003e\n\u003cp\u003e我们以GAT为例，说明scatter在GAT中的应用：一是相似度系数的归一，二是 \\(h_i^{\u0026rsquo;}\\) 的加权邻域聚合。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
     "url" : "https:\/\/blog.aoidayo.site\/blog\/scatter-in-gnn\/",
     "author" : {
@@ -107,7 +107,7 @@
     "dateCreated": "2025-04-21T20:25:21\u002b08:00",
     "datePublished": "2025-04-21T20:25:21\u002b08:00",
     
-    "dateModified": "2025-05-22T03:02:10\u002b00:00",
+    "dateModified": "2025-05-24T10:15:22\u002b00:00",
     
     "keywords": ["ST"],
     
@@ -298,6 +298,13 @@
   <meta name="theme-color"/>
   
   
+      
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
 </head>
 <body
   class="flex flex-col h-screen px-6 m-auto text-lg leading-7 max-w-7xl bg-neutral text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32 scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600">
@@ -915,6 +922,21 @@
         <div class="article-content max-w-prose mb-20">
           
 
+<style>
+.aplayer-title {
+      color: #60A5FA !important;
+    }
+</style>
+<meting-js
+  server="netease"
+  type="song"
+  id="2666749200"
+  fixed="true"
+  autoplay="true"
+  loop="all"
+  order="list"
+  theme="#60A5FA"
+></meting-js>
 <p>PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。</p>
 <p>我们以GAT为例，说明scatter在GAT中的应用：一是相似度系数的归一，二是 \(h_i^{&rsquo;}\) 的加权邻域聚合。</p>
 <blockquote>
@@ -1327,46 +1349,38 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
   </a>
 </div>
     </main><footer id="site-footer" class="py-10 print:hidden">
-  
-  
     
-    <nav class="flex flex-row pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400">
-      <ul class="flex flex-col list-none sm:flex-row">
-        
-        <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
-          <a class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center" href="/categories/"
-            title="Categories">
-            
-            Categories
-          </a>
-        </li>
-        
-        <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
-          <a class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center" href="/tags/"
-            title="Tags">
-            
-            Tags
-          </a>
-        </li>
-        
-      </ul>
-    </nav>
-    
-  
+  <nav class="flex flex-row pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400">
+    <ul class="flex flex-col list-none sm:flex-row">
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/categories/"
+          title="Categories"
+        >
+           Categories
+        </a>
+      </li>
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/tags/"
+          title="Tags"
+        >
+           Tags
+        </a>
+      </li>
+      
+    </ul>
+  </nav>
+   
   <div class="flex items-center justify-between">
-
-    
-    
-    <p class="text-sm text-neutral-500 dark:text-neutral-400">
-      &copy;
-      2025
-      Aoidayo
+     
+    <p class="text-sm text-neutral-500 dark:text-neutral-400"> &copy; 2025 Aoidayo
     </p>
-    
-
-    
-    
-
+      
   </div>
   <script>
     
@@ -1377,11 +1391,9 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
     })
     
   </script>
-  
-  
+   
   <script type="text/javascript" src="/js/process.min.ee03488f19c93c2efb199e2e3014ea5f3cb2ce7d45154adb3399a158cac27ca52831db249ede5bb602700ef87eb02434139de0858af1818ab0fb4182472204a4.js" integrity="sha512-7gNIjxnJPC77GZ4uMBTqXzyyzn1FFUrbM5mhWMrCfKUoMdsknt5btgJwDvh&#43;sCQ0E53ghYrxgYqw&#43;0GCRyIEpA=="></script>
-  
-  
+    
 </footer>
 <div
   id="search-wrapper"
