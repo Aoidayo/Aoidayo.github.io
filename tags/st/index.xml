@@ -15,7 +15,11 @@
       <pubDate>Mon, 21 Apr 2025 20:25:21 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/scatter-in-gnn/</guid>
-      <description>&lt;style&gt;
+      <description>&lt;link rel=&#34;stylesheet&#34; href=&#34;https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css&#34; /&gt;
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js&#34;&gt;&lt;/script&gt;
+
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js&#34;&gt;&lt;/script&gt;
+&lt;style&gt;
 .aplayer-list-title {
   color: #60a5fa !important;
 }
@@ -35,7 +39,7 @@
   type=&#34;song&#34;
   id=&#34;2666749200&#34;
   fixed=&#34;true&#34;
-  autoplay=&#34;true&#34;
+  autoplay=&#34;false&#34;
   loop=&#34;all&#34;
   order=&#34;list&#34;
   theme=&#34;#60A5FA&#34;
