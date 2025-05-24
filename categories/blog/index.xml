@@ -73,9 +73,19 @@ $$&lt;/p&gt;</description>
       
       <guid>https://blog.aoidayo.site/blog/scatter-in-gnn/</guid>
       <description>&lt;style&gt;
+.aplayer-list-title {
+  color: #60a5fa !important;
+}
 .aplayer-title {
-      color: #60A5FA !important;
-    }
+  color: #60a5fa !important;
+}
+
+.aplayer-lrc p.aplayer-lrc-current {
+  color: #60a5fa !important;
+}
+.aplayer.aplayer-fixed .aplayer-lrc {
+  text-shadow: none;
+}
 &lt;/style&gt;
 &lt;meting-js
   server=&#34;netease&#34;
@@ -87,8 +97,7 @@ $$&lt;/p&gt;</description>
   order=&#34;list&#34;
   theme=&#34;#60A5FA&#34;
 &gt;&lt;/meting-js&gt;
-&lt;p&gt;PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。&lt;/p&gt;
-&lt;p&gt;我们以GAT为例，说明scatter在GAT中的应用：一是相似度系数的归一，二是 \(h_i^{&amp;rsquo;}\) 的加权邻域聚合。&lt;/p&gt;</description>
+&lt;p&gt;PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg" />
     </item>
     
