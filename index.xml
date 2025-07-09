@@ -10,6 +10,50 @@
     <atom:link href="https://blog.aoidayo.site/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>25-7</title>
+      <link>https://blog.aoidayo.site/moments/25-7/</link>
+      <pubDate>Thu, 31 Jul 2025 07:00:00 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/moments/25-7/</guid>
+      <description>&lt;p&gt;好有层次感的云
+
+  &lt;figure&gt;
+    &lt;img class=&#34;my-0 rounded-md&#34; loading=&#34;lazy&#34; src=&#34;https://tvax1.sinaimg.cn/large/008cUwX4gy1i37twk3hzyj31hc1404az.jpg&#34; alt=&#34;&#34; /&gt;
+    
+  &lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;帮换宿舍的同学搬行李
+
+  &lt;figure&gt;
+    &lt;img class=&#34;my-0 rounded-md&#34; loading=&#34;lazy&#34; src=&#34;https://tvax2.sinaimg.cn/large/008cUwX4gy1i37ttcdhwvj31yw1h67wh.jpg&#34; alt=&#34;&#34; /&gt;
+    
+  &lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;一半阴天一半晴天，太阳雨之后出了彩虹
+
+  &lt;figure&gt;
+    &lt;img class=&#34;my-0 rounded-md&#34; loading=&#34;lazy&#34; src=&#34;https://tvax3.sinaimg.cn/large/008cUwX4gy1i37tqvqi9nj31yw1h6n4i.jpg&#34; alt=&#34;&#34; /&gt;
+    
+  &lt;/figure&gt;
+
+
+  &lt;figure&gt;
+    &lt;img class=&#34;my-0 rounded-md&#34; loading=&#34;lazy&#34; src=&#34;https://tvax1.sinaimg.cn/large/008cUwX4gy1i37va0fhs7j30u0140jvs.jpg&#34; alt=&#34;&#34; /&gt;
+    
+  &lt;/figure&gt;
+&lt;/p&gt;
+&lt;script&gt;
+    window.onload = function() {
+        var zenButton = document.getElementById(&#39;zen-mode-button&#39;);
+        zenButton.click();
+    };
+    
+    
+&lt;/script&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>Hugo 伪加密</title>
       <link>https://blog.aoidayo.site/blog/encrypt/</link>
       <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
