@@ -10,6 +10,17 @@
     <atom:link href="https://blog.aoidayo.site/blog/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>魔改版RTX 2060 12G装驱动 的傻瓜式补充</title>
+      <link>https://blog.aoidayo.site/blog/2060m-extra/</link>
+      <pubDate>Tue, 14 Oct 2025 22:38:24 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/2060m-extra/</guid>
+      <description>&lt;p&gt;本文对这篇&lt;a href=&#34;https://221.ltd/archives/295&#34; target=&#34;_blank&#34;&gt;魔改版 RTX 2060 12G 装驱动 解决 43 错误 - Shaw&amp;rsquo;s Blog&lt;/a&gt; 做更详细的傻瓜式补充。&lt;/p&gt;
+&lt;p&gt;实验室的这块 GPU 我在咸鱼上看了一下市价，6G 普遍都是四五百，12G 都要七八百了，这类魔改显卡芯片都是笔记本的。去年的时候我看值得买，里面讨论的 4090m 魔改版功耗比 Desltop 版差了一倍多，实际性能只能和 4070ti 掰手腕，我手上的这块 2060m 跑甜甜圈功耗也就在 120 左右。总之垃圾佬可以选择性的尝试甜品显卡的魔改版，高端一点的显卡还是不建议买魔改版。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>Hugo 伪加密</title>
       <link>https://blog.aoidayo.site/blog/encrypt/</link>
       <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
