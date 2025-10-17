@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr" class="scroll-smooth" data-default-appearance="dark"
+  data-auto-appearance="true"><head>
+  <meta charset="utf-8" />
+  
+  <meta http-equiv="content-language" content="zh-cn" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  
+  <title>Windows Scoop包管理，Terminal优化，WSL配置 &middot; Aoidayo</title>
+  <meta name="title" content="Windows Scoop包管理，Terminal优化，WSL配置 &middot; Aoidayo" />
+  
+  <meta name="description" content="Here is 傻瓜式补充" />
+  <meta name="keywords" content="Windows, " />
+  
+  
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/windows-use/" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link type="text/css" rel="stylesheet" href="/css/main.bundle.min.04a4bf51cd70cccf148279a2ff321494d22068ac3afbc59466733fc9eaa56900da5f8038eff2ecdbba22473f0b6677467788dd9fe5219375bb0327e895b9398b.css"
+    integrity="sha512-BKS/Uc1wzM8Ugnmi/zIUlNIgaKw6&#43;8WUZnM/yeqlaQDaX4A47/Ls27oiRz8LZndGd4jdn&#43;Uhk3W7Ayfolbk5iw==" />
+  
+  
+  <script type="text/javascript" src="/js/appearance.min.516a16745bea5a9bd011138d254cc0fd3973cd55ce6e15f3dec763e7c7c2c7448f8fe7b54cca811cb821b0c7e12cd161caace1dd794ac3d34d40937cbcc9ee12.js"
+    integrity="sha512-UWoWdFvqWpvQERONJUzA/TlzzVXObhXz3sdj58fCx0SPj&#43;e1TMqBHLghsMfhLNFhyqzh3XlKw9NNQJN8vMnuEg=="></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script defer type="text/javascript" id="script-bundle" src="/js/main.bundle.min.a2d78d78672e549fbfc972ece871725b5478ba0b65708dda20cb97ab80a865eae6d247e1b05a4aec6ebbf78647ec3233bad8b2609ed98eee53cd58aa17128bc7.js"
+    integrity="sha512-oteNeGcuVJ&#43;/yXLs6HFyW1R4ugtlcI3aIMuXq4CoZerm0kfhsFpK7G6794ZH7DIzutiyYJ7Zju5TzViqFxKLxw==" data-copy="" data-copied=""></script>
+  
+  
+  
+  <script src="/lib/zoom/zoom.min.37d2094687372da3f7343a221a470f6b8806f7891aa46a5a03966af7f0ebd38b9fe536cb154e6ad28f006d184b294525a7c4054b6bbb4be62d8b453b42db99bd.js" integrity="sha512-N9IJRoc3LaP3NDoiGkcPa4gG94kapGpaA5Zq9/Dr04uf5TbLFU5q0o8AbRhLKUUlp8QFS2u7S&#43;Yti0U7QtuZvQ=="></script>
+  
+  
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/windows-use/">
+  <meta property="og:site_name" content="Aoidayo">
+  <meta property="og:title" content="Windows Scoop包管理，Terminal优化，WSL配置">
+  <meta property="og:description" content="Here is 傻瓜式补充">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-10-17T12:42:24+08:00">
+    <meta property="article:modified_time" content="2025-10-17T05:07:51+00:00">
+    <meta property="article:tag" content="Windows">
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Windows Scoop包管理，Terminal优化，WSL配置">
+  <meta name="twitter:description" content="Here is 傻瓜式补充">
+
+  
+  <script type="application/ld+json">
+  [{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "articleSection": "",
+    "name": "Windows Scoop包管理，Terminal优化，WSL配置",
+    "headline": "Windows Scoop包管理，Terminal优化，WSL配置",
+    "description": "Here is 傻瓜式补充",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003e1 \/ Windows 包管理 \n    \u003cdiv id=\u00221--windows-%E5%8C%85%E7%AE%A1%E7%90%86\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#1--windows-%E5%8C%85%E7%AE%A1%E7%90%86\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\n\n\u003ch2 class=\u0022relative group\u0022\u003escoop \n    \u003cdiv id=\u0022scoop\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#scoop\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cul\u003e\n\u003cli\u003escoop 多开发环境配置使用教程：\u003ca href=\u0022https:\/\/www.xrgzs.top\/posts\/scoop-dev-setup\u0022 target=\u0022_blank\u0022\u003eScoop 搭建 Windows 开发环境 | 潇然工作室\u003c\/a\u003e\u003c\/li\u003e\n\u003cli\u003escoop 必不可少的一环：如何使用 \u003ca href=\u0022https:\/\/zhuanlan.zhihu.com\/p\/463284082\u0022 target=\u0022_blank\u0022\u003e(63 封私信 \/ 82 条消息) Scoop——也许是 Windows 平台最好用的软件（包）管理器 - 知乎\u003c\/a\u003e\u003c\/li\u003e\n\u003cli\u003e\u003ca href=\u0022https:\/\/blog.suqingyu.com\/archives\/b3803be6-a713-4aea-8638-58b5402811c5\u0022 target=\u0022_blank\u0022\u003eScoop | Windows 下的软件包管理神器 - 苏青羽的小窝\u003c\/a\u003e\u003c\/li\u003e\n\u003cli\u003e官网：\u003ca href=\u0022https:\/\/scoop.sh\/#\/\u0022 target=\u0022_blank\u0022\u003eScoop\u003c\/a\u003e\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003cp\u003ewindows 的包管理器之一，使用它下载一些比较轻量的软件\/命令行工具、以及一些开发环境（类似 Debian 的 apt \/ brew）。\u003c\/p\u003e",
+    "inLanguage": "zh-cn",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/windows-use\/",
+    "author" : {
+      "@type": "Person",
+      "name": "Aoidayo"
+    },
+    "copyrightYear": "2025",
+    "dateCreated": "2025-10-17T12:42:24\u002b08:00",
+    "datePublished": "2025-10-17T12:42:24\u002b08:00",
+    
+    "dateModified": "2025-10-17T05:07:51\u002b00:00",
+    
+    "keywords": ["Windows"],
+    
+    "mainEntityOfPage": "true",
+    "wordCount": "7088"
+  }]
+  </script>
+
+
+  
+  
+  <meta name="author" content="Aoidayo" />
+  
+  
+  
+  <link href="https://github.com/aoidayo" rel="me" />
+  
+  
+  <link href="https://space.bilibili.com/23522093" rel="me" />
+  
+  
+  
+  
+
+<script src="/lib/jquery/jquery.slim.min.b0dca576e87d7eaa5850ae4e61759c065786cdb6489d68fcc82240539eebd5da522bdb4fda085ffd245808c8fe2acb2516408eb774ef26b5f6015fc6737c0ea8.js" integrity="sha512-sNylduh9fqpYUK5OYXWcBleGzbZInWj8yCJAU57r1dpSK9tP2ghf/SRYCMj&#43;KsslFkCOt3TvJrX2AV/Gc3wOqA=="></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-L93JFY81SM');
+</script>
+
+
+
+  
+  
+  <meta name="theme-color"/>
+  
+  
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.min.css" />
+</head>
+<body
+  class="flex flex-col h-screen px-6 m-auto text-lg leading-7 max-w-7xl bg-neutral text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32 scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600">
+  <div id="the-top" class="absolute flex self-center">
+    <a class="px-3 py-1 text-sm -translate-y-8 rounded-b-lg bg-primary-200 focus:translate-y-0 dark:bg-neutral-600"
+      href="#main-content"><span
+        class="font-bold text-primary-600 ltr:pr-2 rtl:pl-2 dark:text-primary-400">&darr;</span>跳过正文</a>
+  </div>
+  
+  
+  <div class="min-h-[148px]"></div>
+<div class="fixed inset-x-0 pl-[24px] pr-[24px]" style="z-index:100">
+  <div id="menu-blur" class="absolute opacity-0 inset-x-0 top-0 h-full single_hero_background nozoom backdrop-blur-2xl shadow-2xl"></div>
+  <div class="relative max-w-[64rem] ml-auto mr-auto">
+    <div style="padding-left:0;padding-right:0;padding-top:2px;padding-bottom:3px"
+    class="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start gap-x-3">
+    
+    <div class="flex flex-1 items-center justify-between">
+        <nav class="flex space-x-3">
+
+            
+            <a href="/" class="text-base font-medium text-gray-500 hover:text-gray-900">Aoidayo</a>
+            
+
+        </nav>
+        <nav class="hidden md:flex items-center gap-x-5 md:ml-12 h-12">
+
+            
+            
+            
+  <a href="/blog/"  class="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+    
+    <p class="text-base font-medium" title="">
+        blog
+    </p>
+</a>
+
+
+
+            
+            
+
+            
+
+
+            
+            <button id="search-button" aria-label="Search" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
+                title="">
+                
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+            </button>
+            
+
+
+            
+            
+            <div
+                class=" flex items-center">
+                <button id="appearance-switcher" aria-label="Dark mode switcher" type="button" class="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                    <div class="flex items-center justify-center dark:hidden">
+                        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M32 256c0-123.8 100.3-224 223.8-224c11.36 0 29.7 1.668 40.9 3.746c9.616 1.777 11.75 14.63 3.279 19.44C245 86.5 211.2 144.6 211.2 207.8c0 109.7 99.71 193 208.3 172.3c9.561-1.805 16.28 9.324 10.11 16.95C387.9 448.6 324.8 480 255.8 480C132.1 480 32 379.6 32 256z"/></svg>
+
+  </span>
+
+
+                    </div>
+                    <div class="items-center justify-center hidden dark:flex">
+                        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 159.1c-53.02 0-95.1 42.98-95.1 95.1S202.1 351.1 256 351.1s95.1-42.98 95.1-95.1S309 159.1 256 159.1zM509.3 347L446.1 255.1l63.15-91.01c6.332-9.125 1.104-21.74-9.826-23.72l-109-19.7l-19.7-109c-1.975-10.93-14.59-16.16-23.72-9.824L256 65.89L164.1 2.736c-9.125-6.332-21.74-1.107-23.72 9.824L121.6 121.6L12.56 141.3C1.633 143.2-3.596 155.9 2.736 164.1L65.89 256l-63.15 91.01c-6.332 9.125-1.105 21.74 9.824 23.72l109 19.7l19.7 109c1.975 10.93 14.59 16.16 23.72 9.824L256 446.1l91.01 63.15c9.127 6.334 21.75 1.107 23.72-9.822l19.7-109l109-19.7C510.4 368.8 515.6 356.1 509.3 347zM256 383.1c-70.69 0-127.1-57.31-127.1-127.1c0-70.69 57.31-127.1 127.1-127.1s127.1 57.3 127.1 127.1C383.1 326.7 326.7 383.1 256 383.1z"/></svg>
+
+  </span>
+
+
+                    </div>
+                </button>
+            </div>
+            
+
+        </nav>
+        <div class="flex md:hidden items-center gap-x-5 md:ml-12 h-12">
+
+            <span></span>
+
+            
+
+
+            
+            <button id="search-button-mobile" aria-label="Search" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
+                title="">
+                
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+            </button>
+            
+
+            
+            
+            <button id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button" class="text-base hover:text-primary-600 dark:hover:text-primary-400 ltr:mr-1 rtl:ml-1">
+                <div class="flex items-center justify-center dark:hidden">
+                    
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M32 256c0-123.8 100.3-224 223.8-224c11.36 0 29.7 1.668 40.9 3.746c9.616 1.777 11.75 14.63 3.279 19.44C245 86.5 211.2 144.6 211.2 207.8c0 109.7 99.71 193 208.3 172.3c9.561-1.805 16.28 9.324 10.11 16.95C387.9 448.6 324.8 480 255.8 480C132.1 480 32 379.6 32 256z"/></svg>
+
+  </span>
+
+
+                </div>
+                <div class="items-center justify-center hidden dark:flex">
+                    
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 159.1c-53.02 0-95.1 42.98-95.1 95.1S202.1 351.1 256 351.1s95.1-42.98 95.1-95.1S309 159.1 256 159.1zM509.3 347L446.1 255.1l63.15-91.01c6.332-9.125 1.104-21.74-9.826-23.72l-109-19.7l-19.7-109c-1.975-10.93-14.59-16.16-23.72-9.824L256 65.89L164.1 2.736c-9.125-6.332-21.74-1.107-23.72 9.824L121.6 121.6L12.56 141.3C1.633 143.2-3.596 155.9 2.736 164.1L65.89 256l-63.15 91.01c-6.332 9.125-1.105 21.74 9.824 23.72l109 19.7l19.7 109c1.975 10.93 14.59 16.16 23.72 9.824L256 446.1l91.01 63.15c9.127 6.334 21.75 1.107 23.72-9.822l19.7-109l109-19.7C510.4 368.8 515.6 356.1 509.3 347zM256 383.1c-70.69 0-127.1-57.31-127.1-127.1c0-70.69 57.31-127.1 127.1-127.1s127.1 57.3 127.1 127.1C383.1 326.7 326.7 383.1 256 383.1z"/></svg>
+
+  </span>
+
+
+                </div>
+            </button>
+            
+
+        </div>
+    </div>
+    <div class="-my-2 md:hidden">
+
+        <label id="menu-button" class="block">
+            
+            <div class="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+                
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/></svg>
+
+  </span>
+
+
+            </div>
+            <div id="menu-wrapper" style="padding-top:5px;"
+                class="fixed inset-0 z-30 invisible w-screen h-screen m-0 overflow-auto transition-opacity opacity-0 cursor-default bg-neutral-100/50 backdrop-blur-sm dark:bg-neutral-900/50">
+                <ul
+                    class="flex space-y-2 mt-3 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
+
+                    <li id="menu-close-button">
+                        <span
+                            class="cursor-pointer inline-block align-text-bottom hover:text-primary-600 dark:hover:text-primary-400">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/></svg>
+
+  </span>
+
+</span>
+                    </li>
+
+                    
+
+                    
+  <li class="mt-1">
+    <a href="/blog/"  class="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+        
+        <p class="text-bg font-bg" title="">
+            blog
+        </p>
+    </a>
+</li>
+
+
+
+
+                    
+
+                </ul>
+                
+                
+
+            </div>
+        </label>
+    </div>
+</div>
+
+
+
+
+<script>
+    (function () {
+        var $mainmenu = $('.main-menu');
+        var path = window.location.pathname;
+        $mainmenu.find('a[href="' + path + '"]').each(function (i, e) {
+            $(e).children('p').addClass('active');
+        });
+    })();
+</script>
+
+
+  </div>
+</div>
+<script>
+  window.addEventListener('scroll', function (e) {
+    var scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var background_blur = document.getElementById('menu-blur');
+    background_blur.style.opacity = (scroll / 300);
+  });
+</script>
+
+  
+  <div class="relative flex flex-col grow">
+    <main id="main-content" class="grow">
+      
+
+
+<article>
+  
+  
+  
+  
+  
+  
+
+
+
+<div id="hero" class="h-[150px] md:h-[200px]"></div>
+
+
+
+    
+    <div class="fixed inset-x-0 top-0 h-[800px] single_hero_background nozoom"
+    style="background-image:url(/1760363667479_8647532121085158976_hu_dfbcae9a547ec548.png);">
+    
+
+
+    <div class="absolute inset-0 bg-gradient-to-t from-neutral dark:from-neutral-800 to-transparent mix-blend-normal">
+    </div>
+    <div
+        class="absolute inset-0 opacity-60 bg-gradient-to-t from-neutral dark:from-neutral-800 to-neutral-100 dark:to-neutral-800 mix-blend-normal">
+    </div>
+</div>
+
+<div id="background-blur" class="fixed opacity-0 inset-x-0 top-0 h-full single_hero_background nozoom backdrop-blur-2xl"></div>
+<script>
+    window.addEventListener('scroll', function (e) {
+        var scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        var background_blur = document.getElementById('background-blur');
+        background_blur.style.opacity = (scroll / 300)
+    });
+</script>
+
+  
+  
+
+  <header id="single_header" class="mt-5 max-w-prose">
+    
+<div class="post-password">
+  
+</div>
+
+    
+    <ol class="text-sm text-neutral-500 dark:text-neutral-400 print:hidden">
+  
+  
+    
+  
+    
+  
+  <li class="inline hidden">
+    <a
+      class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
+      href="/"
+      ></a
+    ><span class="px-1 text-primary-500">/</span>
+  </li>
+
+  
+  <li class="inline ">
+    <a
+      class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
+      href="/blog/"
+      >blog</a
+    ><span class="px-1 text-primary-500">/</span>
+  </li>
+
+  
+  <li class="inline hidden">
+    <a
+      class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
+      href="/blog/windows-use/"
+      >Windows Scoop包管理，Terminal优化，WSL配置</a
+    ><span class="px-1 text-primary-500">/</span>
+  </li>
+
+</ol>
+
+
+    
+    <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
+      Windows Scoop包管理，Terminal优化，WSL配置
+    </h1>
+    <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
+      
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2025-10-17T12:42:24&#43;08:00">2025年10月17日 12時42分</time><span class="px-2 text-primary-500">&middot;</span><span>7088 字</span><span class="px-2 text-primary-500">&middot;</span>
+
+
+<script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
+
+<span class="mb-[2px]">
+    <span id="zen-mode-button"
+          class="text-lg hover:text-primary-500"
+          title=""
+          data-title-i18n-disable=""
+          data-title-i18n-enable="">
+        <span class="inline-block align-text-bottom">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50px" height="50px">
+    <path fill="currentColor" d="M 12.980469 4 C 9.1204688 4 5.9804688 7.14 5.9804688 11 L 6 26 L 9.9804688 26 L 9.9804688 11 C 9.9804688 9.35 11.320469 8 12.980469 8 L 40.019531 8 C 41.679531 8 43.019531 9.35 43.019531 11 L 43.019531 39 C 43.019531 40.65 41.679531 42 40.019531 42 L 29 42 C 29 43.54 28.420938 44.94 27.460938 46 L 40.019531 46 C 43.879531 46 47.019531 42.86 47.019531 39 L 47.019531 11 C 47.019531 7.14 43.879531 4 40.019531 4 L 12.980469 4 z M 7 28 C 4.794 28 3 29.794 3 32 L 3 42 C 3 44.206 4.794 46 7 46 L 23 46 C 25.206 46 27 44.206 27 42 L 27 32 C 27 29.794 25.206 28 23 28 L 7 28 z M 7 32 L 23 32 L 23.001953 42 L 7 42 L 7 32 z"/>
+</svg>
+  </span>
+
+</span>
+    </span>
+</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/windows/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Windows
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+
+    
+      
+      
+        
+        
+<div class="flex author">
+  
+    
+    
+      
+    
+    
+      
+        
+      
+      <img class="!mt-0 !mb-0 h-24 w-24 rounded-full ltr:mr-4 rtl:ml-4" width="96" height="96"
+      alt="Aoidayo" src="/img/icon_hu_f7dbf5d1721e9ba1.jpeg" />
+    
+  
+  <div class="place-self-center">
+    
+    <div class="text-[0.6rem] uppercase leading-3 text-neutral-500 dark:text-neutral-400">
+      作者
+    </div>
+    <div class="font-semibold leading-6 text-neutral-800 dark:text-neutral-300">
+      Aoidayo
+    </div>
+    
+    
+    <div class="text-sm text-neutral-700 dark:text-neutral-400">懒人</div>
+    
+    <div class="text-2xl sm:text-lg">
+  <div class="flex flex-wrap text-neutral-400 dark:text-neutral-500">
+    
+      
+        <a
+          class="px-1 hover:text-primary-700 dark:hover:text-primary-400"
+          href="https://github.com/aoidayo"
+          target="_blank"
+          aria-label="Github"
+          rel="me noopener noreferrer"
+          ><span class="inline-block align-text-bottom">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+
+  </span>
+
+</span></a
+        >
+      
+    
+      
+        <a
+          class="px-1 hover:text-primary-700 dark:hover:text-primary-400"
+          href="https://space.bilibili.com/23522093"
+          target="_blank"
+          aria-label="Bilibili"
+          rel="me noopener noreferrer"
+          ><span class="inline-block align-text-bottom">
+
+  <span class="relative block icon">
+    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+  </span>
+
+</span></a
+        >
+      
+    
+  </div>
+
+</div>
+  </div>
+</div>
+
+      
+
+      
+
+      
+      <div class="mb-5"></div>
+      
+
+    
+
+  </header>
+  
+  <section class="flex flex-col max-w-full mt-0 prose dark:prose-invert lg:flex-row">
+    
+     <div
+      class="order-first lg:ml-auto px-0 lg:order-last ltr:lg:pl-8 rtl:lg:pr-8">
+      <div class="toc ltr:pl-5 rtl:pr-5 print:hidden lg:sticky lg:top-[140px]">
+
+         <details open id="TOCView"
+  class="toc-right mt-0 overflow-y-scroll overscroll-contain scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600 rounded-lg ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 hidden lg:block">
+  <summary
+    class="block py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
+    目录
+  </summary>
+  <div
+    class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1--windows-包管理">1 / Windows 包管理</a></li>
+    <li><a href="#scoop">scoop</a>
+      <ul>
+        <li><a href="#前置准备">前置准备</a></li>
+        <li><a href="#安装">安装</a></li>
+        <li><a href="#添加代理">添加代理</a></li>
+        <li><a href="#配置-aria2-下载">配置 Aria2 下载</a></li>
+        <li><a href="#配置-sudo-打开管理员模式">配置 sudo 打开管理员模式</a></li>
+        <li><a href="#添加-buckets">添加 buckets</a></li>
+        <li><a href="#基本使用">基本使用</a></li>
+        <li><a href="#如何卸载">如何卸载</a></li>
+        <li><a href="#环境配置">环境配置</a>
+          <ul>
+            <li><a href="#python--miniforge">python | miniforge</a></li>
+          </ul>
+        </li>
+        <li><a href="#app-list">app list</a>
+          <ul>
+            <li><a href="#scoop-list-all-的-powershell-函数">scoop-list-all 的 powershell 函数</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#2--windows-终端优化">2 / Windows 终端优化</a></li>
+    <li><a href="#windows-terminal">Windows Terminal</a></li>
+    <li><a href="#powershell-升级">PowerShell 升级</a>
+      <ul>
+        <li><a href="#启动速度优化">启动速度优化</a></li>
+        <li><a href="#自动补全">自动补全</a></li>
+        <li><a href="#starship-美化">starship 美化</a></li>
+        <li><a href="#命令行增强">命令行增强</a></li>
+        <li><a href="#x-cmd">x-cmd</a></li>
+      </ul>
+    </li>
+    <li><a href="#3--wsl-配置">3 / wsl 配置</a>
+      <ul>
+        <li><a href="#windows-ssh-配置">Windows SSH 配置</a></li>
+        <li><a href="#局域网中的其他主机访问-wsl">局域网中的其他主机访问 wsl</a>
+          <ul>
+            <li><a href="#1windows11">（1）windows11</a></li>
+            <li><a href="#2windows10">（2）windows10</a></li>
+          </ul>
+        </li>
+        <li><a href="#wsl-配置-miniforge">wsl 配置 miniforge</a></li>
+        <li><a href="#pycharm-配置-ssh">pycharm 配置 ssh</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</details>
+<details class="toc-inside mt-0 overflow-hidden rounded-lg ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 lg:hidden">
+  <summary
+    class="py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
+    目录
+  </summary>
+  <div
+    class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1--windows-包管理">1 / Windows 包管理</a></li>
+    <li><a href="#scoop">scoop</a>
+      <ul>
+        <li><a href="#前置准备">前置准备</a></li>
+        <li><a href="#安装">安装</a></li>
+        <li><a href="#添加代理">添加代理</a></li>
+        <li><a href="#配置-aria2-下载">配置 Aria2 下载</a></li>
+        <li><a href="#配置-sudo-打开管理员模式">配置 sudo 打开管理员模式</a></li>
+        <li><a href="#添加-buckets">添加 buckets</a></li>
+        <li><a href="#基本使用">基本使用</a></li>
+        <li><a href="#如何卸载">如何卸载</a></li>
+        <li><a href="#环境配置">环境配置</a>
+          <ul>
+            <li><a href="#python--miniforge">python | miniforge</a></li>
+          </ul>
+        </li>
+        <li><a href="#app-list">app list</a>
+          <ul>
+            <li><a href="#scoop-list-all-的-powershell-函数">scoop-list-all 的 powershell 函数</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#2--windows-终端优化">2 / Windows 终端优化</a></li>
+    <li><a href="#windows-terminal">Windows Terminal</a></li>
+    <li><a href="#powershell-升级">PowerShell 升级</a>
+      <ul>
+        <li><a href="#启动速度优化">启动速度优化</a></li>
+        <li><a href="#自动补全">自动补全</a></li>
+        <li><a href="#starship-美化">starship 美化</a></li>
+        <li><a href="#命令行增强">命令行增强</a></li>
+        <li><a href="#x-cmd">x-cmd</a></li>
+      </ul>
+    </li>
+    <li><a href="#3--wsl-配置">3 / wsl 配置</a>
+      <ul>
+        <li><a href="#windows-ssh-配置">Windows SSH 配置</a></li>
+        <li><a href="#局域网中的其他主机访问-wsl">局域网中的其他主机访问 wsl</a>
+          <ul>
+            <li><a href="#1windows11">（1）windows11</a></li>
+            <li><a href="#2windows10">（2）windows10</a></li>
+          </ul>
+        </li>
+        <li><a href="#wsl-配置-miniforge">wsl 配置 miniforge</a></li>
+        <li><a href="#pycharm-配置-ssh">pycharm 配置 ssh</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</details>
+
+<script>
+
+  var margin = 200;
+  var marginError = 50;
+
+  (function () {
+    var $window = $(window);
+    var $toc = $('#TOCView');
+    var tocHeight = $toc.height();
+
+    function onResize() {
+      var windowAndMarginHeight = $window.height() - margin;
+      if(tocHeight >= windowAndMarginHeight) {
+        $toc.css("overflow-y", "scroll")
+        $toc.css("max-height", (windowAndMarginHeight + marginError) + "px")
+      } else {
+        $toc.css("overflow-y", "hidden")
+        $toc.css("max-height", "9999999px")
+      }
+    }
+
+    $window.on('resize', onResize);
+    $(document).ready(onResize);
+  })();
+
+
+
+  (function () {
+    var $toc = $('#TableOfContents');
+    if ($toc.length > 0) {
+      var $window = $(window);
+
+      function onScroll() {
+        var currentScroll = $window.scrollTop();
+        var h = $('.anchor');
+        var id = "";
+        h.each(function (i, e) {
+          e = $(e);
+          if (e.offset().top - $(window).height()/3 <= currentScroll) {
+            id = decodeURIComponent(e.attr('id'));
+          }
+        });
+        var active = $toc.find('a.active');      
+        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
+
+        active.each(function (i, e) {
+          
+            $(e).removeClass('active');
+          
+        });
+        $toc.find('a[href="#' + id + '"]').addClass('active')
+        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
+          $(e).children('a').parents('ul').show();          
+        });
+      }
+
+      $window.on('scroll', onScroll);
+      $(document).ready(function () {
+        
+        onScroll();
+      });
+    }
+  })();
+
+
+</script>
+   </div>
+      </div>
+      
+
+      <div class="min-w-0 min-h-0 max-w-fit">
+        
+        
+
+
+        <div class="article-content max-w-prose mb-20">
+          
+
+<h2 class="relative group">1 / Windows 包管理 
+    <div id="1--windows-%E5%8C%85%E7%AE%A1%E7%90%86" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#1--windows-%E5%8C%85%E7%AE%A1%E7%90%86" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+
+
+<h2 class="relative group">scoop 
+    <div id="scoop" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#scoop" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<ul>
+<li>scoop 多开发环境配置使用教程：<a href="https://www.xrgzs.top/posts/scoop-dev-setup" target="_blank">Scoop 搭建 Windows 开发环境 | 潇然工作室</a></li>
+<li>scoop 必不可少的一环：如何使用 <a href="https://zhuanlan.zhihu.com/p/463284082" target="_blank">(63 封私信 / 82 条消息) Scoop——也许是 Windows 平台最好用的软件（包）管理器 - 知乎</a></li>
+<li><a href="https://blog.suqingyu.com/archives/b3803be6-a713-4aea-8638-58b5402811c5" target="_blank">Scoop | Windows 下的软件包管理神器 - 苏青羽的小窝</a></li>
+<li>官网：<a href="https://scoop.sh/#/" target="_blank">Scoop</a></li>
+</ul>
+<p>windows 的包管理器之一，使用它下载一些比较轻量的软件/命令行工具、以及一些开发环境（类似 Debian 的 apt / brew）。</p>
+
+
+<h3 class="relative group">前置准备 
+    <div id="%E5%89%8D%E7%BD%AE%E5%87%86%E5%A4%87" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%89%8D%E7%BD%AE%E5%87%86%E5%A4%87" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>Scoop 是一个 PowerShell 工具，需要：</p>
+<ul>
+<li>Windows 10 / 11</li>
+<li>PowerShell 5.1 或更高（默认都有）,最好使用 PowerShell7</li>
+<li>可联网（最好能访问 GitHub）</li>
+<li>建议关闭 UAC（User Account Control） 弹窗（Scoop 默认装在用户目录，无需管理员权限）</li>
+</ul>
+
+
+<h3 class="relative group">安装 
+    <div id="%E5%AE%89%E8%A3%85" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%AE%89%E8%A3%85" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>pre</p>
+<pre tabindex="0"><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+</code></pre><p>（1）默认安装
+（自动放在 <code>C:\Users\&lt;你&gt;\scoop</code>）
+直接打开 PowerShell（非管理员），执行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">iwr </span><span class="n">-useb</span> <span class="n">get</span><span class="p">.</span><span class="py">scoop</span><span class="p">.</span><span class="py">sh</span> <span class="p">|</span> <span class="nb">iex
+</span></span></span></code></pre></div><p>执行后，你可以运行：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">scoop</span> <span class="p">-</span><span class="n">-version</span>
+</span></span></code></pre></div><p>确认安装成功。</p>
+<p>（2）自定义安装目录 <strong>（推荐）</strong>
+如果你想把所有软件放在自定义目录下面比如 <code>D:\Apps\Scoop</code>，则需要添加环境变量</p>
+<pre tabindex="0"><code>setx SCOOP &#34;D:\Apps\Scoop&#34; /M
+iwr -useb get.scoop.sh | iex
+</code></pre><p>安装后，所有 Scoop 软件会放在：</p>
+<pre tabindex="0"><code>D:\Apps\Scoop\apps\&lt;软件名&gt;\current\
+</code></pre><p>非常干净，不污染系统盘。</p>
+<p><sup>🔺setx</sup> 不加/m 表示用户变量，加上就是系统变量</p>
+<p>安装完成后，scoop 文件夹下面的结构</p>
+<ul>
+<li>apps——所有通过 scoop 安装的软件都在里面。</li>
+<li>buckets——管理软件的仓库，用于记录哪些软件可以安装、更新等信息，默认添加<code>main</code>仓库，主要包含无需 GUI 的软件，可手动添加其他仓库或自建仓库，具体在<a href="https://zhuanlan.zhihu.com/write#%E6%8E%A8%E8%8D%90%E8%BD%AF%E4%BB%B6%E4%BB%93%E5%BA%93" target="_blank">推荐软件仓库</a>中介绍。</li>
+<li>cache——软件下载后安装包暂存目录。</li>
+<li>persit——用于储存一些用户数据，不会随软件更新而替换。</li>
+<li>shims——用于软链接应用，使应用之间不会互相干扰，实际使用过程中无用户操作不必细究。</li>
+</ul>
+
+
+<h3 class="relative group">添加代理 
+    <div id="%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E6%B7%BB%E5%8A%A0%E4%BB%A3%E7%90%86" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>设置 scoop 的代理</p>
+<pre tabindex="0"><code>scoop config proxy 127.0.0.1:7890
+# clash verge rev是7897
+</code></pre><p>或者直接找到 Scoop 配置文件，路径 <code>C:\Users\username\.config\scoop\config.json</code>，然后直接修改里面的配置。</p>
+<p>取消代理</p>
+<pre tabindex="0"><code>scoop config rm proxy
+</code></pre>
+
+<h3 class="relative group">配置 Aria2 下载 
+    <div id="%E9%85%8D%E7%BD%AE-aria2-%E4%B8%8B%E8%BD%BD" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E9%85%8D%E7%BD%AE-aria2-%E4%B8%8B%E8%BD%BD" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>使用 Scoop 安装 Aria2 ，Scoop 会自动调用 Aria2 进行多线程加速下载。安装完会自动启用.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">install</span> <span class="n">aria2</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">config</span> <span class="nb">aria2-warning</span><span class="n">-enabled</span> <span class="n">false</span>
+</span></span></code></pre></div><p>与 Aria2 有关的设置选项：</p>
+<ul>
+<li><code>aria2-enabled</code>: 开启 Aria2 下载，默认<code>true</code></li>
+<li><code>aria2-retry-wait</code>: 重试等待秒数，默认<code>2</code></li>
+<li><code>aria2-split</code>: 单任务最大连接数，默认<code>5</code></li>
+<li><code>aria2-max-connection-per-server</code>: 单服务器最大连接数，默认<code>5</code> ，最大<code>16</code></li>
+<li><code>aria2-min-split-size</code>: 最小文件分片大小，默认<code>5M</code>
+优化 Aria2 设置，单任务最大连接数设置为  <code>32</code>，单服务器最大连接数设置为  <code>16</code>，最小文件分片大小设置为  <code>1M</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c">### aria2 在 Scoop 中默认开启</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">config</span> <span class="nb">aria2-enabled</span> <span class="n">true</span>
+</span></span><span class="line"><span class="cl"><span class="c">### 关于以下参数的作用，详见aria2的相关资料</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">config</span> <span class="nb">aria2-retry</span><span class="n">-wait</span> <span class="mf">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">config</span> <span class="nb">aria2-split</span> <span class="mf">16</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">config</span> <span class="nb">aria2-max</span><span class="n">-connection-per-server</span> <span class="mf">16</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">config</span> <span class="nb">aria2-min</span><span class="n">-split-size</span> <span class="mf">4M</span>
+</span></span></code></pre></div><p>因为 Scoop 默认的 TLS1.0/1.1 这两个协议已经被 github 禁用，这里需要配置现代 TLS 协议才能通过 HTTPS 连接下载。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="p">[</span><span class="no">Net.ServicePointManager</span><span class="p">]::</span><span class="n">SecurityProtocol</span> <span class="p">=</span> <span class="p">[</span><span class="no">Net.SecurityProtocolType</span><span class="p">]::</span><span class="n">Tls12</span>
+</span></span></code></pre></div>
+
+<h3 class="relative group">配置 sudo 打开管理员模式 
+    <div id="%E9%85%8D%E7%BD%AE-sudo-%E6%89%93%E5%BC%80%E7%AE%A1%E7%90%86%E5%91%98%E6%A8%A1%E5%BC%8F" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E9%85%8D%E7%BD%AE-sudo-%E6%89%93%E5%BC%80%E7%AE%A1%E7%90%86%E5%91%98%E6%A8%A1%E5%BC%8F" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>使用 Scoop 安装 sudo ，如果要用管理员运行命令,无需用管理员打开 cmd(or powershell) 直接在命令行前加一个 sudo 即可。</p>
+<pre tabindex="0"><code>scoop install sudo
+</code></pre><p>测试：</p>
+<pre tabindex="0"><code>sudo setx testForSudo &#34;C:/&#34;
+$env:testForSudo
+sudo [Environment]::SetEnvironmentVariable(&#39;testForSudo&#39;, $null, &#39;Machine&#39;)
+$env:testForSudo
+</code></pre>
+
+<h3 class="relative group">添加 buckets 
+    <div id="%E6%B7%BB%E5%8A%A0-buckets" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E6%B7%BB%E5%8A%A0-buckets" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>添加 buckets 之前，需要有 git 和 7zip</p>
+<pre tabindex="0"><code>scoop install git
+# 这段命令会连带下载7zip
+</code></pre><p>1、添加整合 buckets <a href="https://github.com/kkzzhizhou/scoop-apps" target="_blank">kkzzhizhou/scoop-apps: 使用 Github Action 每天自动合并其他 scoop 仓库的更新，仓库地址：https://github.com/kkzzhizhou/scoop-apps</a></p>
+<pre tabindex="0"><code>scoop bucket add apps https://github.com/kkzzhizhou/scoop-apps
+</code></pre><p>2、添加<a href="https://github.com/chawyehsu/dorado" target="_blank">dorado</a></p>
+<pre tabindex="0"><code>scoop bucket add dorado https://github.com/chawyehsu/dorado
+</code></pre><blockquote>
+<p>所有的包管理器都会有相应的软件仓库 ，而 bucket 就是 Scoop 中的软件仓库。细心的你可能会发现 scoop 翻译为中文是 “舀”，而 bucket 是 “水桶”，所以安装软件可以理解为从水桶里舀水，似乎很形象的说。 Scoop 默认软件仓库（main bucket）软件数量是有限的，但是可以进行额外的添加。</p></blockquote>
+<p><code>scoop bucket list</code> 查看当前已经添加的 bucekt</p>
+<pre tabindex="0"><code>✗ scoop bucket list
+
+Name   Source                                     Updated             Manifests
+----   ------                                     -------             ---------
+main   https://github.com/ScoopInstaller/Main.git 2025/10/16 8:38:16       1406
+extras https://github.com/ScoopInstaller/Extras   2025/10/16 8:39:16       2197
+apps   https://github.com/kkzzhizhou/scoop-apps   2025/10/15 12:40:54     14810
+</code></pre>
+
+<h3 class="relative group">基本使用 
+    <div id="%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p><strong>basic</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">search</span> <span class="c"># 搜索仓库中是否有相应软件。</span>
+</span></span><span class="line"><span class="cl"><span class="n">install</span> <span class="c"># 安装软件。</span>
+</span></span><span class="line"><span class="cl"><span class="n">uninstall</span> <span class="c"># 卸载软件。</span>
+</span></span><span class="line"><span class="cl"><span class="n">update</span> <span class="c"># 更新软件。可通过scoop update *更新所有已安装软件，或通过scoop update更新所有软件仓库资料及Scoop自身而不更新软件。</span>
+</span></span><span class="line"><span class="cl"><span class="n">hold</span> <span class="c"># 锁定软件阻止其更新。</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span> <span class="c"># 查询软件简要信息。</span>
+</span></span><span class="line"><span class="cl"><span class="n">home</span> <span class="c"># 打开浏览器进入软件官网。</span>
+</span></span><span class="line"><span class="cl"><span class="n">help</span> <span class="c"># 帮助</span>
+</span></span></code></pre></div><p>More&hellip;</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">alias</span>       <span class="n">Manage</span> <span class="n">scoop</span> <span class="n">aliases</span>
+</span></span><span class="line"><span class="cl"><span class="n">bucket</span>      <span class="n">Manage</span> <span class="n">Scoop</span> <span class="n">buckets</span>
+</span></span><span class="line"><span class="cl"><span class="n">cache</span>       <span class="n">Show</span> <span class="n">or</span> <span class="nb">clear </span><span class="n">the</span> <span class="n">download</span> <span class="n">cache</span>
+</span></span><span class="line"><span class="cl"><span class="nb">cat </span>        <span class="n">Show</span> <span class="n">content</span> <span class="n">of</span> <span class="n">specified</span> <span class="n">manifest</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl"><span class="n">checkup</span>     <span class="n">Check</span> <span class="k">for</span> <span class="n">potential</span> <span class="n">problems</span>
+</span></span><span class="line"><span class="cl"><span class="n">cleanup</span>     <span class="n">Cleanup</span> <span class="n">apps</span> <span class="n">by</span> <span class="n">removing</span> <span class="n">old</span> <span class="n">versions</span>
+</span></span><span class="line"><span class="cl"><span class="n">config</span>      <span class="n">Get</span> <span class="n">or</span> <span class="nb">set </span><span class="kd">configuration</span><span class="w"> </span><span class="nb">values
+</span></span></span><span class="line"><span class="cl"><span class="nb"></span><span class="n">create</span>      <span class="n">Create</span> <span class="n">a</span> <span class="n">custom</span> <span class="n">app</span> <span class="n">manifest</span>
+</span></span><span class="line"><span class="cl"><span class="n">depends</span>     <span class="n">List</span> <span class="n">dependencies</span> <span class="k">for</span> <span class="n">an</span> <span class="n">app</span>
+</span></span><span class="line"><span class="cl"><span class="n">export</span>      <span class="n">Exports</span> <span class="p">(</span><span class="n">an</span> <span class="n">importable</span><span class="p">)</span> <span class="n">list</span> <span class="n">of</span> <span class="n">installed</span> <span class="n">apps</span>
+</span></span><span class="line"><span class="cl"><span class="n">help</span>        <span class="n">Show</span> <span class="n">help</span> <span class="k">for</span> <span class="n">a</span> <span class="n">command</span>
+</span></span><span class="line"><span class="cl"><span class="n">hold</span>        <span class="n">Hold</span> <span class="n">an</span> <span class="n">app</span> <span class="n">to</span> <span class="n">disable</span> <span class="n">updates</span>
+</span></span><span class="line"><span class="cl"><span class="n">home</span>        <span class="n">Opens</span> <span class="n">the</span> <span class="n">app</span> <span class="n">homepage</span>
+</span></span><span class="line"><span class="cl"><span class="n">info</span>        <span class="n">Display</span> <span class="n">information</span> <span class="n">about</span> <span class="n">an</span> <span class="n">app</span>
+</span></span><span class="line"><span class="cl"><span class="n">install</span>     <span class="n">Install</span> <span class="n">apps</span>
+</span></span><span class="line"><span class="cl"><span class="n">list</span>        <span class="n">List</span> <span class="n">installed</span> <span class="n">apps</span>
+</span></span><span class="line"><span class="cl"><span class="n">prefix</span>      <span class="n">Returns</span> <span class="n">the</span> <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">specified</span> <span class="n">app</span>
+</span></span><span class="line"><span class="cl"><span class="n">reset</span>       <span class="n">Reset</span> <span class="n">an</span> <span class="n">app</span> <span class="n">to</span> <span class="n">resolve</span> <span class="n">conflicts</span>
+</span></span><span class="line"><span class="cl"><span class="n">search</span>      <span class="n">Search</span> <span class="n">available</span> <span class="n">apps</span>
+</span></span><span class="line"><span class="cl"><span class="n">status</span>      <span class="n">Show</span> <span class="n">status</span> <span class="n">and</span> <span class="n">check</span> <span class="k">for</span> <span class="n">new</span> <span class="n">app</span> <span class="n">versions</span>
+</span></span><span class="line"><span class="cl"><span class="n">unhold</span>      <span class="n">Unhold</span> <span class="n">an</span> <span class="n">app</span> <span class="n">to</span> <span class="n">enable</span> <span class="n">updates</span>
+</span></span><span class="line"><span class="cl"><span class="n">uninstall</span>   <span class="n">Uninstall</span> <span class="n">an</span> <span class="n">app</span>
+</span></span><span class="line"><span class="cl"><span class="n">update</span>      <span class="n">Update</span> <span class="n">apps</span><span class="p">,</span> <span class="n">or</span> <span class="n">Scoop</span> <span class="n">itself</span>
+</span></span><span class="line"><span class="cl"><span class="n">virustotal</span>  <span class="n">Look</span> <span class="k">for</span> <span class="n">app</span><span class="s1">&#39;s hash on virustotal.com
+</span></span></span><span class="line"><span class="cl"><span class="s1">which       Locate a shim/executable (similar to &#39;</span><span class="n">which</span><span class="err">&#39;</span> <span class="n">on</span> <span class="n">Linux</span><span class="p">)</span>
+</span></span></code></pre></div><p><strong>例子</strong>
+以下载 hugo 为例</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="c"># hugo信息</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">info</span> <span class="n">hugo</span>
+</span></span><span class="line"><span class="cl"><span class="c"># hugo 指定版本</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">install</span> <span class="n">hugo</span><span class="nv">@0</span><span class="p">.</span><span class="py">140</span><span class="p">.</span><span class="py">2</span>
+</span></span><span class="line"><span class="cl"><span class="c"># 当前已经安装的hugo版本，可能只会显示一个</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">list</span> <span class="n">hugo</span>
+</span></span><span class="line"><span class="cl"><span class="c"># 再次下载一个hugo</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">install</span> <span class="n">hugo</span><span class="nv">@0</span><span class="p">.</span><span class="py">151</span><span class="p">.</span><span class="py">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">reset</span> <span class="n">hugo</span><span class="nv">@0</span><span class="p">.</span><span class="py">140</span><span class="p">.</span><span class="py">2</span>
+</span></span></code></pre></div><p>以文件夹符号链接的方式，引用当前使用的 hugo 版本：
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251016102255.png" alt="" />
+      
+    </figure>
+</p>
+<blockquote>
+<p>删除旧版本软件，scoop 更新软件不会将旧版移除，只是将创建一个链接指向新版本。</p></blockquote>
+<p><strong>清理包缓存</strong>
+Scoop 会保留下载的安装包，对于卸载后又想再安装的情况，不需要重复下载。但长期累积会占用大量的磁盘空间，如果用不到就成了垃圾。这时可以使用 scoop cache 命令来清理。</p>
+<pre tabindex="0"><code>`scoop cache show` - 显示安装包缓存
+`scoop cache rm *` - 删除所有的安装包缓存
+</code></pre><p>如果不希望安装和更新软件时保留安装包缓存，可以加上  <code>-k</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">install</span> <span class="n">-k</span> <span class="p">&lt;</span><span class="n">app</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">scoop</span> <span class="n">update</span> <span class="n">-k</span> <span class="p">*</span>
+</span></span></code></pre></div><p><strong>安装失败时的处理</strong></p>
+<pre tabindex="0"><code># 删除损坏的安装
+scoop uninstall miniforge --purge
+
+# 管理员模式安装
+sudo scoop install miniforge
+</code></pre>
+
+<h3 class="relative group">如何卸载 
+    <div id="%E5%A6%82%E4%BD%95%E5%8D%B8%E8%BD%BD" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%A6%82%E4%BD%95%E5%8D%B8%E8%BD%BD" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<pre tabindex="0"><code>scoop uninstall scoop
+</code></pre><p>卸载后重新安装会出现问题</p>
+<pre tabindex="0"><code>&gt; iwr -useb get.scoop.sh | iex
+Initializing...
+Scoop is already installed. Run &#39;scoop update&#39; to get the latest version
+</code></pre><p>默认安装路径在 <code>$env:userprofile</code> 下面的 scoop 文件夹中，先删除这个文件夹</p>
+
+
+<h3 class="relative group">环境配置 
+    <div id="%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+
+
+<h4 class="relative group">python | miniforge 
+    <div id="python--miniforge" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#python--miniforge" aria-label="锚点">#</a>
+    </span>        
+    
+</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo scoop install miniforge
+</span></span></code></pre></div><p>安装完成后的 Note：</p>
+<pre tabindex="0"><code>This variant does not add the default venv into your PATH unless you activate it with &#39;conda activate base&#39;.
+You may choose to install the one from the official bucket if you do not care about python PATH pollution.
+
+Conda base env is not persisted by Scoop, packages installed to the base env will be removed when upgrading the app.
+We advice to setup &#39;envs_dirs&#39; to use a seperated path like &#39;~/.conda/envs&#39; and avoid using the base env.
+https://conda.io/projects/conda/en/latest/user-guide/configuration/use-condarc.html#specify-environment-directories-envs-dirs
+
+To enable conda tab-completion autoload, you can add the following code to your PowerShell $PROFILE:
+(&amp; conda &#39;shell.powershell&#39; &#39;hook&#39;) | Out-String | Invoke-Expression
+</code></pre><p>意思就是：</p>
+<ul>
+<li>没有添加 miniforge 的 env 到你的 path 中，但是因为 scoop/shims 已经将软链接 conda 添加，在使用 <code>conda init</code> 后可以直接使用 <code>conda activate base</code> 激活环境</li>
+<li>自动补全开启：<code>(&amp; conda 'shell.powershell' 'hook') | Out-String | Invoke-Expression</code>，把 conda hook 的输出加载进当前 PowerShell 环境。</li>
+</ul>
+<p>condainit 后会向 profile 中写入脏东西，启动速度优化可以转向 <a href="#PowerShell%e5%8d%87%e7%ba%a7">PowerShell 升级</a>。</p>
+
+
+<h3 class="relative group">app list 
+    <div id="app-list" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#app-list" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">➜ scoop list
+</span></span><span class="line"><span class="cl">Installed apps:
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Name           Version          Source           Updated             Info
+</span></span><span class="line"><span class="cl">----           -------          ------           -------             ----
+</span></span><span class="line"><span class="cl">7zip           25.01            main             2025-10-11 12:01:05
+</span></span><span class="line"><span class="cl">aria2          1.37.0-1         main             2025-10-16 09:54:49
+</span></span><span class="line"><span class="cl">colortool      1904.29002       main             2025-10-12 11:30:19
+</span></span><span class="line"><span class="cl">dark           3.14.1           main             2025-10-13 10:00:38
+</span></span><span class="line"><span class="cl">docker-desktop nightly-20251011 apps             2025-10-11 15:37:06
+</span></span><span class="line"><span class="cl">hugo           0.140.2          &lt;auto-generated&gt; 2025-10-16 10:17:26
+</span></span><span class="line"><span class="cl">neofetch       7.1.0            main             2025-10-17 10:36:27
+</span></span><span class="line"><span class="cl">powershell     7.5.3            apps             2025-10-11 16:41:03
+</span></span><span class="line"><span class="cl">powertoys      0.94.2           extras           2025-10-13 10:02:39
+</span></span><span class="line"><span class="cl">qqmusic                                          2025-10-11 15:40:07 Install failed
+</span></span><span class="line"><span class="cl">qqmusic_akirco 21.92            apps             2025-10-11 15:40:41
+</span></span><span class="line"><span class="cl">starship       1.23.0           main             2025-10-12 11:41:57
+</span></span><span class="line"><span class="cl">sudo           0.2020.01.26     main             2025-10-16 10:00:15
+</span></span><span class="line"><span class="cl">tre-command    0.4.0            main             2025-10-11 11:45:48
+</span></span></code></pre></div>
+
+<h4 class="relative group">scoop-list-all 的 powershell 函数 
+    <div id="scoop-list-all-%E7%9A%84-powershell-%E5%87%BD%E6%95%B0" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#scoop-list-all-%E7%9A%84-powershell-%E5%87%BD%E6%95%B0" aria-label="锚点">#</a>
+    </span>        
+    
+</h4>
+<pre tabindex="0"><code>function Scoop-ListAll {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$App
+    )
+
+    $appPath = &#34;$env:scoop\apps\$App&#34;
+
+    if (-not (Test-Path $appPath)) {
+        Write-Host &#34;❌ 未找到 Scoop 应用 &#39;$App&#39;&#34; -ForegroundColor Red
+        return
+    }
+
+    $versions = Get-ChildItem -Path $appPath -Directory | Select-Object -ExpandProperty Name
+
+    if ($versions.Count -eq 0) {
+        Write-Host &#34;⚠️  未找到已安装的版本。&#34;
+        return
+    }
+
+    # 检查 current 链接
+    $currentLink = (Get-Item &#34;$appPath\current&#34; -ErrorAction SilentlyContinue)
+    $currentTarget = $null
+    if ($currentLink -and $currentLink.LinkType -eq &#34;SymbolicLink&#34;) {
+        $currentTarget = Split-Path $currentLink.Target -Leaf
+    }
+
+    Write-Host &#34;📦 $App 已安装的版本：&#34; -ForegroundColor Cyan
+    foreach ($v in $versions) {
+        if ($v -eq &#34;current&#34;) { continue }
+        if ($v -eq $currentTarget) {
+            Write-Host &#34;  → $v  (当前启用)&#34; -ForegroundColor Green
+        } else {
+            Write-Host &#34;    $v&#34;
+        }
+    }
+}
+</code></pre><p>打开 profile，将这个函数加进去，重启 ps 后直接使用</p>
+<pre tabindex="0"><code>notepad $PROFILE
+</code></pre><p>使用</p>
+<pre tabindex="0"><code>➜ scoop-listall hugo
+📦 hugo 已安装的版本：
+    0.140.2
+    0.151.1
+
+➜ scoop list hugo
+Installed apps matching &#39;hugo&#39;:
+
+Name Version Source           Updated             Info
+---- ------- ------           -------             ----
+hugo 0.140.2 &lt;auto-generated&gt; 2025-10-16 10:17:26
+</code></pre>
+
+<h2 class="relative group">2 / Windows 终端优化 
+    <div id="2--windows-%E7%BB%88%E7%AB%AF%E4%BC%98%E5%8C%96" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#2--windows-%E7%BB%88%E7%AB%AF%E4%BC%98%E5%8C%96" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+
+
+<h2 class="relative group">Windows Terminal 
+    <div id="windows-terminal" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#windows-terminal" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<p>在 github <a href="https://github.com/microsoft/terminal" target="_blank">Windows Terminal</a> 或者微软商店页面搜索下载即可。
+Windows Terminal 有更加优雅的现代化界面和终端统一管理功能。</p>
+
+
+<h2 class="relative group">PowerShell 升级 
+    <div id="powershell-%E5%8D%87%E7%BA%A7" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#powershell-%E5%8D%87%E7%BA%A7" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<p>1、首先查看 powershell 的版本</p>
+<pre tabindex="0"><code>$Host.Version
+$psversiontable
+pwsh --version
+</code></pre><p>得到</p>
+<pre tabindex="0"><code>Major  Minor  Build  Revision
+-----  -----  -----  --------
+5      1      19041  1320
+</code></pre><p>分别是「主版本.次版本.构建版本.修订版本」</p>
+<p>powershell 的命令不区分大小写，驼峰式写法只是为了更可读。</p>
+<p>2、使用 scoop 升级 powershell</p>
+<pre tabindex="0"><code>scoop install powershell
+</code></pre><p>3、启用 powershell
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251016110643.png" alt="" />
+      
+    </figure>
+</p>
+<p>在启动处将其设置为默认配置文件</p>
+
+
+<h3 class="relative group">启动速度优化 
+    <div id="%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6%E4%BC%98%E5%8C%96" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%90%AF%E5%8A%A8%E9%80%9F%E5%BA%A6%E4%BC%98%E5%8C%96" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>1、查看 PowerShell 配置文件
+PowerShell 会在启动时按顺序加载不同配置文件：
+<code>$PROFILE | Format-List * -Force</code>
+输出类似：</p>
+<pre tabindex="0"><code>AllUsersAllHosts     : C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1
+AllUsersCurrentHost  : C:\Windows\System32\WindowsPowerShell\v1.0\Microsoft.PowerShell_profile.ps1
+CurrentUserAllHosts  : C:\Users\YourUser\Documents\PowerShell\profile.ps1
+CurrentUserCurrentHost : C:\Users\YourUser\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+</code></pre><p>💡 <strong>解释</strong>：</p>
+<ul>
+<li><code>AllUsersAllHosts</code>：对所有用户和所有宿主有效</li>
+<li><code>CurrentUserCurrentHost</code>：只对当前用户和当前宿主（比如 Windows Terminal）有效</li>
+<li>默认只要存在，PowerShell 就会尝试加载它们</li>
+</ul>
+<p>你可以直接用 Notepad 打开它们：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">&gt;</span> <span class="nv">$PROFILE</span> <span class="p">|</span> <span class="nb">Format-List</span> <span class="p">*</span> <span class="n">-Force</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">AllUsersAllHosts</span>       <span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span><span class="n">profile</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="cl"><span class="n">AllUsersCurrentHost</span>    <span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">v1</span><span class="p">.</span><span class="mf">0</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">PowerShell_profile</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="cl"><span class="n">CurrentUserAllHosts</span>    <span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">\</span><span class="n">Documents</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">profile</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="cl"><span class="n">CurrentUserCurrentHost</span> <span class="err">:</span> <span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">\</span><span class="n">Documents</span><span class="p">\</span><span class="n">WindowsPowerShell</span><span class="p">\</span><span class="n">Microsoft</span><span class="p">.</span><span class="py">PowerShell_profile</span><span class="p">.</span><span class="py">ps1</span>
+</span></span><span class="line"><span class="cl"><span class="n">Length</span>                 <span class="err">:</span> <span class="mf">81</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">&gt;</span> <span class="n">notepad</span> <span class="nv">$profile</span><span class="p">.</span><span class="py">AllUsersAllHosts</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">&gt;</span> <span class="nb">Test-Path</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="py">AllUsersCurrentHost</span>
+</span></span><span class="line"><span class="cl"><span class="n">False</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">&gt;</span> <span class="nb">Test-Path</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="py">CurrentUserAllHosts</span>
+</span></span><span class="line"><span class="cl"><span class="nb">PS </span><span class="n">C:</span><span class="p">\</span><span class="n">Users</span><span class="p">\</span><span class="n">tohsaka</span> <span class="n">rin</span><span class="p">&gt;</span> <span class="nb">Test-Path</span> <span class="nv">$PROFILE</span><span class="p">.</span><span class="py">CurrentUserAllHosts</span>
+</span></span><span class="line"><span class="cl"><span class="n">True</span>
+</span></span></code></pre></div><p>2、修改 conda 的配置
+参考<a href="https://zhuanlan.zhihu.com/p/27841790766" target="_blank">解决 conda init 后启动 powershell 速度慢的问题 - 知乎</a>
+conda init 后启动 powershell 速度慢的问题：</p>
+<p>在 PowerShell 中输入(路径替换为自己真实的路径)</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">(&amp; &#34;C:\path\to\conda\Scripts\conda.exe&#34; &#34;shell.powershell&#34; &#34;hook&#34;) | Out-String
+</span></span></code></pre></div><p>将输出的文本贴到 profile.ps1​ 中（将 username 替换为实际的用户名）</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">$Env:CONDA_EXE = &#34;C:\Users\username\miniconda3\Scripts\conda.exe&#34;
+</span></span><span class="line"><span class="cl">$Env:_CONDA_ROOT = &#34;C:\Users\username\miniconda3&#34;
+</span></span><span class="line"><span class="cl">$Env:_CONDA_EXE = &#34;C:\Users\username\miniconda3\Scripts\conda.exe&#34;
+</span></span><span class="line"><span class="cl">$CondaModuleArgs = @{ChangePs1 = $True }
+</span></span><span class="line"><span class="cl">Import-Module &#34;$Env:_CONDA_ROOT\shell\condabin\Conda.psm1&#34; -ArgumentList $CondaModuleArgs
+</span></span><span class="line"><span class="cl">conda activate base
+</span></span><span class="line"><span class="cl">Remove-Variable CondaModuleArgs
+</span></span></code></pre></div><p>最好删除 conda activate base​，并使用 conda config &ndash;set auto_activate_base false​ 禁用自动激活
+如果 conda config &ndash;set auto_activate_base false​ 提示无权限，则直接去 C:\Users\username​（username 替换)下找到<a href="https://zhida.zhihu.com/search?content_id=254590937&amp;content_type=Article&amp;match_order=1&amp;q=.condarc&amp;zd_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ6aGlkYV9zZXJ2ZXIiLCJleHAiOjE3NjA3NTc3NjIsInEiOiIuY29uZGFyYyIsInpoaWRhX3NvdXJjZSI6ImVudGl0eSIsImNvbnRlbnRfaWQiOjI1NDU5MDkzNywiY29udGVudF90eXBlIjoiQXJ0aWNsZSIsIm1hdGNoX29yZGVyIjoxLCJ6ZF90b2tlbiI6bnVsbH0.bDKLNWDpqcWQPi1HCcrDkMbMpWrnlHWpqROvaeIQSo0&amp;zhida_source=entity" target="_blank">.condarc</a>​ 文件加入如下代码</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">auto_activate_base: false
+</span></span></code></pre></div><p>‍</p>
+
+
+<h3 class="relative group">自动补全 
+    <div id="%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%A8" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>1、自动补全
+这里输入 h，向右即可自动补全
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251017102922.png" alt="" />
+      
+    </figure>
+</p>
+<p>2、开启补全配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="nb">Set-PSReadLineKeyHandler</span> <span class="n">-Key</span> <span class="n">Tab</span> <span class="n">-Function</span> <span class="n">MenuComplete</span>
+</span></span><span class="line"><span class="cl"><span class="nb">Set-PSReadLineKeyHandler</span> <span class="n">-Key</span> <span class="n">Tab</span> <span class="n">-Function</span> <span class="n">Complete</span>
+</span></span></code></pre></div><p>这两个函数的作用分别是：</p>
+<ul>
+<li><code>MenuComplete</code>：当有多个匹配项时，会显示一个交互式菜单列表。</li>
+<li><code>Complete</code>：直接补全到唯一的匹配项。</li>
+</ul>
+<p>如果需要全局生效，则需要加入<code>$profile</code>中</p>
+<p>3、重新加载 PSReadLine
+在 PowerShell 7.4 中，你可以通过以下步骤来重新加载 PSReadLine 模块：</p>
+<ol>
+<li>首先，你需要确保 PSReadLine 模块已经安装。你可以通过运行 <code>Get-Module -ListAvailable PSReadLine</code> 命令来检查 PSReadLine 模块是否已经安装。</li>
+<li>如果 PSReadLine 模块已经安装，你可以通过运行 <code>Remove-Module PSReadLine</code> 命令来卸载当前加载的 PSReadLine 模块。
+3，然后，你可以通过运行 <code>Import-Module PSReadLine</code> 命令来重新加载 PSReadLine 模块。</li>
+</ol>
+
+
+<h3 class="relative group">starship 美化 
+    <div id="starship-%E7%BE%8E%E5%8C%96" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#starship-%E7%BE%8E%E5%8C%96" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>1、下载 nerd 字体</p>
+<ul>
+<li>nerd 字体推荐下载 jetbrainsmono nerd font</li>
+<li>nerd 字体 cheat sheet：<a href="https://www.nerdfonts.com/cheat-sheet" target="_blank">Nerd Fonts - Iconic font aggregator, glyphs/icons collection, &amp; fonts patcher</a></li>
+</ul>
+<p>只安装 mono</p>
+<pre tabindex="0"><code>.
+├── JetBrainsMonoNerdFontMono-Bold.ttf
+├── JetBrainsMonoNerdFontMono-BoldItalic.ttf
+├── JetBrainsMonoNerdFontMono-ExtraBold.ttf
+├── JetBrainsMonoNerdFontMono-ExtraBoldItalic.ttf
+├── JetBrainsMonoNerdFontMono-ExtraLight.ttf
+├── JetBrainsMonoNerdFontMono-ExtraLightItalic.ttf
+├── JetBrainsMonoNerdFontMono-Italic.ttf
+├── JetBrainsMonoNerdFontMono-Light.ttf
+├── JetBrainsMonoNerdFontMono-LightItalic.ttf
+├── JetBrainsMonoNerdFontMono-Medium.ttf
+├── JetBrainsMonoNerdFontMono-MediumItalic.ttf
+├── JetBrainsMonoNerdFontMono-Regular.ttf
+├── JetBrainsMonoNerdFontMono-SemiBold.ttf
+├── JetBrainsMonoNerdFontMono-SemiBoldItalic.ttf
+├── JetBrainsMonoNerdFontMono-Thin.ttf
+└── JetBrainsMonoNerdFontMono-ThinItalic.ttf
+</code></pre><p>2、scoop 安装</p>
+<pre tabindex="0"><code>scoop install starship
+</code></pre><p>3、初始化
+（1）使用 powershell，运行 <code>$PROFILE</code>，记住这个路径，并进入这个路径（如果没有这个路径就创建）
+在这个路径下的 <code>Microsoft.PowerShell_profile.ps1</code> 中加入</p>
+<pre tabindex="0"><code>Invoke-Expression (&amp;starship init powershell)
+</code></pre><p>重启终端即可</p>
+<p>（2）或者</p>
+<pre tabindex="0"><code>PS C:\Users\tohsaka rin&gt; starship init powershell
+Invoke-Expression (&amp; &#39;D:\software\scoop\shims\starship.exe&#39; init powershell --print-full-init | Out-String)
+PS C:\Users\tohsaka rin&gt; notepad $profile
+</code></pre><p>4、配置 config</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="s2">&#34;$schema&#34;</span> <span class="p">=</span> <span class="s1">&#39;https://starship.rs/config-schema.json&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">[](color_orange)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$os\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$username\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$hostname\
+</span></span></span><span class="line"><span class="cl"><span class="s2">[](bg:color_yellow fg:color_orange)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$directory\
+</span></span></span><span class="line"><span class="cl"><span class="s2">[](fg:color_yellow bg:color_aqua)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$git_branch\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$git_status\
+</span></span></span><span class="line"><span class="cl"><span class="s2">[](fg:color_aqua bg:color_blue)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$c\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$cpp\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$rust\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$golang\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$nodejs\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$php\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$java\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$kotlin\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$haskell\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$python\
+</span></span></span><span class="line"><span class="cl"><span class="s2">[](fg:color_blue bg:color_bg3)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$docker_context\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$conda\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$pixi\
+</span></span></span><span class="line"><span class="cl"><span class="s2">[](fg:color_bg3 bg:color_bg1)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$time\
+</span></span></span><span class="line"><span class="cl"><span class="s2">[ ](fg:color_bg1)\
+</span></span></span><span class="line"><span class="cl"><span class="s2">$line_break$character&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">palette</span> <span class="p">=</span> <span class="s1">&#39;gruvbox_dark&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">palettes</span><span class="p">.</span><span class="nx">gruvbox_dark</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_fg0</span> <span class="p">=</span> <span class="s1">&#39;#fbf1c7&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_bg1</span> <span class="p">=</span> <span class="s1">&#39;#3c3836&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_bg3</span> <span class="p">=</span> <span class="s1">&#39;#665c54&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_blue</span> <span class="p">=</span> <span class="s1">&#39;#458588&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_aqua</span> <span class="p">=</span> <span class="s1">&#39;#689d6a&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_green</span> <span class="p">=</span> <span class="s1">&#39;#98971a&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_orange</span> <span class="p">=</span> <span class="s1">&#39;#d65d0e&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_purple</span> <span class="p">=</span> <span class="s1">&#39;#b16286&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_red</span> <span class="p">=</span> <span class="s1">&#39;#cc241d&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_yellow</span> <span class="p">=</span> <span class="s1">&#39;#d79921&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_font</span> <span class="p">=</span> <span class="s1">&#39;#FBF1C7&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_font_app</span> <span class="p">=</span> <span class="s1">&#39;#FBF1C7&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">palettes</span><span class="p">.</span><span class="nx">sakura_night_stars</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_fg0</span> <span class="p">=</span> <span class="s1">&#39;#fbf1c7&#39;</span>  <span class="c"># 柔和温暖的白色（明亮前景色）</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_bg1</span> <span class="p">=</span> <span class="s1">&#39;#2e1a47&#39;</span>  <span class="c"># 深紫色，像夜空</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_bg3</span> <span class="p">=</span> <span class="s1">&#39;#3a2d56&#39;</span>  <span class="c"># 深紫色的阴影</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_blue</span> <span class="p">=</span> <span class="s1">&#39;#7a4d97&#39;</span>  <span class="c"># 柔和梦幻的蓝色，像星辰</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_aqua</span> <span class="p">=</span> <span class="s1">&#39;#b4e0d9&#39;</span>  <span class="c"># 轻盈的水绿色，像月光的反射</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_green</span> <span class="p">=</span> <span class="s1">&#39;#a8d8a5&#39;</span>  <span class="c"># 淡绿色，像樱花的叶子</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_orange</span> <span class="p">=</span> <span class="s1">&#39;#f8a89f&#39;</span>  <span class="c"># 柔和的粉橙色，像樱花花瓣</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_purple</span> <span class="p">=</span> <span class="s1">&#39;#c5a0e2&#39;</span>  <span class="c"># 浅紫色，像暮光的色调</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_red</span> <span class="p">=</span> <span class="s1">&#39;#e5856e&#39;</span>  <span class="c"># 淡珊瑚红色，像黎明的第一缕阳光</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_yellow</span> <span class="p">=</span> <span class="s1">&#39;#f2d97e&#39;</span>  <span class="c"># 浅黄色，像远处星星的微光</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_font</span> <span class="p">=</span> <span class="s1">&#39;#FBF1C7&#39;</span>  <span class="c"># 明亮的白色字体，便于阅读</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_font_app</span> <span class="p">=</span> <span class="s1">&#39;#FBF1C7&#39;</span>  <span class="c"># 应用程序中一致的明亮字体</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">palettes</span><span class="p">.</span><span class="nx">sakura_night_stars_pink_deep</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_fg0</span> <span class="p">=</span> <span class="s1">&#39;#fbf1c7&#39;</span>  <span class="c"># 明亮的白色字体，确保可读性</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_bg1</span> <span class="p">=</span> <span class="s1">&#39;#1e0d2b&#39;</span>  <span class="c"># 深紫黑色背景，增强对比度</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_bg3</span> <span class="p">=</span> <span class="s1">&#39;#3e1f4b&#39;</span>  <span class="c"># 深紫粉色，适合高对比度的环境</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_blue</span> <span class="p">=</span> <span class="s1">&#39;#7a4d97&#39;</span>  <span class="c"># 梦幻蓝色，适合星辰的点缀</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_aqua</span> <span class="p">=</span> <span class="s1">&#39;#f1c8d1&#39;</span>  <span class="c"># 粉蓝色，像月光</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_green</span> <span class="p">=</span> <span class="s1">&#39;#f0b8c4&#39;</span>  <span class="c"># 淡粉绿，增强柔和感</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_orange</span> <span class="p">=</span> <span class="s1">&#39;#f4b7d6&#39;</span>  <span class="c"># 柔和粉橙色，清新又不刺眼</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_purple</span> <span class="p">=</span> <span class="s1">&#39;#d08fc7&#39;</span>  <span class="c"># 深粉紫色，提升深度和对比感</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_red</span> <span class="p">=</span> <span class="s1">&#39;#f56b8a&#39;</span>  <span class="c"># 深粉红色，强调点缀</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_yellow</span> <span class="p">=</span> <span class="s1">&#39;#f2d39b&#39;</span>  <span class="c"># 浅黄色，星光点缀</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_font</span> <span class="p">=</span> <span class="s1">&#39;#FBF1C7&#39;</span>  <span class="c"># 明亮的白色字体，便于阅读</span>
+</span></span><span class="line"><span class="cl"><span class="nx">color_font_app</span> <span class="p">=</span> <span class="s1">&#39;#FBF1C7&#39;</span>  <span class="c"># 一致的白色字体应用</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">os</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">disabled</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_orange fg:color_fg0&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">os</span><span class="p">.</span><span class="nx">symbols</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Windows</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Ubuntu</span> <span class="p">=</span> <span class="s2">&#34;󰕈&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">SUSE</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Raspbian</span> <span class="p">=</span> <span class="s2">&#34;󰐿&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Mint</span> <span class="p">=</span> <span class="s2">&#34;󰣭&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Macos</span> <span class="p">=</span> <span class="s2">&#34;󰀵&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Manjaro</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Linux</span> <span class="p">=</span> <span class="s2">&#34;󰌽&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Gentoo</span> <span class="p">=</span> <span class="s2">&#34;󰣨&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Fedora</span> <span class="p">=</span> <span class="s2">&#34;󰣛&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Alpine</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Amazon</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Android</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Arch</span> <span class="p">=</span> <span class="s2">&#34;󰣇&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Artix</span> <span class="p">=</span> <span class="s2">&#34;󰣇&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">EndeavourOS</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">CentOS</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Debian</span> <span class="p">=</span> <span class="s2">&#34;󰣚&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Redhat</span> <span class="p">=</span> <span class="s2">&#34;󱄛&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">RedHatEnterprise</span> <span class="p">=</span> <span class="s2">&#34;󱄛&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Pop</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">username</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">show_always</span> <span class="p">=</span> <span class="kc">true</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style_user</span> <span class="p">=</span> <span class="s2">&#34;bg:color_orange fg:color_fg0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style_root</span> <span class="p">=</span> <span class="s2">&#34;bg:color_orange fg:color_fg0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[ $user]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">hostname</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">disabled</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="nx">ssh_only</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="nx">ssh_symbol</span> <span class="p">=</span> <span class="s2">&#34;🌏 &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bold green&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c"># [[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)</span>
+</span></span><span class="line"><span class="cl"><span class="c"># format = &#34;[ @$hostname ]($style)&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s2">&#34;[[@$hostname](fg:color_font bg:color_orange)]($style)&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">trim_at</span> <span class="p">=</span> <span class="s2">&#34;.companyname.com&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">directory</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;fg:color_fg0 bg:color_yellow&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s2">&#34;[ $path ]($style)&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">truncation_length</span> <span class="p">=</span> <span class="mi">3</span>
+</span></span><span class="line"><span class="cl"><span class="nx">truncation_symbol</span> <span class="p">=</span> <span class="s2">&#34;…/&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">directory</span><span class="p">.</span><span class="nx">substitutions</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;Documents&#34;</span> <span class="p">=</span> <span class="s2">&#34;󰈙 &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;Downloads&#34;</span> <span class="p">=</span> <span class="s2">&#34; &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;Music&#34;</span> <span class="p">=</span> <span class="s2">&#34;󰝚 &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;Pictures&#34;</span> <span class="p">=</span> <span class="s2">&#34; &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;Developer&#34;</span> <span class="p">=</span> <span class="s2">&#34;󰲋 &#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">git_branch</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_aqua&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">git_status</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_aqua&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">nodejs</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">c</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34; &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">cpp</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34; &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">rust</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">golang</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">php</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">java</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">kotlin</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">haskell</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">python</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_blue&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">docker_context</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_bg3&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">conda</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c"># style = &#34;bg:color_bg3&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c"># format = &#39;[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;green bold&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c"># symbol = &#34;󱔎&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">symbol</span> <span class="p">=</span> <span class="s2">&#34;env:&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c"># &#34;[[ @$hostname](fg:color_yellow bg:color_orange)]($style)&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $environment) ](fg:color_font_app bg:color_bg3)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">ignore_base</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">pixi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_bg3&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[ $symbol( $version)( $environment) ](fg:color_fg0 bg:color_bg3)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">time</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">disabled</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="nx">time_format</span> <span class="p">=</span> <span class="s2">&#34;%R&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">style</span> <span class="p">=</span> <span class="s2">&#34;bg:color_bg1&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s1">&#39;[[  $time ](fg:color_fg0 bg:color_bg1)]($style)&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">line_break</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">disabled</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">character</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">disabled</span> <span class="p">=</span> <span class="kc">false</span>
+</span></span><span class="line"><span class="cl"><span class="nx">format</span> <span class="p">=</span> <span class="s2">&#34;$symbol &#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">success_symbol</span> <span class="p">=</span> <span class="s1">&#39;[➜](bold fg:color_green)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">error_symbol</span> <span class="p">=</span> <span class="s1">&#39;[✗](bold fg:color_red)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">vimcmd_symbol</span> <span class="p">=</span> <span class="s1">&#39;[](bold fg:color_green)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">vimcmd_replace_one_symbol</span> <span class="p">=</span> <span class="s1">&#39;[](bold fg:color_purple)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">vimcmd_replace_symbol</span> <span class="p">=</span> <span class="s1">&#39;[](bold fg:color_purple)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">vimcmd_visual_symbol</span> <span class="p">=</span> <span class="s1">&#39;[](bold fg:color_yellow)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c"># error_symbol = &#34;[✗](fg:red)&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c"># success_symbol = &#34;[](fg:green)&#34;</span>
+</span></span></code></pre></div>
+
+<h3 class="relative group">命令行增强 
+    <div id="%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A2%9E%E5%BC%BA" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%A2%9E%E5%BC%BA" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<ul>
+<li>命令行之前，可以先在 Microsoft Learn 上认识一下基本的 windows 命令
+<ul>
+<li><a href="https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/windows-commands" target="_blank">Windows commands | Microsoft Learn</a></li>
+<li><a href="https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/cd" target="_blank">cd | Microsoft Learn</a> 以 cd 为例，需要切换驱动器需要加上 <code>/d</code></li>
+<li>Learn 上推荐的一些 cl 工具
+<a href="https://learn.microsoft.com/zh-cn/sysinternals/downloads/" target="_blank">Sysinternals 实用工具 - Sysinternals | Microsoft Learn</a>
+<ul>
+<li>psping，替换 ping 命令</li>
+<li>iperf，测试双向网速</li>
+</ul>
+</li>
+<li>没有被推荐的一些 cl 工具
+<ul>
+<li>tree 命令替换
+<ul>
+<li><a href="https://github.com/dduan/tre" target="_blank">dduan/tre: 改进版的 Tree 命令。 &mdash; dduan/tre: Tree command, improved.</a>
+<ul>
+<li><code>tre -d -l 1 .</code> -d 只显示目录，-l 限定深度</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>x-cmd</li>
+</ul>
+
+
+<h3 class="relative group">x-cmd 
+    <div id="x-cmd" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#x-cmd" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p><strong>windows 下</strong>
+1、安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">[</span>System.Text.Encoding<span class="o">]</span>::GetEncoding<span class="o">(</span><span class="s2">&#34;utf-8&#34;</span><span class="o">)</span>.GetString<span class="o">(</span><span class="k">$(</span>Invoke-WebRequest -Uri <span class="s2">&#34;https://get.x-cmd.com/x-cmd.ps1&#34;</span><span class="k">)</span>.RawContentStream.ToArray<span class="o">())</span> <span class="p">|</span> Invoke-Expression
+</span></span></code></pre></div><p>2、使用</p>
+<pre tabindex="0"><code>x tping 192.168.10.4 23
+</code></pre><p><strong>wsl 下</strong></p>
+<pre tabindex="0"><code>eval &#34;$(curl https://get.x-cmd.com)&#34;
+</code></pre>
+
+<h2 class="relative group">3 / wsl 配置 
+    <div id="3--wsl-%E9%85%8D%E7%BD%AE" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#3--wsl-%E9%85%8D%E7%BD%AE" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+
+
+<h3 class="relative group">Windows SSH 配置 
+    <div id="windows-ssh-%E9%85%8D%E7%BD%AE" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#windows-ssh-%E9%85%8D%E7%BD%AE" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>1、安装 openssh
+1.1) Powershell
+打开 <strong>PowerShell（管理员）</strong>，输入：</p>
+<pre tabindex="0"><code>Get-WindowsCapability -Online | Where-Object Name -like &#39;OpenSSH*&#39;
+</code></pre><p>输出中 OpenSSH</p>
+<pre tabindex="0"><code>Name  : OpenSSH.Client~~~~0.0.1.0
+State : Installed
+
+Name  : OpenSSH.Server~~~~0.0.1.0
+State : NotPresent
+</code></pre><ul>
+<li>如果 State 是 NotPresent → 还没安装</li>
+<li>如果 Installed → 已安装</li>
+</ul>
+<p>如果 <code>OpenSSH.Server</code> 没有安装，就安装：</p>
+<pre tabindex="0"><code>Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+</code></pre><p>安装完成后，重启服务或电脑确保生效。</p>
+<p>启动并设置自启动</p>
+<pre tabindex="0"><code># 启动 sshd 服务
+Start-Service sshd
+
+# 设置开机自动启动
+Set-Service -Name sshd -StartupType &#39;Automatic&#39;
+</code></pre><p>这时再运行：</p>
+<pre tabindex="0"><code>net start sshd
+</code></pre><p>就不会报“服务名无效”的错误了。</p>
+<p>1.2) scoop</p>
+<pre tabindex="0"><code>scoop install openssh
+</code></pre><p>Notes</p>
+<pre tabindex="0"><code>Notes
+-----
+Windows 10 or higher includes this build of OpenSSH in the system itself, hence it is recommended to use the system
+OpenSSH there.
+Run &#39;sudo D:\software\scoop\apps\openssh\current\install-sshd.ps1&#39; to install sshd and ssh-agent as a service.
+Run &#39;sudo D:\software\scoop\apps\openssh\current\uninstall-sshd.ps1&#39; to uninstall the services.
+</code></pre><p>运行</p>
+<pre tabindex="0"><code>PS C:\Users\tohsaka rin&gt; sudo D:\software\scoop\apps\openssh\current\install-sshd.ps1
+&gt;  sudo net start sshd
+</code></pre><p>输出</p>
+<pre tabindex="0"><code>PS C:\Users\tohsaka rin&gt; sudo net start sshd
+OpenSSH SSH Server 服务正在启动 ..
+OpenSSH SSH Server 服务已经启动成功。
+</code></pre><p>2、开启防火墙
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251016123000.png" alt="" />
+      
+    </figure>
+</p>
+<p>3、连接测试</p>
+<pre tabindex="0"><code>PS C:\Users\aoi&gt; x tping 192.168.10.4:22
+- I|tping: Target -&gt; [host=192.168.10.4] [port=22]
+
+    0     0.013      1.554       192.168.10.2 57700       192.168.10.4 22
+    1     0.011      1.595       192.168.10.2 57702       192.168.10.4 22
+
+  seq       dns        con           local-ip:port          remote-ip:port
+
+  1.595 ms ∈ [ 1  ,   1 ] | AVG =  1.57 ± 0.02    FAIL=  0
+</code></pre><p>用户名</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">$env</span>:username
+</span></span><span class="line"><span class="cl">whoami <span class="c1"># 计算机名/用户名，域/用户</span>
+</span></span></code></pre></div><p>设置 ssh 密码 / 不建议更改 Administrator 用户，可能没什么用</p>
+<ul>
+<li><strong>SSH 登录使用的是 Windows 用户账户密码</strong>，不是 PIN、指纹或图形密码。</li>
+<li>如果该用户没有设置密码，你可能无法通过 SSH 登录（Windows 默认不允许空密码远程登录）。</li>
+<li>用户名需要和你在远程机器上看到的完全一致，包括空格，例如 <code>&quot;tohsaka rin&quot;</code>。</li>
+</ul>
+<pre tabindex="0"><code>net user &#34;tohsaka rin&#34;
+net user &#34;tohsaka rin&#34; NewPassword123!
+</code></pre><p>连接</p>
+<pre tabindex="0"><code>ssh -l &#34;tohsaka rin&#34; 192.168.10.4
+</code></pre><p>设置连接时自动打开 pwsh</p>
+<ol>
+<li>打开 <strong>管理员权限 PowerShell</strong>。</li>
+<li>编辑 <code>sshd_config</code> 文件：
+<code>notepad &quot;C:\ProgramData\ssh\sshd_config&quot;</code></li>
+<li>添加或修改以下行：</li>
+</ol>
+<pre tabindex="0"><code># 设置登录用户默认 shell
+ForceCommand &#34;C:\Program Files\PowerShell\7\pwsh.exe&#34;
+</code></pre><p>或者针对 <strong>所有用户</strong>：</p>
+<pre tabindex="0"><code># 替换默认 shell
+Subsystem powershell C:\Program Files\PowerShell\7\pwsh.exe -sshs -NoLogo -NoProfile
+</code></pre><blockquote>
+<p>注意路径必须写完整，并且如果路径中有空格，需要用双引号包裹。</p></blockquote>
+<p>重启</p>
+<pre tabindex="0"><code>sudo net stop sshd
+sudo net start sshd
+
+Restart-Service sshd
+</code></pre>
+
+<h3 class="relative group">局域网中的其他主机访问 wsl 
+    <div id="%E5%B1%80%E5%9F%9F%E7%BD%91%E4%B8%AD%E7%9A%84%E5%85%B6%E4%BB%96%E4%B8%BB%E6%9C%BA%E8%AE%BF%E9%97%AE-wsl" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%B1%80%E5%9F%9F%E7%BD%91%E4%B8%AD%E7%9A%84%E5%85%B6%E4%BB%96%E4%B8%BB%E6%9C%BA%E8%AE%BF%E9%97%AE-wsl" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>值得注意的是，windows10 的 wsl 不支持 mirror 模式，也就是无法使用 localhost 直接访问 wsl（但是可以用 localhost 访问 docker 容器开出来的端口，合理怀疑 docker 开的端口是直接映射 windows 端口，而非 wsl 端口）。镜像模式直到 win11 的 23H2 版本才支持，win10 的 22H2 的最后一个 build 版本也不支持。</p>
+
+
+<h4 class="relative group">（1）windows11 
+    <div id="1windows11" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#1windows11" aria-label="锚点">#</a>
+    </span>        
+    
+</h4>
+<p><strong>通过 电脑 A-SSH 登录 电脑 B-Windows，然后自动进入 WSL，而不是 电脑 B-Windows 的 cmd 或 pwsh</strong>。</p>
+<p>1、wsl / 设置 wsl 的 root 密码</p>
+<pre tabindex="0"><code>passwd root
+</code></pre><p>2、wsl / 首先 wsl 添加 openssh-server</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 更新并安装</span>
+</span></span><span class="line"><span class="cl">sudo apt update
+</span></span><span class="line"><span class="cl">sudo apt install -y openssh-server
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 确保 /var/run/sshd 存在（某些发行版需要）</span>
+</span></span><span class="line"><span class="cl">sudo mkdir -p /var/run/sshd
+</span></span><span class="line"><span class="cl">sudo chown root:root /var/run/sshd
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改 sshd 配置，将 Port 22 改为 23</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 先备份</span>
+</span></span><span class="line"><span class="cl">sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+</span></span></code></pre></div><p>修改 sshd_config</p>
+<pre tabindex="0"><code>Port 23
+ListenAddress 0.0.0.0
+PermitRootLogin yes
+PasswordAuthentication yes
+</code></pre><p>重启</p>
+<pre tabindex="0"><code>sudo service ssh restart
+</code></pre><p>3、windows / 添加映射</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo netsh interface portproxy add v4tov4 <span class="nv">listenport</span><span class="o">=</span><span class="m">23</span> <span class="nv">listenaddress</span><span class="o">=</span>0.0.0.0 <span class="nv">connectport</span><span class="o">=</span><span class="m">23</span> <span class="nv">connectaddress</span><span class="o">=</span>localhost
+</span></span></code></pre></div><ul>
+<li>listenport 监听转发端口</li>
+<li>listenaddress 设置为 0.0.0.0, 可以给任意网段连接</li>
+<li>connectport 目标端口，wsl 开放的 ssh 端口</li>
+<li>connectaddress 目标地址，就是 wsl mirrored 的 localhost</li>
+</ul>
+<p>一些其他的命令</p>
+<pre tabindex="0"><code># 删除代理
+netsh interface portproxy delete v4tov4 listenport=23 listenaddress=0.0.0.0
+# 展示所有v4代理
+netsh interface portproxy show v4tov4
+</code></pre><p>连接测试</p>
+<pre tabindex="0"><code>ssh -p 23 root@192.168.10.4
+</code></pre>
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251016190243.png" alt="" />
+      
+    </figure>
+
+
+<h4 class="relative group">（2）windows10 
+    <div id="2windows10" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#2windows10" aria-label="锚点">#</a>
+    </span>        
+    
+</h4>
+<blockquote>
+<p>[!success]
+下面的方法适合在 win10 上启用，我自己不推荐这种麻烦的做法，但如果你是 win10 的话，还是使用这种方法吧。</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/13899770349" target="_blank">如何在局域网的其他主机上中访问本机的 WSL2 - 知乎</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/425312804" target="_blank">如何在局域网的其他主机上中访问本机的 WSL2 - 知乎</a></li>
+<li>Github 上的方法
+<ul>
+<li><a href="https://github.com/HobaiRiku/wsl2-auto-portproxy" target="_blank">HobaiRiku/wsl2-auto-portproxy：从 wsl2 linux 到 windows 的代理端口的 TCP 解决方法 &mdash; HobaiRiku/wsl2-auto-portproxy: A TCP workaround tool for proxy port from wsl2 linux to windows</a></li>
+</ul>
+</li>
+</ul></blockquote>
+<p>我们这里使用 <a href="https://github.com/HobaiRiku/wsl2-auto-portproxy" target="_blank">wslpp</a> 这个项目来将 wsl 的 ip 从 172 代理到 localhost</p>
+<blockquote>
+<p>工作原理
+wslpp start an interval to get IP address of the nat interface and scan all ports listening at all network in the subsystem, then use golang&rsquo;s net to start proxy direct to ports.</p></blockquote>
+<p>间隔 3s 扫描 wsl 中的所有 ports，然后使用 golang 代理。</p>
+<p>1、启动 wslpp，配置文件在 <code>%HOMEPATH%/.wslpp/config.json</code> 中</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">cmd</span> <span class="p">/</span><span class="n">c</span> <span class="n">wslpp</span><span class="p">.</span><span class="py">exe</span>
+</span></span></code></pre></div><p>2、使用 <code>ssh</code> 测试</p>
+<p>3、如果有问题，需要先关闭 23 代理的进程，然后重启 wsl</p>
+<pre tabindex="0"><code>netstat -ano | findstr &#34;:23&#34;
+taskkill /f /pid &lt;xxxid&gt;
+</code></pre><p>More、添加计划任务
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251017095810.png" alt="" />
+      
+    </figure>
+</p>
+
+
+<h3 class="relative group">wsl 配置 miniforge 
+    <div id="wsl-%E9%85%8D%E7%BD%AE-miniforge" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#wsl-%E9%85%8D%E7%BD%AE-miniforge" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">wget <span class="s2">&#34;https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-</span><span class="k">$(</span>uname<span class="k">)</span><span class="s2">-</span><span class="k">$(</span>uname -m<span class="k">)</span><span class="s2">.sh&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 交互，最后默认no就是不执行初始化</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果选择yes就需要手动执行 conda config --set auto_activate_base false</span>
+</span></span><span class="line"><span class="cl">bash Miniforge3-<span class="k">$(</span>uname<span class="k">)</span>-<span class="k">$(</span>uname -m<span class="k">)</span>.sh
+</span></span><span class="line"><span class="cl"><span class="c1"># 非交互，直接这个就行</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 然后跳转到下面的「✈️非交互后」</span>
+</span></span><span class="line"><span class="cl">bash Miniforge3-<span class="k">$(</span>uname<span class="k">)</span>-<span class="k">$(</span>uname -m<span class="k">)</span>.sh -b
+</span></span></code></pre></div><p>安装配置参考：<a href="https://blog.aoidayo.site/blog/conda-or-mamba/" target="_blank">Miniforge：Conda solving enviroment 终结者 · Aoidayo</a>
+补充一些：
+miniforge linux 默认</p>
+<ul>
+<li>安装在 <code>/root/minifortge3</code> 下面</li>
+</ul>
+<p>✈️ 非交互后</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">eval</span> <span class="s2">&#34;</span><span class="k">$(</span>/root/miniforge3/bin/conda shell.bash hook<span class="k">)</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 配置写入bashrc</span>
+</span></span><span class="line"><span class="cl">conda init
+</span></span><span class="line"><span class="cl"><span class="c1"># 关闭 base自动激活</span>
+</span></span><span class="line"><span class="cl">conda config --set auto_activate_base <span class="nb">false</span>
+</span></span></code></pre></div>
+
+<h3 class="relative group">pycharm 配置 ssh 
+    <div id="pycharm-%E9%85%8D%E7%BD%AE-ssh" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#pycharm-%E9%85%8D%E7%BD%AE-ssh" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>两步</p>
+<p>1、settings&gt;build,execution,deployment&gt;添加 sftp 连接，配置 ssh 连接，最后 apply</p>
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251016194821.png" alt="" />
+      
+    </figure>
+<p>2、设置 Mappings，</p>
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251016201228.png" alt="" />
+      
+    </figure>
+<p>3、添加 Python Interpreter，选择 ssh，设置 rsync 的文件夹。</p>
+<p>编写一段简单的代码，运行即可。</p>
+
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="./assets/windows%E5%8C%85%E7%AE%A1%E7%90%86%E5%99%A8-20251017100803.png" alt="" />
+      
+    </figure>
+
+          
+          
+          
+        </div>
+        
+        
+
+        
+        
+
+        
+
+
+  
+      </div>
+     
+      
+      
+        
+        
+          
+          
+        
+      <script>
+        var oid = "views_blog\/windows-use\/index.md"
+        var oid_likes = "likes_blog\/windows-use\/index.md"
+      </script>
+      
+      
+      <script type="text/javascript" src="/js/page.min.0860cf4e04fa2d72cc33ddba263083464d48f67de06114529043cb4623319efed4f484fd7f1730df5abea0e2da6f3538855634081d02f2d6e920b956f063e823.js" integrity="sha512-CGDPTgT6LXLMM926JjCDRk1I9n3gYRRSkEPLRiMxnv7U9IT9fxcw31q&#43;oOLabzU4hVY0CB0C8tbpILlW8GPoIw=="></script>
+      
+  
+    </section>
+  <footer class="pt-8 max-w-prose print:hidden">
+
+    
+  
+    
+    
+    
+    <div class="pt-8">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
+      <div class="flex justify-between pt-3">
+        <span>
+          
+            <a class="flex group mr-3" href="/blog/2060m-extra/">
+              <span
+                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
+                >&larr;</span
+              >
+              <span
+                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
+                >&rarr;</span
+              >
+              <span class="flex flex-col">
+                <span
+                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
+                  >魔改版RTX 2060 12G装驱动 的傻瓜式补充</span
+                >
+                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
+                  
+                    <time datetime="2025-10-14T22:38:24&#43;08:00">2025年10月14日 22時38分</time>
+                  
+                </span>
+              </span>
+            </a>
+          
+        </span>
+        <span>
+          
+        </span>
+      </div>
+    </div>
+  
+
+
+    
+    
+    <div class="pt-3">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
+      <div class="pt-3">
+        
+<span id="/blog/windows-use/" class="leancloud_visitors" data-flag-title="Windows Scoop包管理，Terminal优化，WSL配置">
+  <span class="post-meta-item-text">文章阅读量 </span>
+  <span class="leancloud-visitors-count">0</span>
+  <p></p>
+</span>
+<div id="valine" class="comment"></div>
+
+<script src="//code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script type="text/javascript">
+  new Valine({
+    el: "#valine",
+    appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+    appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+    notify: "",
+    verify: "",
+    avatar: "hide",
+    placeholder: "欢迎留言~",
+    visitor: "true",
+  });
+</script>
+<noscript> Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>. </noscript>
+      </div>
+    </div>
+    
+    
+  </footer>
+</article>
+
+      <div id="top-scroller" class="pointer-events-none absolute top-[110vh] bottom-0 w-12 ltr:right-0 rtl:left-0">
+  <a href="#the-top"
+    class="pointer-events-auto sticky top-[calc(100vh-5.5rem)] flex h-12 w-12 mb-16 items-center justify-center rounded-full bg-neutral/50 text-xl text-neutral-700 hover:text-primary-600 dark:bg-neutral-800/50 dark:text-neutral dark:hover:text-primary-400"
+    aria-label="返回顶部" title="返回顶部">
+    &uarr;
+  </a>
+</div>
+    </main><footer id="site-footer" class="py-10 print:hidden">
+    
+  <nav class="flex flex-row pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400">
+    <ul class="flex flex-col list-none sm:flex-row">
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/categories/"
+          title="Categories"
+        >
+           Categories
+        </a>
+      </li>
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/tags/"
+          title="Tags"
+        >
+           Tags
+        </a>
+      </li>
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/moments/"
+          title="Moments"
+        >
+           Moments
+        </a>
+      </li>
+      
+    </ul>
+  </nav>
+   
+  <div class="flex items-center justify-between">
+     
+    <p class="text-sm text-neutral-500 dark:text-neutral-400"> &copy; 2025 Aoidayo
+    </p>
+      
+  </div>
+  <script>
+    
+    mediumZoom(document.querySelectorAll("img:not(.nozoom)"), {
+      margin: 24,
+      background: 'rgba(0,0,0,0.5)',
+      scrollOffset: 0,
+    })
+    
+  </script>
+   
+  <script type="text/javascript" src="/js/process.min.ee03488f19c93c2efb199e2e3014ea5f3cb2ce7d45154adb3399a158cac27ca52831db249ede5bb602700ef87eb02434139de0858af1818ab0fb4182472204a4.js" integrity="sha512-7gNIjxnJPC77GZ4uMBTqXzyyzn1FFUrbM5mhWMrCfKUoMdsknt5btgJwDvh&#43;sCQ0E53ghYrxgYqw&#43;0GCRyIEpA=="></script>
+   
+  <script>
+    (function () {
+      var w = window;
+      if (w.ChannelIO) {
+        return w.console.error("ChannelIO script included twice.");
+      }
+      var ch = function () {
+        ch.c(arguments);
+      };
+      ch.q = [];
+      ch.c = function (args) {
+        ch.q.push(args);
+      };
+      w.ChannelIO = ch;
+      function l() {
+        if (w.ChannelIOInitialized) {
+          return;
+        }
+        w.ChannelIOInitialized = true;
+        var s = document.createElement("script");
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = "https://cdn.channel.io/plugin/ch-plugin-web.js";
+        var x = document.getElementsByTagName("script")[0];
+        if (x.parentNode) {
+          x.parentNode.insertBefore(s, x);
+        }
+      }
+      if (document.readyState === "complete") {
+        l();
+      } else {
+        w.addEventListener("DOMContentLoaded", l);
+        w.addEventListener("load", l);
+      }
+    })();
+
+    ChannelIO("boot", {
+      pluginKey: "f2ef02e2-d75e-4819-a913-e69f3b45b652",
+    });
+  </script>
+</footer>
+<div
+  id="search-wrapper"
+  class="invisible fixed inset-0 flex h-screen w-screen cursor-default flex-col bg-neutral-500/50 p-4 backdrop-blur-sm dark:bg-neutral-900/50 sm:p-6 md:p-[10vh] lg:p-[12vh]"
+  data-url="https://blog.aoidayo.site/"
+  style="z-index:500"
+>
+  <div
+    id="search-modal"
+    class="flex flex-col w-full max-w-3xl min-h-0 mx-auto border rounded-md shadow-lg top-20 border-neutral-200 bg-neutral dark:border-neutral-700 dark:bg-neutral-800"
+  >
+    <header class="relative z-10 flex items-center justify-between flex-none px-2">
+      <form class="flex items-center flex-auto min-w-0">
+        <div class="flex items-center justify-center w-8 h-8 text-neutral-400">
+          
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+        </div>
+        <input
+          type="search"
+          id="search-query"
+          class="flex flex-auto h-12 mx-1 bg-transparent appearance-none focus:outline-dotted focus:outline-2 focus:outline-transparent"
+          placeholder="搜索"
+          tabindex="0"
+        />
+      </form>
+      <button
+        id="close-search-button"
+        class="flex items-center justify-center w-8 h-8 text-neutral-700 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400"
+        title="关闭 (Esc)"
+      >
+        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/></svg>
+
+  </span>
+
+
+      </button>
+    </header>
+    <section class="flex-auto px-2 overflow-auto">
+      <ul id="search-results">
+        
+      </ul>
+    </section>
+  </div>
+</div>
+
+  </div>
+</body>
+
+</html>

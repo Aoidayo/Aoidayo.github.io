@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Windows on Aoidayo</title>
+    <link>https://blog.aoidayo.site/tags/windows/</link>
+    <description>Recent content in Windows on Aoidayo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>© 2025 Aoidayo</copyright>
+    <lastBuildDate>Fri, 17 Oct 2025 12:42:24 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Windows Scoop包管理，Terminal优化，WSL配置</title>
+      <link>https://blog.aoidayo.site/blog/windows-use/</link>
+      <pubDate>Fri, 17 Oct 2025 12:42:24 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/windows-use/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;1 / Windows 包管理 
+    &lt;div id=&#34;1--windows-%E5%8C%85%E7%AE%A1%E7%90%86&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#1--windows-%E5%8C%85%E7%AE%A1%E7%90%86&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;scoop 
+    &lt;div id=&#34;scoop&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#scoop&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;scoop 多开发环境配置使用教程：&lt;a href=&#34;https://www.xrgzs.top/posts/scoop-dev-setup&#34; target=&#34;_blank&#34;&gt;Scoop 搭建 Windows 开发环境 | 潇然工作室&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;scoop 必不可少的一环：如何使用 &lt;a href=&#34;https://zhuanlan.zhihu.com/p/463284082&#34; target=&#34;_blank&#34;&gt;(63 封私信 / 82 条消息) Scoop——也许是 Windows 平台最好用的软件（包）管理器 - 知乎&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.suqingyu.com/archives/b3803be6-a713-4aea-8638-58b5402811c5&#34; target=&#34;_blank&#34;&gt;Scoop | Windows 下的软件包管理神器 - 苏青羽的小窝&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;官网：&lt;a href=&#34;https://scoop.sh/#/&#34; target=&#34;_blank&#34;&gt;Scoop&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;windows 的包管理器之一，使用它下载一些比较轻量的软件/命令行工具、以及一些开发环境（类似 Debian 的 apt / brew）。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>
