@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>GNN中的scatter离散运算 &middot; Aoidayo</title>
-  <meta name="title" content="GNN中的scatter离散运算 &middot; Aoidayo" />
+  <title>Python算法项目 容器化 &middot; Aoidayo</title>
+  <meta name="title" content="Python算法项目 容器化 &middot; Aoidayo" />
   
   
-  <meta name="keywords" content="ST, " />
+  <meta name="keywords" content="Linux, docker, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/scatter-in-gnn/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/python-container/" />
   
   
   
@@ -69,23 +69,24 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/scatter-in-gnn/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/python-container/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="GNN中的scatter离散运算">
-  <meta property="og:description" content="PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。">
+  <meta property="og:title" content="Python算法项目 容器化">
+  <meta property="og:description" content="实验室的一套 Python 算法项目在部署阶段需要以容器/虚拟化方式运行，因此整理了整个 Docker 化流程，方便后续参考。
+背景 # 算法部分：包含 PyTorch、XGBoost 后端部分：使用 Flask 提供简单 API 服务 将算法后端打包成可直接部署的 Docker 镜像。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2025-04-21T20:25:21+08:00">
+    <meta property="article:published_time" content="2025-11-24T17:13:35+08:00">
     <meta property="article:modified_time" content="2025-11-24T10:52:14+00:00">
-    <meta property="article:tag" content="ST">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg">
+    <meta property="article:tag" content="Linux">
+    <meta property="article:tag" content="Docker">
 
   
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg">
-  <meta name="twitter:title" content="GNN中的scatter离散运算">
-  <meta name="twitter:description" content="PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Python算法项目 容器化">
+  <meta name="twitter:description" content="实验室的一套 Python 算法项目在部署阶段需要以容器/虚拟化方式运行，因此整理了整个 Docker 化流程，方便后续参考。
+背景 # 算法部分：包含 PyTorch、XGBoost 后端部分：使用 Flask 提供简单 API 服务 将算法后端打包成可直接部署的 Docker 镜像。">
 
   
   <script type="application/ld+json">
@@ -93,26 +94,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "GNN中的scatter离散运算",
-    "headline": "GNN中的scatter离散运算",
+    "name": "Python算法项目 容器化",
+    "headline": "Python算法项目 容器化",
     
-    "abstract": "\u003clink rel=\u0022stylesheet\u0022 href=\u0022https:\/\/cdn.jsdelivr.net\/npm\/aplayer\/dist\/APlayer.min.css\u0022 \/\u003e\n\u003cscript src=\u0022https:\/\/cdn.jsdelivr.net\/npm\/aplayer\/dist\/APlayer.min.js\u0022\u003e\u003c\/script\u003e\n\n\u003cscript src=\u0022https:\/\/cdn.jsdelivr.net\/npm\/meting@2.0.1\/dist\/Meting.min.js\u0022\u003e\u003c\/script\u003e\n\u003cstyle\u003e\n.aplayer-list-title {\n  color: #60a5fa !important;\n}\n.aplayer-title {\n  color: #60a5fa !important;\n}\n\n.aplayer-lrc p.aplayer-lrc-current {\n  color: #60a5fa !important;\n}\n.aplayer.aplayer-fixed .aplayer-lrc {\n  text-shadow: none;\n}\n\u003c\/style\u003e\n\u003cmeting-js\n  server=\u0022netease\u0022\n  type=\u0022song\u0022\n  id=\u00222666749200\u0022\n  fixed=\u0022true\u0022\n  autoplay=\u0022false\u0022\n  loop=\u0022all\u0022\n  order=\u0022list\u0022\n  theme=\u0022#60A5FA\u0022\n\u003e\u003c\/meting-js\u003e\n\u003cp\u003ePyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。\u003c\/p\u003e",
+    "abstract": "\u003cp\u003e实验室的一套 Python 算法项目在部署阶段需要以容器\/虚拟化方式运行，因此整理了整个 Docker 化流程，方便后续参考。\u003c\/p\u003e\n\n\n\u003ch2 class=\u0022relative group\u0022\u003e背景 \n    \u003cdiv id=\u0022%E8%83%8C%E6%99%AF\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E8%83%8C%E6%99%AF\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cul\u003e\n\u003cli\u003e算法部分：包含 PyTorch、XGBoost\u003c\/li\u003e\n\u003cli\u003e后端部分：使用 Flask 提供简单 API 服务\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003cp\u003e将算法后端打包成可直接部署的 Docker 镜像。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/scatter-in-gnn\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/python-container\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2025",
-    "dateCreated": "2025-04-21T20:25:21\u002b08:00",
-    "datePublished": "2025-04-21T20:25:21\u002b08:00",
+    "dateCreated": "2025-11-24T17:13:35\u002b08:00",
+    "datePublished": "2025-11-24T17:13:35\u002b08:00",
     
     "dateModified": "2025-11-24T10:52:14\u002b00:00",
     
-    "keywords": ["ST"],
+    "keywords": ["Linux","docker"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1164"
+    "wordCount": "585"
   }]
   </script>
 
@@ -133,139 +134,6 @@
   
 
 <script src="/lib/jquery/jquery.slim.min.b0dca576e87d7eaa5850ae4e61759c065786cdb6489d68fcc82240539eebd5da522bdb4fda085ffd245808c8fe2acb2516408eb774ef26b5f6015fc6737c0ea8.js" integrity="sha512-sNylduh9fqpYUK5OYXWcBleGzbZInWj8yCJAU57r1dpSK9tP2ghf/SRYCMj&#43;KsslFkCOt3TvJrX2AV/Gc3wOqA=="></script>
-
-
-
-
-
-
-
-
-
-
-
-<link type="text/css" rel="stylesheet" href="/lib/katex/katex.min.8fee1bb91734542a6701c61b7be516ff2eb2df248bf4e4591aacc8f4e9df40c7ca9e9c0b3f657b166f5f13e69a8fb50a139b3babcef20aeeea18f0fbcd4169fb.css" integrity="sha512-j&#43;4buRc0VCpnAcYbe&#43;UW/y6y3ySL9ORZGqzI9OnfQMfKnpwLP2V7Fm9fE&#43;aaj7UKE5s7q87yCu7qGPD7zUFp&#43;w==" />
-
-
-<script defer src="/lib/katex/katex.min.8c68eaeb75cfdcfac071717a969e1b9d9230ad52c6a2ac21ff846eaf6a258364cbb79e5e3552e32c280faeb4f4eda4d7c5bd1492e30a961c737e1e5305300281.js" integrity="sha512-jGjq63XP3PrAcXF6lp4bnZIwrVLGoqwh/4Rur2olg2TLt55eNVLjLCgPrrT07aTXxb0UkuMKlhxzfh5TBTACgQ=="></script>
-
-
-<script defer src="/lib/katex/auto-render.min.e9b2833d28623d18c071d78ef13e9c79d695122d296af3dbcee7bf1bf6518b0565bab59939267fbc8f5faf696193c20f5caef3e7501969cfb306f6738032730d.js" integrity="sha512-6bKDPShiPRjAcdeO8T6cedaVEi0pavPbzue/G/ZRiwVlurWZOSZ/vI9fr2lhk8IPXK7z51AZac&#43;zBvZzgDJzDQ=="
-  onload="renderMathInElement(document.body);"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -543,13 +411,14 @@
   
 
 
+
 <div id="hero" class="h-[150px] md:h-[200px]"></div>
 
 
 
     
     <div class="fixed inset-x-0 top-0 h-[800px] single_hero_background nozoom"
-    style="background-image:url(/blog/scatter-in-gnn/feature_hu_ed34af3a0fa2b7d5.jpeg);">
+    style="background-image:url(/5811fb17-9c07-43b7-a729-4846eb7e9d0f_14612575406022701529_hu_1681bd4832822e35.png);">
     
 
 
@@ -607,8 +476,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/scatter-in-gnn/"
-      >GNN中的scatter离散运算</a
+      href="/blog/python-container/"
+      >Python算法项目 容器化</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -617,7 +486,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      GNN中的scatter离散运算
+      Python算法项目 容器化
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -662,7 +531,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2025-04-21T20:25:21&#43;08:00">2025年04月21日 20時25分</time><span class="px-2 text-primary-500">&middot;</span><span>1164 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2025-11-24T17:13:35&#43;08:00">2025年11月24日 17時13分</time><span class="px-2 text-primary-500">&middot;</span><span>585 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -713,10 +582,18 @@
   
   
   
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/st/&#34;,'_self');return false;">
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/linux/&#34;,'_self');return false;">
     <span class="flex" style="cursor: pointer;">
   <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    ST
+    Linux
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/docker/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Docker
   </span>
 </span>
   </span>
@@ -842,14 +719,18 @@
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#scatter">scatter</a></li>
-    <li><a href="#scatter_add">scatter_add</a>
+    <li><a href="#背景">背景</a></li>
+    <li><a href="#算法容器化--now">算法容器化 / Now</a>
       <ul>
-        <li><a href="#单头gat">单头GAT</a></li>
-        <li><a href="#多头gat">多头GAT</a></li>
+        <li><a href="#1构建-dockerfile">1、构建 dockerfile</a></li>
+        <li><a href="#2构建镜像">2、构建镜像</a></li>
+        <li><a href="#3运行容器">3、运行容器</a></li>
+        <li><a href="#4查看容器运行状态">4、查看容器运行状态</a></li>
+        <li><a href="#5端口连通性测试">5、端口连通性测试</a></li>
       </ul>
     </li>
-    <li><a href="#reference">reference</a></li>
+    <li><a href="#镜像保存与迁移">镜像保存与迁移</a></li>
+    <li><a href="#非-docker-部署--before">非 docker 部署 / Before</a></li>
   </ul>
 </nav>
   </div>
@@ -863,14 +744,18 @@
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#scatter">scatter</a></li>
-    <li><a href="#scatter_add">scatter_add</a>
+    <li><a href="#背景">背景</a></li>
+    <li><a href="#算法容器化--now">算法容器化 / Now</a>
       <ul>
-        <li><a href="#单头gat">单头GAT</a></li>
-        <li><a href="#多头gat">多头GAT</a></li>
+        <li><a href="#1构建-dockerfile">1、构建 dockerfile</a></li>
+        <li><a href="#2构建镜像">2、构建镜像</a></li>
+        <li><a href="#3运行容器">3、运行容器</a></li>
+        <li><a href="#4查看容器运行状态">4、查看容器运行状态</a></li>
+        <li><a href="#5端口连通性测试">5、端口连通性测试</a></li>
       </ul>
     </li>
-    <li><a href="#reference">reference</a></li>
+    <li><a href="#镜像保存与迁移">镜像保存与迁移</a></li>
+    <li><a href="#非-docker-部署--before">非 docker 部署 / Before</a></li>
   </ul>
 </nav>
   </div>
@@ -952,175 +837,201 @@
 
 
         <div class="article-content max-w-prose mb-20">
-          
+          <p>实验室的一套 Python 算法项目在部署阶段需要以容器/虚拟化方式运行，因此整理了整个 Docker 化流程，方便后续参考。</p>
 
 
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="2666749200"
-  fixed="true"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-></meting-js>
-<p>PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。</p>
-<p>我们以GAT为例，说明scatter在GAT中的应用：一是相似度系数的归一，二是 \(h_i^{&rsquo;}\) 的加权邻域聚合。</p>
-<blockquote>
-<p>相似度系数归一</p></blockquote>
-<p>$$
-\alpha_{i,j} = \frac{\exp(LeakyReLU(e_{i,j}))}{\sum \limits_{k \in N(i)} \exp(LeakyReLU(e_{i,k})) }
-$$</p>
-<p>其中，分母部分聚合节点 \(i\) 所有邻边相似度系数的运算可以用 <code>scatter_add</code> 简洁优雅的实现。</p>
-<blockquote>
-<p>\(h_i^{&rsquo;}\) 的加权邻域聚合</p></blockquote>
-<p>$$
-h_{i}^{&rsquo;} = \sigma( \sum \limits_{k \in N(i)} \alpha_{i,k} h_{k} )
-$$</p>
-<p>这里的邻域聚合的操作逻辑基本同上，同样可以使用 <code>scatter_add</code>。</p>
-<p>Q:为什么要用scatter？同样一个邻域聚合的操作，我们可以使用for循环，预处理出neighbor照样可以聚合，那么我们为什么需要使用scatter呢？
-A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯度传播。（for循环本身的效率其实不低，因为一个node只有有限个neighbor）</p>
-
-
-<h2 class="relative group">scatter 
-    <div id="scatter" class="anchor"></div>
+<h2 class="relative group">背景 
+    <div id="%E8%83%8C%E6%99%AF" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#scatter" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="bp">self</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="bp">self</span><span class="p">:</span> <span class="n">tensor张量</span>
-</span></span><span class="line"><span class="cl"><span class="n">Args</span><span class="p">:</span>
-</span></span><span class="line"><span class="cl">	<span class="n">dim</span><span class="p">:</span> <span class="n">沿dim轴索引</span>
-</span></span><span class="line"><span class="cl">	<span class="n">index</span><span class="p">(</span><span class="n">LongTensor</span><span class="p">):</span> <span class="n">索引</span>
-</span></span><span class="line"><span class="cl">	<span class="n">src</span><span class="p">:</span> <span class="n">写入self中的值张量</span><span class="err">，</span><span class="n">类型需要和self相同</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">作用</span><span class="err">：</span><span class="n">将src中的每个值</span><span class="err">，</span><span class="n">按index的指定索引</span><span class="err">，</span><span class="n">scatter至self中</span><span class="err">。</span>
-</span></span></code></pre></div><p>以3维张量为例，self中的值由如下公式决定：
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/index/scatter-20250421191929.png" alt="" />
-      
-    </figure>
-</p>
-<p>同时self，index以及src需要满足如下条件：</p>
-<ol>
-<li>self、index、src的维度相同（即dim相同:self.dim()=index.dim()=src.dim()，非维度大小）
-具体来说就是 <code>index.shape (3,4,5), dim()=3</code>,同理 <code>src.shape=(4,5,6), dim()=3</code>。因为需要执行如上公式的赋值，所以self、index、src的维度需要相同。</li>
-<li>index每一个维度的大小 &lt;= src每一个维度的大小, 即 \(index.shape(i) \leq src.shape(i),\ i \in [0,src.dim())\)</li>
-<li>\(index.shape(i) \leq self.shape(i),\ i \in [0,src.dim()) \ 且 i \neq dim_{arg}\), 即除开操作维度dim之外（指的是scatter的参数dim之外），其他维度的大小都必须小于self的对应维度大小。
-理解起来同样很简单，因为其他维度需要索引self，而 <code>index[i][j][k]</code> 在操作维度之上无所谓，他只需要满足 <code>index[i][j][k]&lt;=self.dim(arg_dim)</code> 即可。</li>
-</ol>
-<p>张量index的数值大小约束：</p>
-<ol start="5">
-<li>index中的任意值，其大小需要在 <code>[0, self.dim(arg_dim)-1]</code> 的范围内。</li>
-<li>index沿dim维度的一行，值必须唯一（弱约束，违反不报错，但是会产生无意义的重复scatter）</li>
-</ol>
-<p>例1.index沿dim的一行数组，值不唯一，产生scatter的重复赋值
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/index/scatter-20250421194537.png" alt="|725" />
-      
-    </figure>
-</p>
-<p>例2. index沿dim的一行数组，值唯一，scatter离散到不同的位置
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/index/scatter-20250421195245.png" alt="|625" />
-      
-    </figure>
-</p>
-
-
-<h2 class="relative group">scatter_add 
-    <div id="scatter_add" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#scatter_add" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<p>scatter_add的基本原理同scatter，但是self的同一位置可以多次add（即不需要满足上面数学约束的第五条，允许index沿dim轴有重复值），以GAT的邻域聚合为例：</p>
-
-
-<h3 class="relative group">单头GAT 
-    <div id="%E5%8D%95%E5%A4%B4gat" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%8D%95%E5%A4%B4gat" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/index/scatter-20250421201933.png" alt="|725" />
-      
-    </figure>
-<p>邻域相加，得到最后的结果，即 <code>neighbor_sum[i]</code> 为node_i的邻域聚合值。</p>
-
-
-<h3 class="relative group">多头GAT 
-    <div id="%E5%A4%9A%E5%A4%B4gat" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%A4%9A%E5%A4%B4gat" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>基本原理仍然和单头相似，具体如下图所示：</p>
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/index/image-20250421203255067.png" alt="image-20250421203255067" />
-      
-    </figure>
-
-
-<h2 class="relative group">reference 
-    <div id="reference" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#reference" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E8%83%8C%E6%99%AF" aria-label="锚点">#</a>
     </span>        
     
 </h2>
 <ul>
-<li>知乎 奔腾的黑猫 博客： <a href="https://zhuanlan.zhihu.com/p/158993858" target="_blank">PyTorch数据发散（scatter/scatter_add）与聚集（Gather）操作和二者关系 - 知乎</a></li>
+<li>算法部分：包含 PyTorch、XGBoost</li>
+<li>后端部分：使用 Flask 提供简单 API 服务</li>
+</ul>
+<p>将算法后端打包成可直接部署的 Docker 镜像。</p>
+
+
+<h2 class="relative group">算法容器化 / Now 
+    <div id="%E7%AE%97%E6%B3%95%E5%AE%B9%E5%99%A8%E5%8C%96--now" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E7%AE%97%E6%B3%95%E5%AE%B9%E5%99%A8%E5%8C%96--now" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+
+
+<h3 class="relative group">1、构建 dockerfile 
+    <div id="1%E6%9E%84%E5%BB%BA-dockerfile" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#1%E6%9E%84%E5%BB%BA-dockerfile" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>新建<code>Dockerfile.alg</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="c"># 🐋 基于指定的 PyTorch CUDA 镜像</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 📁 设置工作目录</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /workspace</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 📦 复制本地 zmj 仓库到容器</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> zmj /workspace/zmj<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 🔧 进入 zmj 目录</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /workspace/zmj</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 🪞 配置 pip 使用清华源加速下载</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> pip config <span class="nb">set</span> global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 📚 安装依赖</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> pip install --no-cache-dir -r requirements.txt<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 🌐 暴露 Flask 服务的端口</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">EXPOSE</span><span class="s"> 20010</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 🚀 启动容器时运行 Flask 服务，并将日志写入 output.log</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># ⚠️ 这里保留前台，以使docekr run -d不会直接退出</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;bash&#34;</span><span class="p">,</span> <span class="s2">&#34;-c&#34;</span><span class="p">,</span> <span class="s2">&#34;python main.py &gt; output.log 2&gt;&amp;1&#34;</span><span class="p">]</span><span class="err">
+</span></span></span></code></pre></div>
+
+<h3 class="relative group">2、构建镜像 
+    <div id="2%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#2%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">docker</span> <span class="n">build</span> <span class="o">-</span><span class="n">t</span> <span class="n">alg</span><span class="p">:</span><span class="n">v1</span><span class="mf">.0</span> <span class="o">-</span><span class="n">f</span> <span class="n">Dockerfile</span><span class="o">.</span><span class="n">alg</span> <span class="o">.</span>
+</span></span></code></pre></div>
+
+<h3 class="relative group">3、运行容器 
+    <div id="3%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#3%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># single</span>
+</span></span><span class="line"><span class="cl">docker run -d -p 20010:20010 -v /opt/code/alg:/workspace/mount --gpus all --name alg --restart<span class="o">=</span>unless-stopped alg:v1.0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># multiple</span>
+</span></span><span class="line"><span class="cl">docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -p 20010:20010 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -v /opt/code/alg:/workspace/mount <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --gpus all <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --name alg <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --restart<span class="o">=</span>unless-stopped <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  alg:v1.0
+</span></span></code></pre></div>
+
+<h3 class="relative group">4、查看容器运行状态 
+    <div id="4%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#4%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docekr ps -a
+</span></span><span class="line"><span class="cl">docker logs -f alg
+</span></span></code></pre></div>
+
+<h3 class="relative group">5、端口连通性测试 
+    <div id="5%E7%AB%AF%E5%8F%A3%E8%BF%9E%E9%80%9A%E6%80%A7%E6%B5%8B%E8%AF%95" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#5%E7%AB%AF%E5%8F%A3%E8%BF%9E%E9%80%9A%E6%80%A7%E6%B5%8B%E8%AF%95" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>测试端口联通</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">curl -I http://localhost:20010
+</span></span></code></pre></div>
+
+<h2 class="relative group">镜像保存与迁移 
+    <div id="%E9%95%9C%E5%83%8F%E4%BF%9D%E5%AD%98%E4%B8%8E%E8%BF%81%E7%A7%BB" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E9%95%9C%E5%83%8F%E4%BF%9D%E5%AD%98%E4%B8%8E%E8%BF%81%E7%A7%BB" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<p>1、保存 image 为 tar</p>
+<pre tabindex="0"><code>docker save -o alg.tar alg:v1.0
+</code></pre><p>2、加载 image</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 7z x alg.7z -o./ # 得到 alg.tar</span>
+</span></span><span class="line"><span class="cl">docker load -i alg.tar
+</span></span><span class="line"><span class="cl">docker images
+</span></span></code></pre></div><p>3、启动容器</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker run -d -p 20010:20010 -v /opt/code/alg:/workspace/mount --gpus all --name alg --restart<span class="o">=</span>unless-stopped alg:v1.0
+</span></span></code></pre></div><p>4、开防火墙</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">ufw allow <span class="m">20010</span>
+</span></span></code></pre></div><p>5、API 测试</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 测试</span>
+</span></span><span class="line"><span class="cl">curl -X POST http://localhost:20010/predict
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 返回如下输出即完成</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;code&#34;</span>: 415,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;error&#34;</span>: <span class="s2">&#34;Internal Server Error&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;message&#34;</span>: <span class="s2">&#34;415 Unsupported Media Type: Did not attempt to load JSON data because the request Content-Type was not &#39;application/json&#39;.&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></div>
+
+<h2 class="relative group">非 docker 部署 / Before 
+    <div id="%E9%9D%9E-docker-%E9%83%A8%E7%BD%B2--before" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E9%9D%9E-docker-%E9%83%A8%E7%BD%B2--before" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<ul>
+<li>配置 python 环境
+<ul>
+<li>conda/miniforge/mamba</li>
+<li>pip</li>
+<li>poetry</li>
+</ul>
+</li>
+<li>下载依赖
+<ul>
+<li><code>pip install -r requirements.txt</code></li>
+<li>conda 下载 pytorch 相关依赖</li>
+</ul>
+</li>
+<li>部署
+<ul>
+<li><code>nohup python main.py &gt; output.log 2&gt;&amp;1</code>，将算法的输出重定向至 output.log 中，同时每次向 predict 发送的请求存放至 <code>log/json</code> 中，以时间戳顺序排布。</li>
+</ul>
+</li>
 </ul>
 
           
@@ -1136,235 +1047,6 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
         
 
 
-<h2 class="mt-8 text-2xl font-extrabold mb-10">相关文章</h2>
-<section class="w-full grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-  
-  
-
-  <a href="/blog/conda-or-mamba/" class="min-w-full">
-    
-    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
-        
-        <div class="w-full thumbnail_card_related nozoom" style="background-image:url(/blog/conda-or-mamba/feature_hu_141c6d4525a6d5fa.png);"></div>
-        
-      
-
-      <div class="px-6 py-4">
-
-        
-        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
-          href="/blog/conda-or-mamba/">Miniforge：Conda solving enviroment终结者</div>
-        
-
-        <div class="text-sm text-neutral-500 dark:text-neutral-400">
-          
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  <time datetime="2025-03-19T22:00:16&#43;08:00">2025年03月19日 22時00分</time><span class="px-2 text-primary-500">&middot;</span><span>1308 字</span>
-  
-
-  
-  
-</div>
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Blog
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/st/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    ST
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-</div>
-
-
-
-
-        </div>
-
-        
-      </div>
-      <div class="px-6 pt-4 pb-2">
-
-      </div>
-    </div>
-  </a>
-
-  
-  
-
-  <a href="/report/raw-data-process/" class="min-w-full">
-    
-    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
-        
-        <div class="w-full thumbnail_card_related nozoom" style="background-image:url(/report/raw-data-process/feature_hu_c2450aceb26f3b27.png);"></div>
-        
-      
-
-      <div class="px-6 py-4">
-
-        
-        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
-          href="/report/raw-data-process/">数据清洗</div>
-        
-
-        <div class="text-sm text-neutral-500 dark:text-neutral-400">
-          
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  <time datetime="2025-02-09T15:38:16&#43;08:00">2025年02月09日 15時38分</time><span class="px-2 text-primary-500">&middot;</span><span>2060 字</span>
-  
-
-  
-  
-</div>
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/report/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Report
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/st/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    ST
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-</div>
-
-
-
-
-        </div>
-
-        
-      </div>
-      <div class="px-6 pt-4 pb-2">
-
-      </div>
-    </div>
-  </a>
-
-  
-</section>
-
   
       </div>
      
@@ -1376,8 +1058,8 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
           
         
       <script>
-        var oid = "views_blog\/scatter-in-gnn\/index.md"
-        var oid_likes = "likes_blog\/scatter-in-gnn\/index.md"
+        var oid = "views_blog\/python-container\/index.md"
+        var oid_likes = "likes_blog\/python-container\/index.md"
       </script>
       
       
@@ -1397,7 +1079,7 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="flex group mr-3" href="/blog/conda-or-mamba/">
+            <a class="flex group mr-3" href="/blog/windows-use/">
               <span
                 class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
                 >&larr;</span
@@ -1409,11 +1091,11 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Miniforge：Conda solving enviroment终结者</span
+                  >Windows Scoop包管理，Terminal优化，WSL配置</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2025-03-19T22:00:16&#43;08:00">2025年03月19日 22時00分</time>
+                    <time datetime="2025-10-17T12:42:24&#43;08:00">2025年10月17日 12時42分</time>
                   
                 </span>
               </span>
@@ -1421,28 +1103,6 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
           
         </span>
         <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/encrypt/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Hugo 伪加密</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-05-22T15:38:16&#43;08:00">2025年05月22日 15時38分</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-            </a>
           
         </span>
       </div>
@@ -1456,7 +1116,7 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/scatter-in-gnn/" class="leancloud_visitors" data-flag-title="GNN中的scatter离散运算">
+<span id="/blog/python-container/" class="leancloud_visitors" data-flag-title="Python算法项目 容器化">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>

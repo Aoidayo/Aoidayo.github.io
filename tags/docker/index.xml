@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docker on Aoidayo</title>
+    <link>https://blog.aoidayo.site/tags/docker/</link>
+    <description>Recent content in Docker on Aoidayo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>© 2025 Aoidayo</copyright>
+    <lastBuildDate>Mon, 24 Nov 2025 17:13:35 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Python算法项目 容器化</title>
+      <link>https://blog.aoidayo.site/blog/python-container/</link>
+      <pubDate>Mon, 24 Nov 2025 17:13:35 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/python-container/</guid>
+      <description>&lt;p&gt;实验室的一套 Python 算法项目在部署阶段需要以容器/虚拟化方式运行，因此整理了整个 Docker 化流程，方便后续参考。&lt;/p&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;背景 
+    &lt;div id=&#34;%E8%83%8C%E6%99%AF&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E8%83%8C%E6%99%AF&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;算法部分：包含 PyTorch、XGBoost&lt;/li&gt;
+&lt;li&gt;后端部分：使用 Flask 提供简单 API 服务&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;将算法后端打包成可直接部署的 Docker 镜像。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>
