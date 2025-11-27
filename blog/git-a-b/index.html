@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>Git 清除.git仓库历史记录中的高存储占用文件 &middot; Aoidayo</title>
-  <meta name="title" content="Git 清除.git仓库历史记录中的高存储占用文件 &middot; Aoidayo" />
+  <title>单电脑git多用户配置 &middot; Aoidayo</title>
+  <meta name="title" content="单电脑git多用户配置 &middot; Aoidayo" />
   
   
-  <meta name="keywords" content="Git, " />
+  <meta name="keywords" content="Linux, Git, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/git-big/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/git-a-b/" />
   
   
   
@@ -69,23 +69,22 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/git-big/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/git-a-b/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="Git 清除.git仓库历史记录中的高存储占用文件">
-  <meta property="og:description" content="前言 # 最近使用 Git 管理 Unity 项目，误将 Unity 的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有12MB&#43;, 对于一个 Git 仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。">
+  <meta property="og:title" content="单电脑git多用户配置">
+  <meta property="og:description" content="A&amp;B # 场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2025-02-28T22:15:00+08:00">
+    <meta property="article:published_time" content="2025-11-27T08:53:55+08:00">
     <meta property="article:modified_time" content="2025-11-27T01:04:32+00:00">
+    <meta property="article:tag" content="Linux">
     <meta property="article:tag" content="Git">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/git-big/feature.png">
 
   
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/git-big/feature.png">
-  <meta name="twitter:title" content="Git 清除.git仓库历史记录中的高存储占用文件">
-  <meta name="twitter:description" content="前言 # 最近使用 Git 管理 Unity 项目，误将 Unity 的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有12MB&#43;, 对于一个 Git 仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="单电脑git多用户配置">
+  <meta name="twitter:description" content="A&amp;B # 场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。">
 
   
   <script type="application/ld+json">
@@ -93,26 +92,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "Git 清除.git仓库历史记录中的高存储占用文件",
-    "headline": "Git 清除.git仓库历史记录中的高存储占用文件",
+    "name": "单电脑git多用户配置",
+    "headline": "单电脑git多用户配置",
     
-    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003e前言 \n    \u003cdiv id=\u0022%E5%89%8D%E8%A8%80\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%89%8D%E8%A8%80\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e最近使用 Git 管理 Unity 项目，误将 Unity 的\u003ccode\u003eFilo Cables\u003c\/code\u003e包\u003ccode\u003ecommit\u0026amp;push\u003c\/code\u003e到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有\u003ccode\u003e12MB\u002b\u003c\/code\u003e, 对于一个 Git 仓库来说还是太大了，所以需要即时从\u003ccode\u003e.git\u003c\/code\u003e中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。\u003c\/p\u003e",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003eA\u0026amp;B \n    \u003cdiv id=\u0022ab\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#ab\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/git-big\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/git-a-b\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2025",
-    "dateCreated": "2025-02-28T22:15:00\u002b08:00",
-    "datePublished": "2025-02-28T22:15:00\u002b08:00",
+    "dateCreated": "2025-11-27T08:53:55\u002b08:00",
+    "datePublished": "2025-11-27T08:53:55\u002b08:00",
     
     "dateModified": "2025-11-27T01:04:32\u002b00:00",
     
-    "keywords": ["Git"],
+    "keywords": ["Linux","Git"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "835"
+    "wordCount": "732"
   }]
   </script>
 
@@ -408,6 +407,12 @@
   
   
   
+ 
+  
+   
+  
+ 
+
 
 
 <div id="hero" class="h-[150px] md:h-[200px]"></div>
@@ -416,7 +421,7 @@
 
     
     <div class="fixed inset-x-0 top-0 h-[800px] single_hero_background nozoom"
-    style="background-image:url(/blog/git-big/feature_hu_6121b68d022fae06.png);">
+    style="background-image:url(/img/bg-azusa-fan_hu_c0ea7103e1c8e779.png);">
     
 
 
@@ -474,8 +479,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/git-big/"
-      >Git 清除.git仓库历史记录中的高存储占用文件</a
+      href="/blog/git-a-b/"
+      >单电脑git多用户配置</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -484,7 +489,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      Git 清除.git仓库历史记录中的高存储占用文件
+      单电脑git多用户配置
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -529,7 +534,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2025-02-28T22:15:00&#43;08:00">2025年02月28日 22時15分</time><span class="px-2 text-primary-500">&middot;</span><span>835 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2025-11-27T08:53:55&#43;08:00">2025年11月27日 08時53分</time><span class="px-2 text-primary-500">&middot;</span><span>732 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -579,6 +584,14 @@
   
   
   
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/linux/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Linux
+  </span>
+</span>
+  </span>
   
   <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/git/&#34;,'_self');return false;">
     <span class="flex" style="cursor: pointer;">
@@ -709,18 +722,13 @@
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#前言">前言</a></li>
-    <li><a href="#工具">工具</a>
+    <li><a href="#ab">A&amp;B</a></li>
+    <li><a href="#appendix">Appendix</a>
       <ul>
-        <li><a href="#常用方法">常用方法</a>
-          <ul>
-            <li><a href="#a-filter-repo">A. filter-repo</a></li>
-            <li><a href="#b-验证">B. 验证</a></li>
-          </ul>
-        </li>
+        <li><a href="#appendix1修改指定-a-提交为-b-提交">Appendix.1、修改指定 A 提交为 B 提交</a></li>
+        <li><a href="#appendix2修改所有-a-提交为-b-提交">Appendix.2、修改所有 A 提交为 B 提交</a></li>
       </ul>
     </li>
-    <li><a href="#附录">附录</a></li>
   </ul>
 </nav>
   </div>
@@ -734,18 +742,13 @@
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#前言">前言</a></li>
-    <li><a href="#工具">工具</a>
+    <li><a href="#ab">A&amp;B</a></li>
+    <li><a href="#appendix">Appendix</a>
       <ul>
-        <li><a href="#常用方法">常用方法</a>
-          <ul>
-            <li><a href="#a-filter-repo">A. filter-repo</a></li>
-            <li><a href="#b-验证">B. 验证</a></li>
-          </ul>
-        </li>
+        <li><a href="#appendix1修改指定-a-提交为-b-提交">Appendix.1、修改指定 A 提交为 B 提交</a></li>
+        <li><a href="#appendix2修改所有-a-提交为-b-提交">Appendix.2、修改所有 A 提交为 B 提交</a></li>
       </ul>
     </li>
-    <li><a href="#附录">附录</a></li>
   </ul>
 </nav>
   </div>
@@ -829,159 +832,139 @@
         <div class="article-content max-w-prose mb-20">
           
 
-<h2 class="relative group">前言 
-    <div id="%E5%89%8D%E8%A8%80" class="anchor"></div>
+<h2 class="relative group">A&amp;B 
+    <div id="ab" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%89%8D%E8%A8%80" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#ab" aria-label="锚点">#</a>
     </span>        
     
 </h2>
-<p>最近使用 Git 管理 Unity 项目，误将 Unity 的<code>Filo Cables</code>包<code>commit&amp;push</code>到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有<code>12MB+</code>, 对于一个 Git 仓库来说还是太大了，所以需要即时从<code>.git</code>中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。</p>
-
-
-<h2 class="relative group">工具 
-    <div id="%E5%B7%A5%E5%85%B7" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%B7%A5%E5%85%B7" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<p>推荐使用<code>git filter-repo</code>，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比 git 自带的<code>git filter-branch</code>更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如 Unity 的 3d-fbx 文件，模型 pt 文件等等）。</p>
+<p>场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。</p>
+<p>1、添加新用户的 sshkey</p>
+<p>假设第一个 key 是</p>
+<pre tabindex="0"><code>~/.ssh/id_rsa
+</code></pre><p>现在创建第二个 key，用不同的名字（比如 id_rsa_work）：</p>
+<pre tabindex="0"><code>ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_B -C &#34;B@B.com&#34;
+</code></pre><p>这里的~为用户目录，可以使用 powershell 的 <code>cd ~</code> 查看</p>
+<pre tabindex="0"><code># powershell
+cd ~
+pwd
+C:\Users\yourusername
+</code></pre><p>2、编辑 <code>code ~/.ssh/config</code>
+如果没有则新建，添加如下内容</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 默认 GitHub 账号（id_rsa）</span>
+</span></span><span class="line"><span class="cl">Host github.com
+</span></span><span class="line"><span class="cl">    HostName github.com
+</span></span><span class="line"><span class="cl">    User git
+</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/id_rsa
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 第二个 GitHub 账号（id_rsa_B）</span>
+</span></span><span class="line"><span class="cl">Host B
+</span></span><span class="line"><span class="cl">    HostName github.com
+</span></span><span class="line"><span class="cl">    User git
+</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/id_rsa_B
+</span></span></code></pre></div><p>测试是否正常工作</p>
+<pre tabindex="0"><code>ssh -T github.com
+ssh -T B
+</code></pre><p>返回如下则正常工作</p>
+<pre tabindex="0"><code>Hi another-user! You&#39;ve successfully authenticated...
+</code></pre><p>3、修改远程仓库地址
+然后：</p>
 <ul>
-<li><code>git filter-repo</code>：<a href="https://github.com/newren/git-filter-repo/tree/main" target="_blank">newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement)</a></li>
-<li>验证清理效果：<code>git 自带命令</code></li>
-<li>查看 git 仓库占用空间：<code>git count-objects -vH</code></li>
+<li>对于第一个账号克隆的仓库仍用
+<code>git@github.com:xxx/repo.git</code></li>
+<li>对于第二个账号克隆仓库时：
+<code>git@B:xxx/repo.git</code>
+这样 Git 会根据 Host 自动选择 SSH key。</li>
 </ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git remote -v
+</span></span><span class="line"><span class="cl"><span class="c1"># 这里显示  origin  git@github:USERNAME/REPO.git (fetch)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 你需要替换github为第二个账号对应的 Host</span>
+</span></span><span class="line"><span class="cl">git remote set-url origin git@B:USERNAME/REPO.git
+</span></span><span class="line"><span class="cl"><span class="c1"># 验证</span>
+</span></span><span class="line"><span class="cl">git remote -v
+</span></span></code></pre></div><p>4、修改需要推送的仓库局部 B 的 git 用户名和邮箱</p>
+<p>接着 在你需要推送的仓库中修改用户名和 email</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git config --local user.name B
+</span></span><span class="line"><span class="cl">git config --local user.email B@B.com
+</span></span></code></pre></div><p>最后就可以让 B 在 A 的电脑上提交 commits 了。</p>
 
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="./assets/image-20250228223219471.png" alt="image-20250228223219471" />
-      
-    </figure>
 
-
-<h3 class="relative group">常用方法 
-    <div id="%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" class="anchor"></div>
+<h2 class="relative group">Appendix 
+    <div id="appendix" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#appendix" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<p>如果 B 使用 A 的 git 账号提交了怎么办？</p>
+
+
+<h3 class="relative group">Appendix.1、修改指定 A 提交为 B 提交 
+    <div id="appendix1%E4%BF%AE%E6%94%B9%E6%8C%87%E5%AE%9A-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#appendix1%E4%BF%AE%E6%94%B9%E6%8C%87%E5%AE%9A-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" aria-label="锚点">#</a>
     </span>        
     
 </h3>
+<p>例如你想修改 commit hash <code>77f5a0</code> 的作者<code>A</code>：
+1、启动交互式 rebase（从要改的 commit 前一个开始）</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git rebase -i 77f5a0^
+</span></span></code></pre></div><p>2、编辑器修改：</p>
+<pre tabindex="0"><code>pick 77f5a0 B的提交信息
+</code></pre><p>改成：</p>
+<pre tabindex="0"><code>edit 77f5a0 B的提交信息
+</code></pre><p>保存退出。</p>
+<p>3、此时 Git 会停在该提交，执行：</p>
+<pre tabindex="0"><code>git commit --amend --author=&#34;B &lt;B@B.com&gt;&#34;
+</code></pre><p>4、继续 rebase：</p>
+<pre tabindex="0"><code>git rebase --continue
+</code></pre><p>完成后该 commit 的作者就被修改了。</p>
 
 
-<h4 class="relative group">A. filter-repo 
-    <div id="a-filter-repo" class="anchor"></div>
+<h3 class="relative group">Appendix.2、修改所有 A 提交为 B 提交 
+    <div id="appendix2%E4%BF%AE%E6%94%B9%E6%89%80%E6%9C%89-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#a-filter-repo" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#appendix2%E4%BF%AE%E6%94%B9%E6%89%80%E6%9C%89-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" aria-label="锚点">#</a>
     </span>        
     
-</h4>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. 文件夹</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 保留my_folder下面的所有文件, 删除其他所有文件</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path my_folder
-</span></span><span class="line"><span class="cl"><span class="c1"># --invert-paths 反转. 删除my_folder下面的所有文件</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path my_folder --invert-paths --force
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 2. 文件</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># --path-glob &lt;file.name&gt; 删除指定文件</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path-glob xxx.mp4 --invert-paths --force
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 3. 占用空间</span>
-</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 100K
-</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1M
-</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1G
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 清理引用和缓存</span>
-</span></span><span class="line"><span class="cl">git reflog expire --expire<span class="o">=</span>now --all <span class="o">&amp;&amp;</span> git gc --prune<span class="o">=</span>now --aggressive
-</span></span><span class="line"><span class="cl"><span class="c1"># 可能清理完成之后，把remote也给清除了，这里重置</span>
-</span></span><span class="line"><span class="cl">git remote add origin git@github.com:Aoidayo/xxx.git
-</span></span><span class="line"><span class="cl"><span class="c1"># push</span>
-</span></span><span class="line"><span class="cl">git push origin --force --all
-</span></span><span class="line"><span class="cl">git push origin --force --tags
-</span></span></code></pre></div>
-
-<h4 class="relative group">B. 验证 
-    <div id="b-%E9%AA%8C%E8%AF%81" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#b-%E9%AA%8C%E8%AF%81" aria-label="锚点">#</a>
-    </span>        
-    
-</h4>
-<ul>
-<li><code>git rev-list</code> 查看高占用文件， 剩余文件大小分布</li>
-<li><code>git count-objects -vH</code></li>
-<li><code>git log &lt;file/dir&gt;</code></li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. git rev-list</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象）</span>
-</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> grep -f &lt;<span class="o">(</span>git verify-pack -v .git/objects/pack/*.idx <span class="p">|</span> grep blob <span class="p">|</span> sort -k <span class="m">3</span> -n <span class="p">|</span> cut -f <span class="m">1</span> -d <span class="s2">&#34; &#34;</span><span class="p">|</span>tail -10<span class="o">)</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 剩余文件大小分布 (B)</span>
-</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> awk <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> git cat-file --batch-check<span class="o">=</span><span class="s1">&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;/^blob/ {print $3, $4}&#39;</span> <span class="p">|</span> sort -n
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 2. git count-objects -vH</span>
-</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">git count-objects -vH
-</span></span></span><span class="line"><span class="cl"><span class="s1">count: 19
-</span></span></span><span class="line"><span class="cl"><span class="s1">size: 25.71 KiB
-</span></span></span><span class="line"><span class="cl"><span class="s1">in-pack: 283
-</span></span></span><span class="line"><span class="cl"><span class="s1">packs: 1
-</span></span></span><span class="line"><span class="cl"><span class="s1">size-pack: 9.30 MiB
-</span></span></span><span class="line"><span class="cl"><span class="s1">prune-packable: 0
-</span></span></span><span class="line"><span class="cl"><span class="s1">garbage: 0
-</span></span></span><span class="line"><span class="cl"><span class="s1">size-garbage: 0 bytes
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 3. git log &lt;file/dir&gt;</span>
-</span></span><span class="line"><span class="cl">$ git log RopeUpDown<span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="c1"># 没有输出表示已经清理干净了</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 输出 和当前文件或者目录有关的commit history</span>
-</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main)
-</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 21:17:38 2025 +0800
+</h3>
+<p>使用 git filter-branch，将某个人的所有提交统一改成另外一个身份
+⚠️：filter-branch 会彻底重写历史，请先备份仓库！</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git filter-branch --env-filter <span class="s1">&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">OLD_EMAIL=&#34;A@A.com&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">CORRECT_NAME=&#34;B&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">CORRECT_EMAIL=&#34;B@B.com&#34;
 </span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">    fix(remove filo): add ignore
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13
-</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
-</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 20:57:55 2025 +0800
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">    Rope Up Down
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
-</span></span></code></pre></div>
-
-<h2 class="relative group">附录 
-    <div id="%E9%99%84%E5%BD%95" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#%E9%99%84%E5%BD%95" aria-label="锚点">#</a>
-    </span>        
-    
-</h2>
-<p>参考：</p>
-<ul>
-<li><a href="https://www.bilibili.com/video/BV1C841117TD/?vd_source=a3b7a95f2cd97322455e13ec98e4c6d4" target="_blank">GitFAQ-如何删除提交记录中的大文件_哔哩哔哩_bilibili</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/377661967" target="_blank">Git 清理.git 文件夹中的大文件及.gitignore 简单使用 - 知乎</a></li>
-<li>DS</li>
-</ul>
-
+</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_COMMITTER_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
+</span></span></span><span class="line"><span class="cl"><span class="s1">then
+</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_NAME=&#34;$CORRECT_NAME&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_EMAIL=&#34;$CORRECT_EMAIL&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">fi
+</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_AUTHOR_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
+</span></span></span><span class="line"><span class="cl"><span class="s1">then
+</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_NAME=&#34;$CORRECT_NAME&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_EMAIL=&#34;$CORRECT_EMAIL&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s1">fi
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;</span> --tag-name-filter cat -- --all
+</span></span></code></pre></div><p>检查+提交</p>
+<pre tabindex="0"><code>git log
+# 强推
+git push --force --all # git push -f
+git push --force --tags
+</code></pre>
           
           
           
@@ -995,6 +978,244 @@
         
 
 
+<h2 class="mt-8 text-2xl font-extrabold mb-10">相关文章</h2>
+<section class="w-full grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+  
+  
+
+  <a href="/blog/python-container/" class="min-w-full">
+    
+    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
+      
+        
+        <div class="w-full thumbnail_card_related nozoom" style="background-image:url(/5811fb17-9c07-43b7-a729-4846eb7e9d0f_14612575406022701529_hu_1862d05ac13f80b3.png);"></div>
+        
+      
+
+      <div class="px-6 py-4">
+
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/python-container/">Python算法项目 容器化</div>
+        
+
+        <div class="text-sm text-neutral-500 dark:text-neutral-400">
+          
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2025-11-24T17:13:35&#43;08:00">2025年11月24日 17時13分</time><span class="px-2 text-primary-500">&middot;</span><span>585 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/linux/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Linux
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/docker/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Docker
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+        </div>
+
+        
+      </div>
+      <div class="px-6 pt-4 pb-2">
+
+      </div>
+    </div>
+  </a>
+
+  
+  
+
+  <a href="/blog/git-big/" class="min-w-full">
+    
+    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
+        
+        <div class="w-full thumbnail_card_related nozoom" style="background-image:url(/blog/git-big/feature_hu_e68d29da6e8382f2.png);"></div>
+        
+      
+
+      <div class="px-6 py-4">
+
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/git-big/">Git 清除.git仓库历史记录中的高存储占用文件</div>
+        
+
+        <div class="text-sm text-neutral-500 dark:text-neutral-400">
+          
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2025-02-28T22:15:00&#43;08:00">2025年02月28日 22時15分</time><span class="px-2 text-primary-500">&middot;</span><span>835 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/git/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Git
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+        </div>
+
+        
+      </div>
+      <div class="px-6 pt-4 pb-2">
+
+      </div>
+    </div>
+  </a>
+
+  
+</section>
+
   
       </div>
      
@@ -1006,8 +1227,8 @@
           
         
       <script>
-        var oid = "views_blog\/git-big\/index.md"
-        var oid_likes = "likes_blog\/git-big\/index.md"
+        var oid = "views_blog\/git-A-B\/index.md"
+        var oid_likes = "likes_blog\/git-A-B\/index.md"
       </script>
       
       
@@ -1027,7 +1248,7 @@
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="flex group mr-3" href="/blog/use-hugo/">
+            <a class="flex group mr-3" href="/blog/python-container/">
               <span
                 class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
                 >&larr;</span
@@ -1039,11 +1260,11 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >使用hugo</span
+                  >Python算法项目 容器化</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2025-01-07T15:38:16&#43;08:00">2025年01月07日 15時38分</time>
+                    <time datetime="2025-11-24T17:13:35&#43;08:00">2025年11月24日 17時13分</time>
                   
                 </span>
               </span>
@@ -1051,28 +1272,6 @@
           
         </span>
         <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/24-sum/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >24年年终总结</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-03-18T07:00:16&#43;08:00">2025年03月18日 07時00分</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-            </a>
           
         </span>
       </div>
@@ -1086,7 +1285,7 @@
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/git-big/" class="leancloud_visitors" data-flag-title="Git 清除.git仓库历史记录中的高存储占用文件">
+<span id="/blog/git-a-b/" class="leancloud_visitors" data-flag-title="单电脑git多用户配置">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>

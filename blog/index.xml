@@ -10,6 +10,26 @@
     <atom:link href="https://blog.aoidayo.site/blog/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>单电脑git多用户配置</title>
+      <link>https://blog.aoidayo.site/blog/git-a-b/</link>
+      <pubDate>Thu, 27 Nov 2025 08:53:55 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/git-a-b/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;A&amp;amp;B 
+    &lt;div id=&#34;ab&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#ab&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>Python算法项目 容器化</title>
       <link>https://blog.aoidayo.site/blog/python-container/</link>
       <pubDate>Mon, 24 Nov 2025 17:13:35 +0800</pubDate>
@@ -234,7 +254,7 @@
     &lt;/span&gt;        
     
 &lt;/h2&gt;
-&lt;p&gt;最近使用Git管理Unity项目，误将Unity的&lt;code&gt;Filo Cables&lt;/code&gt;包&lt;code&gt;commit&amp;amp;push&lt;/code&gt;到仓库中了，折腾半天发现无法撤回，这个包没有导入到Unity之前就有&lt;code&gt;12MB+&lt;/code&gt;, 对于一个Git仓库来说还是太大了，所以需要即时从&lt;code&gt;.git&lt;/code&gt;中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用Github公共资源。&lt;/p&gt;</description>
+&lt;p&gt;最近使用 Git 管理 Unity 项目，误将 Unity 的&lt;code&gt;Filo Cables&lt;/code&gt;包&lt;code&gt;commit&amp;amp;push&lt;/code&gt;到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有&lt;code&gt;12MB+&lt;/code&gt;, 对于一个 Git 仓库来说还是太大了，所以需要即时从&lt;code&gt;.git&lt;/code&gt;中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/git-big/feature.png" />
     </item>
     
