@@ -7,7 +7,30 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>© 2025 Aoidayo</copyright>
-    <lastBuildDate>Thu, 27 Nov 2025 08:53:55 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Dec 2025 23:44:14 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Overleaf集成Git&amp;Github</title>
+      <link>https://blog.aoidayo.site/blog/olgit/</link>
+      <pubDate>Fri, 26 Dec 2025 23:44:14 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/olgit/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;Olgitbridge 
+    &lt;div id=&#34;olgitbridge&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#olgitbridge&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;Olgitbridge: Overleaf Git Bridge&lt;/p&gt;
+&lt;p&gt;鉴于 Overleaf 开源版本无法集成 git，在 github 上逛了一圈发现还是&lt;a href=&#34;https://gitlab.com/axkibe/olgitbridge&#34; target=&#34;_blank&#34;&gt;olgitbridge&lt;/a&gt;最好用，本篇博客做&lt;strong&gt;部署和使用&lt;/strong&gt;的相关介绍。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;😋github 上的介绍 / 机翻过来作为参考&lt;/p&gt;</description>
+      
+    </item>
     
     <item>
       <title>单电脑git多用户配置</title>
