@@ -10,6 +10,33 @@
     <atom:link href="https://blog.aoidayo.site/blog/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>境外借记卡简单调研</title>
+      <link>https://blog.aoidayo.site/blog/debit-card/</link>
+      <pubDate>Sat, 27 Dec 2025 23:31:36 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/debit-card/</guid>
+      <description>&lt;p&gt;最近 GPT 和 Gemini 越来越强，于是萌生了办理境外借记卡的想法。之前也不太了解银行卡的类型，简单做个调研。&lt;/p&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;A. 信用卡、借记卡 
+    &lt;div id=&#34;a-%E4%BF%A1%E7%94%A8%E5%8D%A1%E5%80%9F%E8%AE%B0%E5%8D%A1&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#a-%E4%BF%A1%E7%94%A8%E5%8D%A1%E5%80%9F%E8%AE%B0%E5%8D%A1&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://zh.wikipedia.org/wiki/%E4%BF%A1%E7%94%A8%E5%8D%A1&#34; target=&#34;_blank&#34;&gt;信用卡 - 维基百科，自由的百科全书&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://zh.wikipedia.org/wiki/%E5%80%9F%E8%AE%B0%E5%8D%A1&#34; target=&#34;_blank&#34;&gt;借记卡 - 维基百科，自由的百科全书&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;先说说借记卡（Debit Card），又称储蓄卡，主要特点是&lt;/p&gt;</description>
+      
+    </item>
+    
+    <item>
       <title>Overleaf集成Git&amp;Github</title>
       <link>https://blog.aoidayo.site/blog/olgit/</link>
       <pubDate>Fri, 26 Dec 2025 23:44:14 +0800</pubDate>
