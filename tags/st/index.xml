@@ -6,7 +6,7 @@
     <description>Recent content in ST on Aoidayo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>© 2025 Aoidayo</copyright>
+    <copyright>© 2026 Aoidayo</copyright>
     <lastBuildDate>Mon, 21 Apr 2025 20:25:21 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/st/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
@@ -43,6 +43,7 @@
   loop=&#34;all&#34;
   order=&#34;list&#34;
   theme=&#34;#60A5FA&#34;
+  mini=&#34;false&#34;
 &gt;&lt;/meting-js&gt;
 &lt;p&gt;PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg" />

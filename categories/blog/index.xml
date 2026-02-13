@@ -6,8 +6,67 @@
     <description>Recent content in Blog on Aoidayo</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <copyright>© 2025 Aoidayo</copyright>
-    <lastBuildDate>Sat, 27 Dec 2025 23:31:36 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>© 2026 Aoidayo</copyright>
+    <lastBuildDate>Fri, 13 Feb 2026 10:36:02 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>2025：时间的魔法</title>
+      <link>https://blog.aoidayo.site/blog/25-sum/</link>
+      <pubDate>Fri, 13 Feb 2026 10:36:02 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/25-sum/</guid>
+      <description>&lt;!-- ## 2025年终：时间的魔法 --&gt;
+
+  
+  
+  
+  
+
+
+
+&lt;div
+  
+    class=&#34;flex px-4 py-3 rounded-md&#34;
+    style=&#34;background-color: #e63946&#34;
+  &gt;
+
+  &lt;span
+    
+      class=&#34;ltr:pr-3 rtl:pl-3 flex items-center&#34;
+      style=&#34;color: #60A5FA&#34;
+    &gt;
+
+    
+
+  &lt;span class=&#34;relative block icon&#34;&gt;
+    &lt;svg xmlns=&#34;http://www.w3.org/2000/svg&#34; viewBox=&#34;0 0 448 512&#34;&gt;
+&lt;path fill=&#34;currentColor&#34; d=&#34;M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z&#34;/&gt;&lt;/svg&gt;
+  &lt;/span&gt;
+
+
+  &lt;/span&gt;
+
+  &lt;span
+    
+      style=&#34;color: #f1faee&#34;
+    &gt;孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。&lt;/span&gt;
+&lt;/div&gt;
+
+
+
+&lt;h3 class=&#34;relative group&#34;&gt;chap1 
+    &lt;div id=&#34;chap1&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#chap1&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h3&gt;
+&lt;p&gt;如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 &lt;strong&gt;「时间的魔法」&lt;/strong&gt;。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/25-sum/feature.jpeg" />
+    </item>
     
     <item>
       <title>境外借记卡简单调研</title>
@@ -243,6 +302,7 @@
   loop=&#34;all&#34;
   order=&#34;list&#34;
   theme=&#34;#60A5FA&#34;
+  mini=&#34;false&#34;
 &gt;&lt;/meting-js&gt;
 &lt;p&gt;PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg" />

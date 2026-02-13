@@ -77,7 +77,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
     <meta property="article:published_time" content="2025-04-21T20:25:21+08:00">
-    <meta property="article:modified_time" content="2025-12-27T15:53:10+00:00">
+    <meta property="article:modified_time" content="2026-02-13T04:15:47+00:00">
     <meta property="article:tag" content="ST">
     <meta property="og:image" content="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg">
 
@@ -96,7 +96,7 @@
     "name": "GNN中的scatter离散运算",
     "headline": "GNN中的scatter离散运算",
     
-    "abstract": "\u003clink rel=\u0022stylesheet\u0022 href=\u0022https:\/\/cdn.jsdelivr.net\/npm\/aplayer\/dist\/APlayer.min.css\u0022 \/\u003e\n\u003cscript src=\u0022https:\/\/cdn.jsdelivr.net\/npm\/aplayer\/dist\/APlayer.min.js\u0022\u003e\u003c\/script\u003e\n\n\u003cscript src=\u0022https:\/\/cdn.jsdelivr.net\/npm\/meting@2.0.1\/dist\/Meting.min.js\u0022\u003e\u003c\/script\u003e\n\u003cstyle\u003e\n.aplayer-list-title {\n  color: #60a5fa !important;\n}\n.aplayer-title {\n  color: #60a5fa !important;\n}\n\n.aplayer-lrc p.aplayer-lrc-current {\n  color: #60a5fa !important;\n}\n.aplayer.aplayer-fixed .aplayer-lrc {\n  text-shadow: none;\n}\n\u003c\/style\u003e\n\u003cmeting-js\n  server=\u0022netease\u0022\n  type=\u0022song\u0022\n  id=\u00222666749200\u0022\n  fixed=\u0022true\u0022\n  autoplay=\u0022false\u0022\n  loop=\u0022all\u0022\n  order=\u0022list\u0022\n  theme=\u0022#60A5FA\u0022\n\u003e\u003c\/meting-js\u003e\n\u003cp\u003ePyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。\u003c\/p\u003e",
+    "abstract": "\u003clink rel=\u0022stylesheet\u0022 href=\u0022https:\/\/cdn.jsdelivr.net\/npm\/aplayer\/dist\/APlayer.min.css\u0022 \/\u003e\n\u003cscript src=\u0022https:\/\/cdn.jsdelivr.net\/npm\/aplayer\/dist\/APlayer.min.js\u0022\u003e\u003c\/script\u003e\n\n\u003cscript src=\u0022https:\/\/cdn.jsdelivr.net\/npm\/meting@2.0.1\/dist\/Meting.min.js\u0022\u003e\u003c\/script\u003e\n\u003cstyle\u003e\n.aplayer-list-title {\n  color: #60a5fa !important;\n}\n.aplayer-title {\n  color: #60a5fa !important;\n}\n\n.aplayer-lrc p.aplayer-lrc-current {\n  color: #60a5fa !important;\n}\n.aplayer.aplayer-fixed .aplayer-lrc {\n  text-shadow: none;\n}\n\u003c\/style\u003e\n\u003cmeting-js\n  server=\u0022netease\u0022\n  type=\u0022song\u0022\n  id=\u00222666749200\u0022\n  fixed=\u0022true\u0022\n  autoplay=\u0022false\u0022\n  loop=\u0022all\u0022\n  order=\u0022list\u0022\n  theme=\u0022#60A5FA\u0022\n  mini=\u0022false\u0022\n\u003e\u003c\/meting-js\u003e\n\u003cp\u003ePyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
     "url" : "https:\/\/blog.aoidayo.site\/blog\/scatter-in-gnn\/",
     "author" : {
@@ -107,7 +107,7 @@
     "dateCreated": "2025-04-21T20:25:21\u002b08:00",
     "datePublished": "2025-04-21T20:25:21\u002b08:00",
     
-    "dateModified": "2025-12-27T15:53:10\u002b00:00",
+    "dateModified": "2026-02-13T04:15:47\u002b00:00",
     
     "keywords": ["ST"],
     
@@ -985,6 +985,7 @@
   loop="all"
   order="list"
   theme="#60A5FA"
+  mini="false"
 ></meting-js>
 <p>PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。</p>
 <p>我们以GAT为例，说明scatter在GAT中的应用：一是相似度系数的归一，二是 \(h_i^{&rsquo;}\) 的加权邻域聚合。</p>
@@ -1533,7 +1534,7 @@ A:答案就是scatter支持pytorch的并行化，同时更加便于pytorch的梯
    
   <div class="flex items-center justify-between">
      
-    <p class="text-sm text-neutral-500 dark:text-neutral-400"> &copy; 2025 Aoidayo
+    <p class="text-sm text-neutral-500 dark:text-neutral-400"> &copy; 2026 Aoidayo
     </p>
       
   </div>
