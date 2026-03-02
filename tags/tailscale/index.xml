@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TailScale on Aoidayo</title>
+    <link>https://blog.aoidayo.site/tags/tailscale/</link>
+    <description>Recent content in TailScale on Aoidayo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>© 2026 Aoidayo</copyright>
+    <lastBuildDate>Mon, 02 Mar 2026 19:45:56 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/tailscale/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网</title>
+      <link>https://blog.aoidayo.site/blog/s2s-vpn/</link>
+      <pubDate>Mon, 02 Mar 2026 19:45:56 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/s2s-vpn/</guid>
+      <description>&lt;p&gt;最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r+淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/s2s-vpn/feature.png" />
+    </item>
+    
+  </channel>
+</rss>

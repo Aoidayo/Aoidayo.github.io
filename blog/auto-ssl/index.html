@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>2025：时间的魔法 &middot; Aoidayo</title>
-  <meta name="title" content="2025：时间的魔法 &middot; Aoidayo" />
+  <title>CertBot自动化SSL证书部署 &middot; Aoidayo</title>
+  <meta name="title" content="CertBot自动化SSL证书部署 &middot; Aoidayo" />
   
   
+  <meta name="keywords" content="运维, " />
   
   
-  
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/25-sum/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/auto-ssl/" />
   
   
   
@@ -69,22 +69,23 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/25-sum/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/auto-ssl/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="2025：时间的魔法">
-  <meta property="og:description" content="孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。 chap1 # 如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 「时间的魔法」。">
+  <meta property="og:title" content="CertBot自动化SSL证书部署">
+  <meta property="og:description" content="前言 # 为什么需要使用SSL证书自动部署？
+SSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。 现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。 现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。 证书自动化的机制：">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2026-02-13T10:36:02+08:00">
+    <meta property="article:published_time" content="2026-03-02T19:58:04+08:00">
     <meta property="article:modified_time" content="2026-03-02T12:06:04+00:00">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/25-sum/feature.jpeg">
+    <meta property="article:tag" content="运维">
 
   
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/25-sum/feature.jpeg">
-  <meta name="twitter:title" content="2025：时间的魔法">
-  <meta name="twitter:description" content="孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。 chap1 # 如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 「时间的魔法」。">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="CertBot自动化SSL证书部署">
+  <meta name="twitter:description" content="前言 # 为什么需要使用SSL证书自动部署？
+SSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。 现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。 现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。 证书自动化的机制：">
 
   
   <script type="application/ld+json">
@@ -92,26 +93,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "2025：时间的魔法",
-    "headline": "2025：时间的魔法",
+    "name": "CertBot自动化SSL证书部署",
+    "headline": "CertBot自动化SSL证书部署",
     
-    "abstract": "\u003c!-- ## 2025年终：时间的魔法 --\u003e\n\n  \n  \n  \n  \n\n\n\n\u003cdiv\n  \n    class=\u0022flex px-4 py-3 rounded-md\u0022\n    style=\u0022background-color: #e63946\u0022\n  \u003e\n\n  \u003cspan\n    \n      class=\u0022ltr:pr-3 rtl:pl-3 flex items-center\u0022\n      style=\u0022color: #60A5FA\u0022\n    \u003e\n\n    \n\n  \u003cspan class=\u0022relative block icon\u0022\u003e\n    \u003csvg xmlns=\u0022http:\/\/www.w3.org\/2000\/svg\u0022 viewBox=\u00220 0 448 512\u0022\u003e\n\u003cpath fill=\u0022currentColor\u0022 d=\u0022M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z\u0022\/\u003e\u003c\/svg\u003e\n  \u003c\/span\u003e\n\n\n  \u003c\/span\u003e\n\n  \u003cspan\n    \n      style=\u0022color: #f1faee\u0022\n    \u003e孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。\u003c\/span\u003e\n\u003c\/div\u003e\n\n\n\n\u003ch3 class=\u0022relative group\u0022\u003echap1 \n    \u003cdiv id=\u0022chap1\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#chap1\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\u003cp\u003e如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 \u003cstrong\u003e「时间的魔法」\u003c\/strong\u003e。\u003c\/p\u003e",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003e前言 \n    \u003cdiv id=\u0022%E5%89%8D%E8%A8%80\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%E5%89%8D%E8%A8%80\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e为什么需要使用SSL证书自动部署？\u003c\/p\u003e\n\u003cul\u003e\n\u003cli\u003eSSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。\u003c\/li\u003e\n\u003cli\u003e现在的短有效期证书以后可能会更短，据说CA\/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。\u003c\/li\u003e\n\u003cli\u003e现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。\u003c\/li\u003e\n\u003c\/ul\u003e\n\u003cp\u003e证书自动化的机制：\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/25-sum\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/auto-ssl\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2026",
-    "dateCreated": "2026-02-13T10:36:02\u002b08:00",
-    "datePublished": "2026-02-13T10:36:02\u002b08:00",
+    "dateCreated": "2026-03-02T19:58:04\u002b08:00",
+    "datePublished": "2026-03-02T19:58:04\u002b08:00",
     
     "dateModified": "2026-03-02T12:06:04\u002b00:00",
     
-    
+    "keywords": ["运维"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1144"
+    "wordCount": "1707"
   }]
   </script>
 
@@ -407,8 +408,14 @@
   
   
   
+ 
+  
+   
+  
+ 
+
         
-            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/blog/25-sum/feature_hu_3872aa5dc27bbb9.jpeg);"></div>
+            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/img/bg-azusa-fan_hu_c0ea7103e1c8e779.png);"></div>
         
     
   
@@ -449,8 +456,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/25-sum/"
-      >2025：时间的魔法</a
+      href="/blog/auto-ssl/"
+      >CertBot自动化SSL证书部署</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -459,7 +466,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      2025：时间的魔法
+      CertBot自动化SSL证书部署
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -504,7 +511,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2026-02-13T10:36:02&#43;08:00">2026年02月13日 10時36分</time><span class="px-2 text-primary-500">&middot;</span><span>1144 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2026-03-02T19:58:04&#43;08:00">2026年03月02日 19時58分</time><span class="px-2 text-primary-500">&middot;</span><span>1707 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -552,6 +559,16 @@
   
   
   
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/%E8%BF%90%E7%BB%B4/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    运维
+  </span>
+</span>
+  </span>
   
   
   
@@ -674,14 +691,15 @@
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#certbot使用">CertBot使用</a>
       <ul>
-        <li><a href="#chap1">chap1</a></li>
-        <li><a href="#chap2">chap2</a></li>
-        <li><a href="#chap3">chap3</a></li>
-        <li><a href="#chap4">chap4</a></li>
+        <li><a href="#1安装">1、安装</a></li>
+        <li><a href="#2dns-验证插件安装">2、DNS 验证插件安装</a></li>
+        <li><a href="#3certbot使用">3、certbot使用</a></li>
       </ul>
     </li>
+    <li><a href="#参考">参考</a></li>
   </ul>
 </nav>
   </div>
@@ -695,14 +713,15 @@
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#certbot使用">CertBot使用</a>
       <ul>
-        <li><a href="#chap1">chap1</a></li>
-        <li><a href="#chap2">chap2</a></li>
-        <li><a href="#chap3">chap3</a></li>
-        <li><a href="#chap4">chap4</a></li>
+        <li><a href="#1安装">1、安装</a></li>
+        <li><a href="#2dns-验证插件安装">2、DNS 验证插件安装</a></li>
+        <li><a href="#3certbot使用">3、certbot使用</a></li>
       </ul>
     </li>
+    <li><a href="#参考">参考</a></li>
   </ul>
 </nav>
   </div>
@@ -784,172 +803,248 @@
 
 
         <div class="article-content max-w-prose mb-20">
-          <!-- ## 2025年终：时间的魔法 -->
+          
 
-  
-  
-  
-  
-
-
-
-<div
-  
-    class="flex px-4 py-3 rounded-md"
-    style="background-color: #e63946"
-  >
-
-  <span
-    
-      class="ltr:pr-3 rtl:pl-3 flex items-center"
-      style="color: #60A5FA"
-    >
-
-    
-
-  <span class="relative block icon">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-<path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg>
-  </span>
-
-
-  </span>
-
-  <span
-    
-      style="color: #f1faee"
-    >孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。</span>
-</div>
-
-
-
-<h3 class="relative group">chap1 
-    <div id="chap1" class="anchor"></div>
+<h2 class="relative group">前言 
+    <div id="%E5%89%8D%E8%A8%80" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap1" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#%E5%89%8D%E8%A8%80" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 <strong>「时间的魔法」</strong>。</p>
-<p>这个名字来自于游戏「白色相簿2」的一首背景音乐「時の魔法」。相比<a href="https://music.163.com/#/song?id=775895" target="_blank">人声版本</a>，<a href="https://music.163.com/#/song?id=775893" target="_blank">八音盒版本</a> 这种仿佛来自童年的纯粹旋律更贴近人声版本歌词的主旨，一个只属于游戏的美好机制：「Save&amp;Load」，我们知道很多游戏都有这个模式，关键处存档，后续推进游戏遇到棘手情况时读档重开。当然也有像杀戮尖塔这种只允许单把关卡存档的游戏，但不管怎么样，在游戏中我们可以针对一关甚至多关反复重开，通过求多次局部最优的方式达到我们心中的结果最优。
+</h2>
+<p>为什么需要使用SSL证书自动部署？</p>
+<ul>
+<li>SSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。</li>
+<li>现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。</li>
+<li>现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。</li>
+</ul>
+<p>证书自动化的机制：</p>
+<ul>
+<li>ACME协议把证书申请变成了可编程的API：通过DNS验证某个域名是你自己的，CA就会给你发证书。（<code>Let's Encrypt</code>真是能和cloudflare类比的大好人啊，我以前还以为证书都需要自己花钱买的。）</li>
+</ul>
+<p>我的情况：</p>
+<ul>
+<li>我只需要更新SSL的cert和key，将cert和key替换原来的证书和密钥文件，然后重启nginx，现在需要做的就是实现这个流程的自动化。</li>
+<li>之前我在ohttps上申请证书并部署到服务器上，使用fullchain.pem（证书和中间证书）和certkey.pem（私钥）两个文件。</li>
+<li>现在使用certbot和python3-certbot-dns-cloudflare自动化该流程，向<code>let's encrypt</code>申请通配符证书到本地。</li>
+</ul>
+<p>关于我为什么需要SSL证书：</p>
+<ul>
+<li>Damn的密码管理器VaultWarden强制需要SSL证书，不然不给连接。</li>
+</ul>
 
 
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="775895"
-  fixed="false"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-  mini="false"
-></meting-js>
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="775893"
-  fixed="false"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-  mini="false"
-></meting-js></p>
-<p>现实和游戏的最大区别就是无法「Save&amp;Load」，也正因为这样，这首歌的名字才叫「时间的魔法」。游戏中选错选项可以读档，打不过可以重开，配卡不理想可以重新构筑，只要愿意投入时间，总能获得一个更好的结果。现实更像每把强制的铁人模式，每一个选择都会被永久写入存档，等意识到你某一步操作的影响时，游戏已经默默向前了一大步。</p>
-
-
-<h3 class="relative group">chap2 
-    <div id="chap2" class="anchor"></div>
+<h2 class="relative group">CertBot使用 
+    <div id="certbot%E4%BD%BF%E7%94%A8" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap2" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#certbot%E4%BD%BF%E7%94%A8" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>2025对我来说，就是这样的一年。</p>
-<p>很多事情当时看都很普通：要不要多花一点时间在某件事上，要不要早点开始准备，要不要把身体的不适当回事。等到回头看，才发现这些当时随手做的决定，已经慢慢把这一年带到了现在这个样子。</p>
-<p>写年终的时候，很容易去想：如果当时换一个选项，或者再坚持一下，会不会结果不同？但现实没有「重来一次」的机会。错过的就是错过了，只能在现有的基础上继续往下走。</p>
-<p>明年是我的本命年。十二年前还在小学，那时候对时间没什么概念，一年就是一年。现在走到学生阶段的末尾，再回头看这十二年，才发现很多变化都是一点点发生的。你以为只是普通的一年，其实也许是某个长期故事阶段性章节的收尾。</p>
-<p>年末生病之后，不得不把小论文的撰写和投递往前赶，又一次寒假提前回家。本来安排好的节奏被打乱，人也感觉明显的状态下降。游戏里血量掉了可以补回来，现实里却不是这样。身体的消耗是慢慢累积的，不会因为休息几天就完全清零。</p>
+</h2>
+<p>基本流程：</p>
+<ul>
+<li>1、安装</li>
+<li>2、DNS 验证插件安装</li>
+<li>3、使用CertBot申请证书</li>
+</ul>
 
 
-<h3 class="relative group">chap3 
-    <div id="chap3" class="anchor"></div>
+<h3 class="relative group">1、安装 
+    <div id="1%E5%AE%89%E8%A3%85" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap3" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#1%E5%AE%89%E8%A3%85" aria-label="锚点">#</a>
     </span>        
     
 </h3>
-<p>如果游戏的机制是通过读档来反复尝试逼近最优解，那现实的机制，大概是通过承担后果，逐步修正决策。这或许才是「时间的魔法」的真正含义：</p>
-<p>不是回溯，而是累积。</p>
-<p>不是重开，而是继续。</p>
+<p>两种方式：
+1）使用snap安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt update
+</span></span><span class="line"><span class="cl">sudo apt install snapd -y
+</span></span><span class="line"><span class="cl">sudo snap install core
+</span></span><span class="line"><span class="cl">sudo snap refresh core
+</span></span><span class="line"><span class="cl">sudo snap install --classic certbot
+</span></span><span class="line"><span class="cl">sudo ln -s /snap/bin/certbot /usr/bin/certbot
+</span></span></code></pre></div><p>2）使用apt安装</p>
+<pre tabindex="0"><code>apt install certbot
+</code></pre><p>验证</p>
+<pre tabindex="0"><code>certbot --version
+</code></pre><hr>
 
 
-<h3 class="relative group">chap4 
-    <div id="chap4" class="anchor"></div>
+<h3 class="relative group">2、DNS 验证插件安装 
+    <div id="2dns-%E9%AA%8C%E8%AF%81%E6%8F%92%E4%BB%B6%E5%AE%89%E8%A3%85" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap4" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#2dns-%E9%AA%8C%E8%AF%81%E6%8F%92%E4%BB%B6%E5%AE%89%E8%A3%85" aria-label="锚点">#</a>
     </span>        
     
 </h3>
-<p>今年没有很多想说的话，过年的时候坐在家里闲的没事儿写一下这篇博客，以此纪念下2025，很多年之后再看会不会感觉很唏嘘呢？</p>
-<p>最后祝大家身体健康，吃嘛嘛香。身体才是支撑时间魔法的唯一本钱，大家平时忙的时候也要注意休息，压力大的时候多摆摆烂。毕竟我们不必事事努力，生活只需要健康的身体与继续下去的勇气。</p>
-<p>2025，存档（111真能存档吗，孩子们我想重来了）。</p>
-<p>2026，继续。</p>
+<p><strong>(1) 申请cloudflare的api token</strong></p>
+<p>申请cloudflare的api token（注意不是global token）</p>
+<p>登录 Cloudflare：</p>
+<ol>
+<li>进入 → My Profile</li>
+<li>选择 → API Tokens</li>
+<li>点击 → Create Token</li>
+<li>使用模板：Edit zone DNS，其中权限必须包含：Zone：DNS+Zobe</li>
+<li>Zone Resources 选择：Include → Specific zone → aoidayo.site</li>
+</ol>
+<p>保存并复制完整 token。</p>
+<p>⚠️ 注意：不要多复制空格或换行。</p>
+<p><strong>(2) DNS API自动验证</strong></p>
+<p>DNS API自动验证：以Cloudflare为例：</p>
+<p>1、安装插件</p>
+<pre tabindex="0"><code>sudo apt install python3-certbot-dns-cloudflare
+</code></pre><p>2、创建 API Token 文件</p>
+<pre tabindex="0"><code>sudo nano /root/.cloudflare.ini
+</code></pre><p>写入：</p>
+<pre tabindex="0"><code>dns_cloudflare_api_token = NEywfvoLF012e5bvEQyqqntGL4V4L971YnTInGqd
+</code></pre><p>设置权限：</p>
+<pre tabindex="0"><code>sudo chmod 600 /root/.cloudflare.ini
+</code></pre><hr>
+
+
+<h3 class="relative group">3、certbot使用 
+    <div id="3certbot%E4%BD%BF%E7%94%A8" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#3certbot%E4%BD%BF%E7%94%A8" aria-label="锚点">#</a>
+    </span>        
+    
+</h3>
+<p>1、申请通配符证书</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">sudo</span><span class="w"> </span><span class="n">certbot</span><span class="w"> </span><span class="n">certonly</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">--</span><span class="n">dns</span><span class="o">-</span><span class="n">cloudflare</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">--</span><span class="n">dns</span><span class="o">-</span><span class="n">cloudflare</span><span class="o">-</span><span class="n">credentials</span><span class="w"> </span><span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="p">.</span><span class="na">cloudflare</span><span class="p">.</span><span class="na">ini</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">aoidayo</span><span class="p">.</span><span class="na">site</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="s">&#34;*.aoidayo.site&#34;</span><span class="w">
+</span></span></span></code></pre></div><p>这一步需要你添加通知邮箱和一些协议，我都默认yes了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ sudo certbot certonly <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --dns-cloudflare <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --dns-cloudflare-credentials /root/.cloudflare.ini <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -d aoidayo.site <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  -d <span class="s2">&#34;*.aoidayo.site&#34;</span>
+</span></span><span class="line"><span class="cl">Saving debug log to /var/log/letsencrypt/letsencrypt.log
+</span></span><span class="line"><span class="cl">Requesting a certificate <span class="k">for</span> aoidayo.site and *.aoidayo.site
+</span></span><span class="line"><span class="cl">Waiting <span class="m">10</span> seconds <span class="k">for</span> DNS changes to propagate
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Successfully received certificate.
+</span></span><span class="line"><span class="cl">Certificate is saved at: /etc/letsencrypt/live/aoidayo.site/fullchain.pem
+</span></span><span class="line"><span class="cl">Key is saved at:         /etc/letsencrypt/live/aoidayo.site/privkey.pem
+</span></span><span class="line"><span class="cl">This certificate expires on 2026-05-31.
+</span></span><span class="line"><span class="cl">These files will be updated when the certificate renews.
+</span></span><span class="line"><span class="cl">Certbot has <span class="nb">set</span> up a scheduled task to automatically renew this certificate in the background.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl">If you like Certbot, please consider supporting our work by:
+</span></span><span class="line"><span class="cl"> * Donating to ISRG / Let<span class="err">&#39;</span>s Encrypt:   https://letsencrypt.org/donate
+</span></span><span class="line"><span class="cl"> * Donating to EFF:                    https://eff.org/donate-le
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span></code></pre></div><p>成功后证书在：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/etc/letsencrypt/live/example.com/
+</span></span></code></pre></div><p>2、同时certbot会自动创建定时任务：</p>
+<p>查看：</p>
+<pre tabindex="0"><code>systemctl list-timers | grep certbot
+# 
+Tue 2026-03-03 09:46:37 CST 17h left           n/a                         n/a           certbot.timer                  certbot.service
+</code></pre><p>3、测试续期：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo certbot renew --dry-run <span class="c1"># 测试续期</span>
+</span></span><span class="line"><span class="cl">sudo certbot renew --force-renewal <span class="c1"># 强制续期</span>
+</span></span></code></pre></div><p>4、添加续期后hook</p>
+<p>🤔 添加续期后hook，在复制证书后，自动reload nginx，最后写入nginx/ssl的op.log中。</p>
+<pre tabindex="0"><code>sudo nano /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh # 
+sudo chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh # 赋权
+</code></pre><p>我的bash脚本如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="nb">set</span> -e
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 基本变量</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">DOMAIN</span><span class="o">=</span><span class="s2">&#34;aoidayo.site&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">SRC_DIR</span><span class="o">=</span><span class="s2">&#34;/etc/letsencrypt/live/</span><span class="nv">$DOMAIN</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">DST_DIR</span><span class="o">=</span><span class="s2">&#34;/home/dockers/nginx/ssl/aoidayo&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">/op.log&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">SRC_CERT</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$SRC_DIR</span><span class="s2">/fullchain.pem&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">SRC_KEY</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$SRC_DIR</span><span class="s2">/privkey.pem&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">DST_CERT</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">/fullchain.pem&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">DST_KEY</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">/certkey.pem&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">TIMESTAMP</span><span class="o">=</span><span class="k">$(</span>date <span class="s2">&#34;+%Y-%m-%d %H:%M:%S&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 检查源文件是否存在</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&#34;</span><span class="nv">$SRC_CERT</span><span class="s2">&#34;</span> <span class="o">||</span> ! -f <span class="s2">&#34;</span><span class="nv">$SRC_KEY</span><span class="s2">&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="nv">$TIMESTAMP</span><span class="s2">] ERROR: Source certificate files not found.&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$LOG_FILE</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 创建目标目录</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mkdir -p <span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 复制并覆盖</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cp -f <span class="s2">&#34;</span><span class="nv">$SRC_CERT</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$DST_CERT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">cp -f <span class="s2">&#34;</span><span class="nv">$SRC_KEY</span><span class="s2">&#34;</span>  <span class="s2">&#34;</span><span class="nv">$DST_KEY</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置合理权限</span>
+</span></span><span class="line"><span class="cl">chmod <span class="m">644</span> <span class="s2">&#34;</span><span class="nv">$DST_CERT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">chmod <span class="m">600</span> <span class="s2">&#34;</span><span class="nv">$DST_KEY</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 重启 docker nginx</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> docker restart nginx-server &gt; /dev/null 2&gt;<span class="p">&amp;</span>1<span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="nv">$TIMESTAMP</span><span class="s2">] SUCCESS: Certificate updated and nginx-server restarted.&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$LOG_FILE</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="nv">$TIMESTAMP</span><span class="s2">] ERROR: Docker restart failed!&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$LOG_FILE</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">exit</span> <span class="m">0</span>
+</span></span></code></pre></div>
+
+<h2 class="relative group">参考 
+    <div id="%E5%8F%82%E8%80%83" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#%E5%8F%82%E8%80%83" aria-label="锚点">#</a>
+    </span>        
+    
+</h2>
+<p>最后给出本文参考。</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/1985782987418259611/answer/1985818988610086500" target="_blank">HTTPS证书自动化部署方案求推荐，Let&rsquo;s Encrypt靠谱吗？ - 杞鋂的回答 - 知乎</a></li>
+<li><a href="https://www.cnblogs.com/ljbguanli/p/18925988" target="_blank">使用 Let‘s Encrypt 和 Certbot 为 Cloudflare 托管的域名申请 SSL 证书 - 指南 - ljbguanli - 博客园</a></li>
+</ul>
 
           
           
@@ -975,8 +1070,8 @@
           
         
       <script>
-        var oid = "views_blog\/25-sum\/index.md"
-        var oid_likes = "likes_blog\/25-sum\/index.md"
+        var oid = "views_blog\/auto-ssl\/index.md"
+        var oid_likes = "likes_blog\/auto-ssl\/index.md"
       </script>
       
       
@@ -996,7 +1091,7 @@
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="flex group mr-3" href="/blog/debit-card/">
+            <a class="flex group mr-3" href="/blog/s2s-vpn/">
               <span
                 class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
                 >&larr;</span
@@ -1008,11 +1103,11 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >境外借记卡简单调研</span
+                  >公网ip收回后：利用TailScale+自建中转Derp实现异地组网</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2025-12-27T23:31:36&#43;08:00">2025年12月27日 23時31分</time>
+                    <time datetime="2026-03-02T19:45:56&#43;08:00">2026年03月02日 19時45分</time>
                   
                 </span>
               </span>
@@ -1020,28 +1115,6 @@
           
         </span>
         <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/ms-rewards-puzzle/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >薅微软Rewards羊毛：更快的滑动拼图方法</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2026-02-20T16:57:55&#43;08:00">2026年02月20日 16時57分</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-            </a>
           
         </span>
       </div>
@@ -1055,7 +1128,7 @@
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/25-sum/" class="leancloud_visitors" data-flag-title="2025：时间的魔法">
+<span id="/blog/auto-ssl/" class="leancloud_visitors" data-flag-title="CertBot自动化SSL证书部署">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>

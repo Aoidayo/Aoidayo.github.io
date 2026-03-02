@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>2025：时间的魔法 &middot; Aoidayo</title>
-  <meta name="title" content="2025：时间的魔法 &middot; Aoidayo" />
+  <title>公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 &middot; Aoidayo</title>
+  <meta name="title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 &middot; Aoidayo" />
   
   
+  <meta name="keywords" content="TailScale, 网络, " />
   
   
-  
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/25-sum/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/s2s-vpn/" />
   
   
   
@@ -69,22 +69,24 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/25-sum/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/s2s-vpn/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="2025：时间的魔法">
-  <meta property="og:description" content="孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。 chap1 # 如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 「时间的魔法」。">
+  <meta property="og:title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
+  <meta property="og:description" content="最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r&#43;淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2026-02-13T10:36:02+08:00">
+    <meta property="article:published_time" content="2026-03-02T19:45:56+08:00">
     <meta property="article:modified_time" content="2026-03-02T12:06:04+00:00">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/25-sum/feature.jpeg">
+    <meta property="article:tag" content="TailScale">
+    <meta property="article:tag" content="网络">
+    <meta property="og:image" content="https://blog.aoidayo.site/blog/s2s-vpn/feature.png">
 
   
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/25-sum/feature.jpeg">
-  <meta name="twitter:title" content="2025：时间的魔法">
-  <meta name="twitter:description" content="孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。 chap1 # 如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 「时间的魔法」。">
+  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/s2s-vpn/feature.png">
+  <meta name="twitter:title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
+  <meta name="twitter:description" content="最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r&#43;淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。">
 
   
   <script type="application/ld+json">
@@ -92,26 +94,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "2025：时间的魔法",
-    "headline": "2025：时间的魔法",
+    "name": "公网ip收回后：利用TailScale\u002b自建中转Derp实现异地组网",
+    "headline": "公网ip收回后：利用TailScale\u002b自建中转Derp实现异地组网",
     
-    "abstract": "\u003c!-- ## 2025年终：时间的魔法 --\u003e\n\n  \n  \n  \n  \n\n\n\n\u003cdiv\n  \n    class=\u0022flex px-4 py-3 rounded-md\u0022\n    style=\u0022background-color: #e63946\u0022\n  \u003e\n\n  \u003cspan\n    \n      class=\u0022ltr:pr-3 rtl:pl-3 flex items-center\u0022\n      style=\u0022color: #60A5FA\u0022\n    \u003e\n\n    \n\n  \u003cspan class=\u0022relative block icon\u0022\u003e\n    \u003csvg xmlns=\u0022http:\/\/www.w3.org\/2000\/svg\u0022 viewBox=\u00220 0 448 512\u0022\u003e\n\u003cpath fill=\u0022currentColor\u0022 d=\u0022M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z\u0022\/\u003e\u003c\/svg\u003e\n  \u003c\/span\u003e\n\n\n  \u003c\/span\u003e\n\n  \u003cspan\n    \n      style=\u0022color: #f1faee\u0022\n    \u003e孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。\u003c\/span\u003e\n\u003c\/div\u003e\n\n\n\n\u003ch3 class=\u0022relative group\u0022\u003echap1 \n    \u003cdiv id=\u0022chap1\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#chap1\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\u003cp\u003e如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 \u003cstrong\u003e「时间的魔法」\u003c\/strong\u003e。\u003c\/p\u003e",
+    "abstract": "\u003cp\u003e最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r\u002b淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/25-sum\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/s2s-vpn\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2026",
-    "dateCreated": "2026-02-13T10:36:02\u002b08:00",
-    "datePublished": "2026-02-13T10:36:02\u002b08:00",
+    "dateCreated": "2026-03-02T19:45:56\u002b08:00",
+    "datePublished": "2026-03-02T19:45:56\u002b08:00",
     
     "dateModified": "2026-03-02T12:06:04\u002b00:00",
     
-    
+    "keywords": ["TailScale","网络"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1144"
+    "wordCount": "1980"
   }]
   </script>
 
@@ -408,7 +410,7 @@
   
   
         
-            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/blog/25-sum/feature_hu_3872aa5dc27bbb9.jpeg);"></div>
+            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/blog/s2s-vpn/feature_hu_2991ca9e637181bd.png);"></div>
         
     
   
@@ -449,8 +451,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/25-sum/"
-      >2025：时间的魔法</a
+      href="/blog/s2s-vpn/"
+      >公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -459,7 +461,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      2025：时间的魔法
+      公网ip收回后：利用TailScale+自建中转Derp实现异地组网
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -504,7 +506,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2026-02-13T10:36:02&#43;08:00">2026年02月13日 10時36分</time><span class="px-2 text-primary-500">&middot;</span><span>1144 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2026-03-02T19:45:56&#43;08:00">2026年03月02日 19時45分</time><span class="px-2 text-primary-500">&middot;</span><span>1980 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -552,6 +554,24 @@
   
   
   
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/tailscale/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    TailScale
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/%E7%BD%91%E7%BB%9C/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    网络
+  </span>
+</span>
+  </span>
   
   
   
@@ -660,123 +680,7 @@
   
   <section class="flex flex-col max-w-full mt-0 prose dark:prose-invert lg:flex-row">
     
-     <div
-      class="order-first lg:ml-auto px-0 lg:order-last ltr:lg:pl-8 rtl:lg:pr-8">
-      <div class="toc ltr:pl-5 rtl:pr-5 print:hidden lg:sticky lg:top-[140px]">
-
-         <details open id="TOCView"
-  class="toc-right mt-0 overflow-y-scroll overscroll-contain scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600 rounded-lg ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 hidden lg:block">
-  <summary
-    class="block py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
-    目录
-  </summary>
-  <div
-    class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#chap1">chap1</a></li>
-        <li><a href="#chap2">chap2</a></li>
-        <li><a href="#chap3">chap3</a></li>
-        <li><a href="#chap4">chap4</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</details>
-<details class="toc-inside mt-0 overflow-hidden rounded-lg ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 lg:hidden">
-  <summary
-    class="py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
-    目录
-  </summary>
-  <div
-    class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
-    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#chap1">chap1</a></li>
-        <li><a href="#chap2">chap2</a></li>
-        <li><a href="#chap3">chap3</a></li>
-        <li><a href="#chap4">chap4</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</details>
-
-<script>
-
-  var margin = 200;
-  var marginError = 50;
-
-  (function () {
-    var $window = $(window);
-    var $toc = $('#TOCView');
-    var tocHeight = $toc.height();
-
-    function onResize() {
-      var windowAndMarginHeight = $window.height() - margin;
-      if(tocHeight >= windowAndMarginHeight) {
-        $toc.css("overflow-y", "scroll")
-        $toc.css("max-height", (windowAndMarginHeight + marginError) + "px")
-      } else {
-        $toc.css("overflow-y", "hidden")
-        $toc.css("max-height", "9999999px")
-      }
-    }
-
-    $window.on('resize', onResize);
-    $(document).ready(onResize);
-  })();
-
-
-
-  (function () {
-    var $toc = $('#TableOfContents');
-    if ($toc.length > 0) {
-      var $window = $(window);
-
-      function onScroll() {
-        var currentScroll = $window.scrollTop();
-        var h = $('.anchor');
-        var id = "";
-        h.each(function (i, e) {
-          e = $(e);
-          if (e.offset().top - $(window).height()/3 <= currentScroll) {
-            id = decodeURIComponent(e.attr('id'));
-          }
-        });
-        var active = $toc.find('a.active');      
-        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
-
-        active.each(function (i, e) {
-          
-            $(e).removeClass('active');
-          
-        });
-        $toc.find('a[href="#' + id + '"]').addClass('active')
-        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
-          $(e).children('a').parents('ul').show();          
-        });
-      }
-
-      $window.on('scroll', onScroll);
-      $(document).ready(function () {
-        
-        onScroll();
-      });
-    }
-  })();
-
-
-</script>
-   </div>
-      </div>
-      
+    
 
       <div class="min-w-0 min-h-0 max-w-fit">
         
@@ -784,172 +688,52 @@
 
 
         <div class="article-content max-w-prose mb-20">
-          <!-- ## 2025年终：时间的魔法 -->
+          <p>最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r+淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。</p>
+<p>由于家里的宽带本来也快到期了，续费时大概率还是哪家便宜选哪家，所以公网 IP 被收回对我来说几乎是注定的结果。只是这样一来，一个现实问题就摆在面前：如果不再拥有公网地址，我该如何在外网环境下访问家里的那台小服务器呢？</p>
+<p>这台小服务器配置还不错，功耗也低，常年开着也不心疼电费，完全闲置实在可惜。既然公网直连这条路可能走不通（其实公网直连也有坏处，年前飞牛爆出的0day漏洞让几十万台裸奔机变成了肉鸡，即使我将默认5666端口转发到了1024，也未能幸免），那就只能另辟蹊径。于是，我开始在网上查阅各种资料，系统了解“异地组网”相关的技术方案，希望找到一种既稳定又省心的远程访问方式。</p>
+<hr>
+<p>简单罗列一下的搜索到的远程访问方式：</p>
+<ul>
+<li>frps、frpc：这是一种比较常见的内网穿透方式，平时开发用的也多，常见于将本地需要高配置才能运行的服务穿透到公网服务器上给甲方访问。但是我们这里需要访问的端口不止一个，而且鉴于安全，直接开公网端口显然不适合，所以这种方式不适用。</li>
+<li>基于WireGuard的方案：VPN的一种，其实很多路由器的互联Mesh也是一种WireGuard，网络这块深入的我了解不太多。
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/18256305161" target="_blank">WireGuard使用</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/157121608?from_voters_page=true" target="_blank">WireGuard 教程：WireGuard 的工作原理 - 知乎</a></li>
+<li>Tailscale + 使用云服务器自建中继Derper 的方案：</li>
+<li>Nebula</li>
+<li>WireGuard最大的问题，我是在回到学校后才发现的。这种<code>固定 UDP 端口、固定握手格式、包长度特征明显、协议特征稳定</code>的协议很容易被识别为WireGuard流量，在学校实验室的内网环境下会出现无法使用WireGuard协议从TailScale客户端登录到TailScale官网/自建HeadScale的情况。伪装性上不如被VPN广泛采用的Vless、XUDP、Hysteria2和Torjan。（不过最近Torjan已经很少看见了，被时代抛弃了吗😭）。</li>
+</ul>
+</li>
+<li>Zerotier
+<ul>
+<li>和TailScale一样的情况，无法在学校实验室的内网环境连接到Zerotier的Planet节点。</li>
+</ul>
+</li>
+<li>Syncthing：这个是中心服务器无关的，但是只能部署文件的同步，适合拿来同步eagle。</li>
+</ul>
+<hr>
+<p>最终，我选择的是 <strong>Tailscale + 云服务器自建 DERP 中继</strong> 的方案。</p>
+<p>之所以做出这个选择，其实中间也经历了一些折腾。</p>
+<p>一开始在学院实验室内网环境下使用 Tailscale 时，怎么都连不上，节点始终无法正常建立连接，折腾得我相当头大。但奇怪的是，在宿舍的学生内网环境下却可以正常使用。两个内网之间甚至还能互相 ping 通，甚至可以说本质上就是一个内网，可偏偏 Tailscale 就是在实验室环境下水土不服。</p>
+<p>推测大概率是实验室网络的安全策略更严格，对 UDP 流量或打洞行为做了更细致的限制，而宿舍网络相对宽松。</p>
+<p>后来我又尝试了自建 <strong>Headscale</strong> 作为控制服务器，但新的问题又出现了：最新版本的 <strong>Tailscale</strong> 客户端几乎强制要求通过 HTTPS（SSL）访问 Headscale 服务器。相关报错可以在 <code>ProgramData/Local/Tailscale</code> 的日志里清晰看到。</p>
+<p>当时我是真的有点绷不住——原本只是想搭个轻量的控制器，结果还得额外折腾HTTPS。对于一个只是想打通内外网访问的人来说，复杂度明显开始上升。</p>
+<p>不过，后来我发现了一个曲线救国的办法：先用手机热点连接到 Tailscale 官方控制服务器，完成 STUN 打洞，让节点之间建立直连；随后再切回实验室内网环境。神奇的是，只要洞已经打通，后续的直连流量并不会被实验室网络拦截，节点之间依然可以正常互访。</p>
+<p>这下就简单了——既然已经能稳定打通，那就没必要继续深挖复杂部署了。与其在实验室网络环境里和各种策略，不如先在一个宽松环境下完成打洞，再切换回目标网络使用。于是我：直接采用官方控制服务器 + 自建 DERP 中继的组合，既保证稳定性，也保留一定程度的可控性。以后需要连接实验室网络时，先切手机流量打洞，再进内网，一切都简单得多。</p>
 
-  
-  
-  
-  
-
-
-
-<div
-  
-    class="flex px-4 py-3 rounded-md"
-    style="background-color: #e63946"
-  >
-
-  <span
-    
-      class="ltr:pr-3 rtl:pl-3 flex items-center"
-      style="color: #60A5FA"
-    >
-
-    
-
-  <span class="relative block icon">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-<path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg>
-  </span>
-
-
-  </span>
-
-  <span
-    
-      style="color: #f1faee"
-    >孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。</span>
-</div>
-
-
-
-<h3 class="relative group">chap1 
-    <div id="chap1" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap1" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 <strong>「时间的魔法」</strong>。</p>
-<p>这个名字来自于游戏「白色相簿2」的一首背景音乐「時の魔法」。相比<a href="https://music.163.com/#/song?id=775895" target="_blank">人声版本</a>，<a href="https://music.163.com/#/song?id=775893" target="_blank">八音盒版本</a> 这种仿佛来自童年的纯粹旋律更贴近人声版本歌词的主旨，一个只属于游戏的美好机制：「Save&amp;Load」，我们知道很多游戏都有这个模式，关键处存档，后续推进游戏遇到棘手情况时读档重开。当然也有像杀戮尖塔这种只允许单把关卡存档的游戏，但不管怎么样，在游戏中我们可以针对一关甚至多关反复重开，通过求多次局部最优的方式达到我们心中的结果最优。
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="775895"
-  fixed="false"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-  mini="false"
-></meting-js>
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="775893"
-  fixed="false"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-  mini="false"
-></meting-js></p>
-<p>现实和游戏的最大区别就是无法「Save&amp;Load」，也正因为这样，这首歌的名字才叫「时间的魔法」。游戏中选错选项可以读档，打不过可以重开，配卡不理想可以重新构筑，只要愿意投入时间，总能获得一个更好的结果。现实更像每把强制的铁人模式，每一个选择都会被永久写入存档，等意识到你某一步操作的影响时，游戏已经默默向前了一大步。</p>
-
-
-<h3 class="relative group">chap2 
-    <div id="chap2" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap2" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>2025对我来说，就是这样的一年。</p>
-<p>很多事情当时看都很普通：要不要多花一点时间在某件事上，要不要早点开始准备，要不要把身体的不适当回事。等到回头看，才发现这些当时随手做的决定，已经慢慢把这一年带到了现在这个样子。</p>
-<p>写年终的时候，很容易去想：如果当时换一个选项，或者再坚持一下，会不会结果不同？但现实没有「重来一次」的机会。错过的就是错过了，只能在现有的基础上继续往下走。</p>
-<p>明年是我的本命年。十二年前还在小学，那时候对时间没什么概念，一年就是一年。现在走到学生阶段的末尾，再回头看这十二年，才发现很多变化都是一点点发生的。你以为只是普通的一年，其实也许是某个长期故事阶段性章节的收尾。</p>
-<p>年末生病之后，不得不把小论文的撰写和投递往前赶，又一次寒假提前回家。本来安排好的节奏被打乱，人也感觉明显的状态下降。游戏里血量掉了可以补回来，现实里却不是这样。身体的消耗是慢慢累积的，不会因为休息几天就完全清零。</p>
-
-
-<h3 class="relative group">chap3 
-    <div id="chap3" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap3" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>如果游戏的机制是通过读档来反复尝试逼近最优解，那现实的机制，大概是通过承担后果，逐步修正决策。这或许才是「时间的魔法」的真正含义：</p>
-<p>不是回溯，而是累积。</p>
-<p>不是重开，而是继续。</p>
-
-
-<h3 class="relative group">chap4 
-    <div id="chap4" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap4" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>今年没有很多想说的话，过年的时候坐在家里闲的没事儿写一下这篇博客，以此纪念下2025，很多年之后再看会不会感觉很唏嘘呢？</p>
-<p>最后祝大家身体健康，吃嘛嘛香。身体才是支撑时间魔法的唯一本钱，大家平时忙的时候也要注意休息，压力大的时候多摆摆烂。毕竟我们不必事事努力，生活只需要健康的身体与继续下去的勇气。</p>
-<p>2025，存档（111真能存档吗，孩子们我想重来了）。</p>
-<p>2026，继续。</p>
+    <figure>
+      <img class="my-0 rounded-md" loading="lazy" src="assets/%E5%BC%82%E5%9C%B0%E7%BB%84%E7%BD%91-20260302194238.png" alt="一个简单的网络结构" />
+      
+    </figure>
+<p>参考 | 自建Derper服务器</p>
+<ul>
+<li>关于自建Derper服务器中转：<a href="https://blog.sleepstars.net/archives/ji-yu-docker-compose#%E4%BD%BF%E7%94%A8-ping-%E6%B5%8B%E8%AF%95%E8%BF%9E%E9%80%9A%E6%80%A7" target="_blank">自建免备案防偷 Tailscale 国内中继（DERP）教程 - Sleepstars 的记录室</a></li>
+</ul>
+<p>扩展 | 以后可以扩展实现的方案</p>
+<ul>
+<li>HeadScale配置Https：HeadScale如果配置好https应该也是能正常用的，只不过不想折腾了。</li>
+<li>TailScale早期客户端：TailScale早期的客户端可以直连http，不过tailscale早期版本在Github上只有Code没有Release安装包。在TailScale官网上找到的最早安装包也是在1.8.x，不支持http连接。</li>
+</ul>
 
           
           
@@ -975,8 +759,8 @@
           
         
       <script>
-        var oid = "views_blog\/25-sum\/index.md"
-        var oid_likes = "likes_blog\/25-sum\/index.md"
+        var oid = "views_blog\/s2s-vpn\/index.md"
+        var oid_likes = "likes_blog\/s2s-vpn\/index.md"
       </script>
       
       
@@ -996,7 +780,7 @@
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="flex group mr-3" href="/blog/debit-card/">
+            <a class="flex group mr-3" href="/blog/ms-rewards-puzzle/">
               <span
                 class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
                 >&larr;</span
@@ -1008,11 +792,11 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >境外借记卡简单调研</span
+                  >薅微软Rewards羊毛：更快的滑动拼图方法</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2025-12-27T23:31:36&#43;08:00">2025年12月27日 23時31分</time>
+                    <time datetime="2026-02-20T16:57:55&#43;08:00">2026年02月20日 16時57分</time>
                   
                 </span>
               </span>
@@ -1021,15 +805,15 @@
         </span>
         <span>
           
-            <a class="flex text-right group ml-3" href="/blog/ms-rewards-puzzle/">
+            <a class="flex text-right group ml-3" href="/blog/auto-ssl/">
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >薅微软Rewards羊毛：更快的滑动拼图方法</span
+                  >CertBot自动化SSL证书部署</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2026-02-20T16:57:55&#43;08:00">2026年02月20日 16時57分</time>
+                    <time datetime="2026-03-02T19:58:04&#43;08:00">2026年03月02日 19時58分</time>
                   
                 </span>
               </span>
@@ -1055,7 +839,7 @@
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/25-sum/" class="leancloud_visitors" data-flag-title="2025：时间的魔法">
+<span id="/blog/s2s-vpn/" class="leancloud_visitors" data-flag-title="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>
