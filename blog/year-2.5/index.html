@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 &middot; Aoidayo</title>
-  <meta name="title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 &middot; Aoidayo" />
+  <title>练习时长两年半的日记本 &middot; Aoidayo</title>
+  <meta name="title" content="练习时长两年半的日记本 &middot; Aoidayo" />
   
   
-  <meta name="keywords" content="TailScale, 网络, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/s2s-vpn/" />
+  
+  <link rel="canonical" href="https://blog.aoidayo.site/blog/year-2.5/" />
   
   
   
@@ -69,24 +69,22 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/s2s-vpn/">
+  <meta property="og:url" content="https://blog.aoidayo.site/blog/year-2.5/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
-  <meta property="og:description" content="最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r&#43;淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。">
+  <meta property="og:title" content="练习时长两年半的日记本">
+  <meta property="og:description" content="本来想倒序记录一下读研生活的，但发现稍微有点远的事记忆模糊了，当时的痛苦和难受对比现在没有这么明显，想想还是正常顺序写写平时的流水账吧。
+如果要给大学之前的生活划自然段的话，那么就是开智前后，开智前的事情全不记得，开智后开始记得一些事情了。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2026-03-02T19:45:56+08:00">
+    <meta property="article:published_time" content="2026-03-13T14:53:01+08:00">
     <meta property="article:modified_time" content="2026-03-13T07:04:04+00:00">
-    <meta property="article:tag" content="TailScale">
-    <meta property="article:tag" content="网络">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/s2s-vpn/feature.png">
 
   
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/s2s-vpn/feature.png">
-  <meta name="twitter:title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
-  <meta name="twitter:description" content="最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r&#43;淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="练习时长两年半的日记本">
+  <meta name="twitter:description" content="本来想倒序记录一下读研生活的，但发现稍微有点远的事记忆模糊了，当时的痛苦和难受对比现在没有这么明显，想想还是正常顺序写写平时的流水账吧。
+如果要给大学之前的生活划自然段的话，那么就是开智前后，开智前的事情全不记得，开智后开始记得一些事情了。">
 
   
   <script type="application/ld+json">
@@ -94,26 +92,26 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "",
-    "name": "公网ip收回后：利用TailScale\u002b自建中转Derp实现异地组网",
-    "headline": "公网ip收回后：利用TailScale\u002b自建中转Derp实现异地组网",
+    "name": "练习时长两年半的日记本",
+    "headline": "练习时长两年半的日记本",
     
-    "abstract": "\u003cp\u003e最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r\u002b淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。\u003c\/p\u003e",
+    "abstract": "\u003cp\u003e本来想倒序记录一下读研生活的，但发现稍微有点远的事记忆模糊了，当时的痛苦和难受对比现在没有这么明显，想想还是正常顺序写写平时的流水账吧。\u003c\/p\u003e\n\u003cp\u003e如果要给大学之前的生活划自然段的话，那么就是开智前后，开智前的事情全不记得，开智后开始记得一些事情了。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/s2s-vpn\/",
+    "url" : "https:\/\/blog.aoidayo.site\/blog\/year-2.5\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2026",
-    "dateCreated": "2026-03-02T19:45:56\u002b08:00",
-    "datePublished": "2026-03-02T19:45:56\u002b08:00",
+    "dateCreated": "2026-03-13T14:53:01\u002b08:00",
+    "datePublished": "2026-03-13T14:53:01\u002b08:00",
     
     "dateModified": "2026-03-13T07:04:04\u002b00:00",
     
-    "keywords": ["TailScale","网络"],
+    
     
     "mainEntityOfPage": "true",
-    "wordCount": "1980"
+    "wordCount": "3081"
   }]
   </script>
 
@@ -409,8 +407,14 @@
   
   
   
+ 
+  
+   
+  
+ 
+
         
-            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/blog/s2s-vpn/feature_hu_2991ca9e637181bd.png);"></div>
+            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/img/bg-azusa-fan_hu_c0ea7103e1c8e779.png);"></div>
         
     
   
@@ -451,8 +455,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/s2s-vpn/"
-      >公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网</a
+      href="/blog/year-2.5/"
+      >练习时长两年半的日记本</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -461,7 +465,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      公网ip收回后：利用TailScale+自建中转Derp实现异地组网
+      练习时长两年半的日记本
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -506,7 +510,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2026-03-02T19:45:56&#43;08:00">2026年03月02日 19時45分</time><span class="px-2 text-primary-500">&middot;</span><span>1980 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2026-03-13T14:53:01&#43;08:00">2026年03月13日 14時53分</time><span class="px-2 text-primary-500">&middot;</span><span>3081 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -554,24 +558,6 @@
   
   
   
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/tailscale/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    TailScale
-  </span>
-</span>
-  </span>
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/%E7%BD%91%E7%BB%9C/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    网络
-  </span>
-</span>
-  </span>
   
   
   
@@ -688,52 +674,40 @@
 
 
         <div class="article-content max-w-prose mb-20">
-          <p>最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r+淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。</p>
-<p>由于家里的宽带本来也快到期了，续费时大概率还是哪家便宜选哪家，所以公网 IP 被收回对我来说几乎是注定的结果。只是这样一来，一个现实问题就摆在面前：如果不再拥有公网地址，我该如何在外网环境下访问家里的那台小服务器呢？</p>
-<p>这台小服务器配置还不错，功耗也低，常年开着也不心疼电费，完全闲置实在可惜。既然公网直连这条路可能走不通（其实公网直连也有坏处，年前飞牛爆出的0day漏洞让几十万台裸奔机变成了肉鸡，即使我将默认5666端口转发到了1024，也未能幸免），那就只能另辟蹊径。于是，我开始在网上查阅各种资料，系统了解“异地组网”相关的技术方案，希望找到一种既稳定又省心的远程访问方式。</p>
+          <p>本来想倒序记录一下读研生活的，但发现稍微有点远的事记忆模糊了，当时的痛苦和难受对比现在没有这么明显，想想还是正常顺序写写平时的流水账吧。</p>
+<p>如果要给大学之前的生活划自然段的话，那么就是开智前后，开智前的事情全不记得，开智后开始记得一些事情了。</p>
+<p>给大学之后的生活划分的话，就是读研了，读研前的大学生活基本上都是开心的事情，读研后基本上都是糟心的事情。</p>
+<p>读研的一众心酸事是不能为外人所道的，无论是同学，还是老爸老妈。人总是需要一些出口，所以我偶尔会在博客上记录一些莫名奇妙的想法，写完之后我感觉写的不咋地，有时候又隐藏或者加密了。</p>
 <hr>
-<p>简单罗列一下的搜索到的远程访问方式：</p>
-<ul>
-<li>frps、frpc：这是一种比较常见的内网穿透方式，平时开发用的也多，常见于将本地需要高配置才能运行的服务穿透到公网服务器上给甲方访问。但是我们这里需要访问的端口不止一个，而且鉴于安全，直接开公网端口显然不适合，所以这种方式不适用。</li>
-<li>基于WireGuard的方案：VPN的一种，其实很多路由器的互联Mesh也是一种WireGuard，网络这块深入的我了解不太多。
-<ul>
-<li><a href="https://zhuanlan.zhihu.com/p/18256305161" target="_blank">WireGuard使用</a></li>
-<li><a href="https://zhuanlan.zhihu.com/p/157121608?from_voters_page=true" target="_blank">WireGuard 教程：WireGuard 的工作原理 - 知乎</a></li>
-<li>Tailscale + 使用云服务器自建中继Derper 的方案：</li>
-<li>Nebula</li>
-<li>WireGuard最大的问题，我是在回到学校后才发现的。这种<code>固定 UDP 端口、固定握手格式、包长度特征明显、协议特征稳定</code>的协议很容易被识别为WireGuard流量，在学校实验室的内网环境下会出现无法使用WireGuard协议从TailScale客户端登录到TailScale官网/自建HeadScale的情况。伪装性上不如被VPN广泛采用的Vless、XUDP、Hysteria2和Torjan。（不过最近Torjan已经很少看见了，被时代抛弃了吗😭）。</li>
-</ul>
-</li>
-<li>Zerotier
-<ul>
-<li>和TailScale一样的情况，无法在学校实验室的内网环境连接到Zerotier的Planet节点。</li>
-</ul>
-</li>
-<li>Syncthing：这个是中心服务器无关的，但是只能部署文件的同步，适合拿来同步eagle。</li>
-</ul>
+<p>以前我在qq空间上写，现在换的博客在我心里其实和小时候期待的，开黄钻精装修的qq空间没有什么区别。</p>
+<p>至于为什么不在qq空间上写，因为qq空间发一条这种很长的很沉重的文字需要屏蔽很多人，我又讨厌一个个选人，基本上我的qq空间都是公开所有人可见的，高中之前因为言论太过逆天所以我全给锁住了，自己都不敢看了。</p>
+<p>用博客记录这种东西，一方面只有和我比较熟的同学会偶尔看看，另一方面这在某种程度上又满足了我内心某种想要将它公开的阴暗欲望。</p>
 <hr>
-<p>最终，我选择的是 <strong>Tailscale + 云服务器自建 DERP 中继</strong> 的方案。</p>
-<p>之所以做出这个选择，其实中间也经历了一些折腾。</p>
-<p>一开始在学院实验室内网环境下使用 Tailscale 时，怎么都连不上，节点始终无法正常建立连接，折腾得我相当头大。但奇怪的是，在宿舍的学生内网环境下却可以正常使用。两个内网之间甚至还能互相 ping 通，甚至可以说本质上就是一个内网，可偏偏 Tailscale 就是在实验室环境下水土不服。</p>
-<p>推测大概率是实验室网络的安全策略更严格，对 UDP 流量或打洞行为做了更细致的限制，而宿舍网络相对宽松。</p>
-<p>后来我又尝试了自建 <strong>Headscale</strong> 作为控制服务器，但新的问题又出现了：最新版本的 <strong>Tailscale</strong> 客户端几乎强制要求通过 HTTPS（SSL）访问 Headscale 服务器。相关报错可以在 <code>ProgramData/Local/Tailscale</code> 的日志里清晰看到。</p>
-<p>当时我是真的有点绷不住——原本只是想搭个轻量的控制器，结果还得额外折腾HTTPS。对于一个只是想打通内外网访问的人来说，复杂度明显开始上升。</p>
-<p>不过，后来我发现了一个曲线救国的办法：先用手机热点连接到 Tailscale 官方控制服务器，完成 STUN 打洞，让节点之间建立直连；随后再切回实验室内网环境。神奇的是，只要洞已经打通，后续的直连流量并不会被实验室网络拦截，节点之间依然可以正常互访。</p>
-<p>这下就简单了——既然已经能稳定打通，那就没必要继续深挖复杂部署了。与其在实验室网络环境里和各种策略，不如先在一个宽松环境下完成打洞，再切换回目标网络使用。于是我：直接采用官方控制服务器 + 自建 DERP 中继的组合，既保证稳定性，也保留一定程度的可控性。以后需要连接实验室网络时，先切手机流量打洞，再进内网，一切都简单得多。</p>
-
-    <figure>
-      <img class="my-0 rounded-md" loading="lazy" src="assets/%E5%BC%82%E5%9C%B0%E7%BB%84%E7%BD%91-20260302194238.png" alt="一个简单的网络结构" />
-      
-    </figure>
-<p>参考 | 自建Derper服务器</p>
+<p>我从头开始讲讲我的故事。</p>
+<p>大四九月份保内的时候，需要找几个专家签字，我自己又不太好意思一个个找教授，所以我就想直接联系导师，然后托导师帮我解决专家签字的事情。当时有考虑过几个不同的老师，因为我上过好几门我现在老师的课，直觉上这么能说东道西的老师人品肯定不会差（虽然这几门课给我的分普遍都不高😭），所以我就在qq上联系了，没几天导师也给我回消息了，就这样我进了现在的实验室。后来我才知道老师基本上不上qq，应该用邮箱联系的，当然这都是后话了。</p>
+<p>九月末我来实验室找老师拿专家签字，顺便跟师兄师姐混个脸熟。上午十点左右我很忐忑的到了b617的门口，还在犹豫要不要进去的时候看见一个本科同学正要进去。我当时很惊讶，惊讶的不是有同学选和我一样的老师，而是惊讶于居然有女生会选，因为我们老师的项目比较多，平时项目忙的时候也很苦，感觉应该很少有女生会选。她和我说大哥你来干嘛的，我说我来找老师拿专家签字书，后面回去的时候我还在想何意味，虽然我有时候逃课，但是一起上课的居然连脸都没混熟，真没认出来我是同一级的吗，孩子们我真不是来送水的😭。</p>
+<p>十月初，国庆还剩两天的时候我返校了，按老师安排坐在了门口的饮水机神位上给师兄做的项目打打下手。刚坐下准备打开电脑，发现主机屁股上没有hdmi口，我摸了半天然后把机子抬到桌子上看到显卡没了，后面问师兄才知道是有个研一的师兄把显卡拆回去打游戏了，这个师兄我们就给他简称<strong>刀哥</strong>化名称呼吧，我和他有一段孽缘，后面要考。</p>
+<p>大四一年做了几个项目，这几个项目总体做的都挺愉快的，总体我们只需要完成师兄师姐交代的工作，我们自己完成的内容有问题的时候，有时候师兄师姐顺手就给改了，总之和这几个师兄师姐一起做项目很舒服（这几个师兄师姐里面没有刀哥）。硬要说有什么不愉快的话，就是开始的项目和另外一个实验室合作，那个实验室的一个bro晚上到凌晨2点自己的任务做不出来了，给我打电话让我帮他做，我当时还在床上呢🐴的被他吵起来干活了，刚开始老师只是说让我帮他做做，后面变成这一块全部交给我了😅。</p>
+<p>大四暑假之前要选宿舍，当时本硕博只能在研一选完宿舍后再选，这个选宿舍还是线下的限时活动，早上八点半工作人员上班后开始，但是如果你想选你想要的楼层和阴面阳面，就得早点去，当时很多人凌晨0点就在那儿开始打游戏等待了。但是说是这么说，大部分本硕博选到南湖研究生宿舍就是底楼1楼或者顶楼7楼。我当时找了几个本硕博的同学一起阻塞等待，到了我们选的时候发现没有四人寝了，又因为刀哥跟我说了他选的宿舍，我就说选那个宿舍吧，有师兄的话也方便调寝。后面我搬去新宿舍后发现是我的三个舍友选了和刀哥一个小寝，我在大寝的隔壁小寝，因为担心刀哥可能和三个舍友相处不来，我就和刀哥换位了一下，后面又因为我分到的位置头顶有点漏水（伊拉克战损），就这么阴差阳错的我和刀哥就调整到了一个小寝。</p>
+<hr>
+<p>研一的时候有了几个新同学，加上一个考研结束后就提前进组当牛做马的同学，还有一个我拉过来的本科同学之后，我们这届暂时算凑齐了大部分人。</p>
+<p>研一上学期的时候项目不多，师兄师姐基本上都在整论文。</p>
+<p>研一上快到学期末的时候，有一个机器学习的项目启动了，老师让刀哥带着我一起弄。我当时有门课马上要考试了，急得不行要看一千多页ppt，老师把刀哥叫下去说需求，要干什么。我也不知道刀哥说了什么，从老师办公室回来之后跟我说他不做了，全部丢给我，反正他不做。我当时直接掉小珍珠了，何意味？你不知道我马上要考试吗？我也没说我不干啊，但是我又不知道怎么做，你怎么让我直接上手？那个星期我和他还有另外一个师兄处理数据，他迁移代码，一干点小活就跟我叫半天。我说实话那坨代码纯屎，毫无可维护性，局部变量用<code>_</code>表示，这是人啊；全篇代码几乎没啥注释；变量喜欢用那种只有自己看得懂的，觉得很简洁的变量名命名；可复用的模块0解耦；代码一马平川的结构，真是构构又槽槽。就那一个星期他帮我干了点活，之后就唯恐避之而不及，后面全是我干的，就这之后还跟我叫他干的活也不少，不少在哪里😅？</p>
+<p>关于和刀哥沟槽的那些事情还有很多，关键我们还是舍友，因为我之前从来没有遇到过这种神人，刚开始我还是很给他帮忙的，但是他的一些行为真的伤人，这些事情包括但不限于：</p>
 <ul>
-<li>关于自建Derper服务器中转：<a href="https://blog.sleepstars.net/archives/ji-yu-docker-compose#%E4%BD%BF%E7%94%A8-ping-%E6%B5%8B%E8%AF%95%E8%BF%9E%E9%80%9A%E6%80%A7" target="_blank">自建免备案防偷 Tailscale 国内中继（DERP）教程 - Sleepstars 的记录室</a></li>
+<li>刀哥心情不好的时候找我跟他散步，我给他当一路的情绪垃圾桶，又因为我们是舍友，他🐴的因为我们是一个宿舍的，到了宿舍还要受他折磨。还一直反问我要是老师这么对你你怎么办，我怎么回答这种问题？</li>
+<li>刀哥和老师闹僵的时候，我给刀哥说情，帮刀哥说过好几次话。然后从老师办公室出来还没走两步呢，马上跟我说我一点用都没有，啥都没帮他说，我真无语。</li>
+<li>类似地，刀哥研二找实习，老师给他论文让他评审，他让我帮他提意见，我提完给他后，老师说意见不行，他回来又批评上我了。别的师兄师姐有让师弟师妹帮忙做这个事情吗，帮忙之后还倒反天罡批评帮忙的人？</li>
+<li>研二上学期结尾的时候，我身体不舒服提前回去，每次他都和我说“真羡慕你，现在就能回去。”，你来，我和你换，何意味？关键是这种话说了两年，你到底是不是真心说这话的，我不明白，我有时候也经常说话不过脑子，但是这种伤人的话你为什么老说？</li>
+<li>&hellip;&hellip;这里地方太小了，我写不下。</li>
 </ul>
-<p>扩展 | 以后可以扩展实现的方案</p>
-<ul>
-<li>HeadScale配置Https：HeadScale如果配置好https应该也是能正常用的，只不过不想折腾了。</li>
-<li>TailScale早期客户端：TailScale早期的客户端可以直连http，不过tailscale早期版本在Github上只有Code没有Release安装包。在TailScale官网上找到的最早安装包也是在1.8.x，不支持http连接。</li>
-</ul>
+<p>读研中我有至少一半的难过和伤心都是因为你，我他🐴对你的耐心超过<strong>白色相簿2</strong>中死活爱不上雪菜的春希，我说过你很像<strong>士兵突击</strong>中的<strong>成才</strong>，我希望你什么时候能认真看看这部剧，或者你就找个解说把这片看完，别他🐴地问你那破豆包看个剧情梗概就说我懂了，你懂个🥚，就是因为你这种态度我才说你像成才。哪里才是你的归宿？哪个人值得你关心，值得你无条件付出？如果你以后有女朋友了乃至结婚了，我会很敬佩那个女生的，什么样的圣人才能包容像这样的你。</p>
+<p>反正我不行，我要是有女朋友，对她的耐心也不会像对你这么高，或者换句话说，如果我有女朋友是你这个性格，我早逃跑了。</p>
+<p>我们两个纯纯的孽缘，不幸地在一个宿舍，不幸地经历了这些事情。</p>
+<p>写完和你的事情我就不想写了，本来是写记录的，大四到研一还没写一年半我就写生气了，本来是除我之外全部第三人称的，写完这个变成致不共戴天的你了。</p>
+<p>有几个同学问我怎么现在还没开始找工作，我只能说刀哥这些破事只能占我痛苦的一半，还有一半相当痛苦程度的事情。</p>
+<p>刀哥，这些难过的事情我很少和你说，一方面我不喜欢找人倒垃圾，另一方面你根本理解不了我的痛苦，是你的话肯定一笑了之了吧，反正又不发生在你身上。</p>
+<p>累了，不想写了。</p>
 
           
           
@@ -759,8 +733,8 @@
           
         
       <script>
-        var oid = "views_blog\/s2s-vpn\/index.md"
-        var oid_likes = "likes_blog\/s2s-vpn\/index.md"
+        var oid = "views_blog\/year-2.5\/index.md"
+        var oid_likes = "likes_blog\/year-2.5\/index.md"
       </script>
       
       
@@ -780,7 +754,7 @@
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="flex group mr-3" href="/blog/ms-rewards-puzzle/">
+            <a class="flex group mr-3" href="/blog/auto-ssl/">
               <span
                 class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
                 >&larr;</span
@@ -792,23 +766,6 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >薅微软Rewards羊毛：更快的滑动拼图方法</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2026-02-20T16:57:55&#43;08:00">2026年02月20日 16時57分</time>
-                  
-                </span>
-              </span>
-            </a>
-          
-        </span>
-        <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/auto-ssl/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
                   >CertBot自动化SSL证书部署</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
@@ -817,15 +774,10 @@
                   
                 </span>
               </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
             </a>
+          
+        </span>
+        <span>
           
         </span>
       </div>
@@ -839,7 +791,7 @@
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/s2s-vpn/" class="leancloud_visitors" data-flag-title="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
+<span id="/blog/year-2.5/" class="leancloud_visitors" data-flag-title="练习时长两年半的日记本">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>
