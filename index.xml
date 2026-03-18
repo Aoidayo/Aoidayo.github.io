@@ -10,17 +10,6 @@
     <atom:link href="https://blog.aoidayo.site/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>练习时长两年半的日记本</title>
-      <link>https://blog.aoidayo.site/blog/year-2.5/</link>
-      <pubDate>Fri, 13 Mar 2026 14:53:01 +0800</pubDate>
-      
-      <guid>https://blog.aoidayo.site/blog/year-2.5/</guid>
-      <description>&lt;p&gt;本来想倒序记录一下读研生活的，但发现稍微有点远的事记忆模糊了，当时的痛苦和难受对比现在没有这么明显，想想还是正常顺序写写平时的流水账吧。&lt;/p&gt;
-&lt;p&gt;如果要给大学之前的生活划自然段的话，那么就是开智前后，开智前的事情全不记得，开智后开始记得一些事情了。&lt;/p&gt;</description>
-      
-    </item>
-    
-    <item>
       <title>CertBot自动化SSL证书部署</title>
       <link>https://blog.aoidayo.site/blog/auto-ssl/</link>
       <pubDate>Mon, 02 Mar 2026 19:58:04 +0800</pubDate>
