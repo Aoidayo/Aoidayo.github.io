@@ -7,8 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>© 2026 Aoidayo</copyright>
-    <lastBuildDate>Mon, 02 Mar 2026 19:58:04 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Sat, 20 Jun 2026 15:38:52 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/categories/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>小说Collection</title>
+      <link>https://blog.aoidayo.site/blog/novel-collection/</link>
+      <pubDate>Sat, 20 Jun 2026 15:38:52 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/novel-collection/</guid>
+      <description>此文章包含加密内容。</description>
+      
+    </item>
     <item>
       <title>CertBot自动化SSL证书部署</title>
       <link>https://blog.aoidayo.site/blog/auto-ssl/</link>
@@ -34,7 +42,6 @@
 &lt;p&gt;证书自动化的机制：&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网</title>
       <link>https://blog.aoidayo.site/blog/s2s-vpn/</link>
@@ -44,7 +51,6 @@
       <description>&lt;p&gt;最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r+淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/s2s-vpn/feature.png" />
     </item>
-    
     <item>
       <title>薅微软Rewards羊毛：更快的滑动拼图方法</title>
       <link>https://blog.aoidayo.site/blog/ms-rewards-puzzle/</link>
@@ -54,7 +60,6 @@
       <description>&lt;p&gt;Windows自带的Edge浏览器使用bing必应搜索的时候，会给你Rewards，如果你的Rewards积分积攒到一定程度（去年是17000+，现在是19000+）可以兑换&lt;strong&gt;肯德基/盒马生鲜等的百元代金券&lt;/strong&gt;。这个积分主要通过你对必应的使用频率来给予积分，一般攒个半年就可以拿到这个大奖了，当然&lt;strong&gt;如果你还玩玩它的滑动拼图🧩小游戏（或者一些人喜欢叫它为数字华容道、八数码）的话，可能会攒的更快&lt;/strong&gt;。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>2025：时间的魔法</title>
       <link>https://blog.aoidayo.site/blog/25-sum/</link>
@@ -113,7 +118,6 @@
 &lt;p&gt;如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 &lt;strong&gt;「时间的魔法」&lt;/strong&gt;。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/25-sum/feature.jpeg" />
     </item>
-    
     <item>
       <title>境外借记卡简单调研</title>
       <link>https://blog.aoidayo.site/blog/debit-card/</link>
@@ -140,7 +144,6 @@
 &lt;p&gt;先说说借记卡（Debit Card），又称储蓄卡，主要特点是&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>Overleaf集成Git&amp;Github</title>
       <link>https://blog.aoidayo.site/blog/olgit/</link>
@@ -163,7 +166,6 @@
 &lt;p&gt;😋github 上的介绍 / 机翻过来作为参考&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>单电脑git多用户配置</title>
       <link>https://blog.aoidayo.site/blog/git-a-b/</link>
@@ -183,7 +185,6 @@
 &lt;p&gt;场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>Python算法项目 容器化</title>
       <link>https://blog.aoidayo.site/blog/python-container/</link>
@@ -210,7 +211,6 @@
 &lt;p&gt;将算法后端打包成可直接部署的 Docker 镜像。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>Windows Scoop包管理，Terminal优化，WSL配置</title>
       <link>https://blog.aoidayo.site/blog/windows-use/</link>
@@ -248,7 +248,6 @@
 &lt;p&gt;windows 的包管理器之一，使用它下载一些比较轻量的软件/命令行工具、以及一些开发环境（类似 Debian 的 apt / brew）。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>魔改版RTX 2060 12G装驱动 的傻瓜式补充</title>
       <link>https://blog.aoidayo.site/blog/2060m-extra/</link>
@@ -259,61 +258,15 @@
 &lt;p&gt;实验室的这块 GPU 我在咸鱼上看了一下市价，6G 普遍都是四五百，12G 都要七八百了，这类魔改显卡芯片都是笔记本的。去年的时候我看值得买，里面讨论的 4090m 魔改版功耗比 Desltop 版差了一倍多，实际性能只能和 4070ti 掰手腕，我手上的这块 2060m 跑甜甜圈功耗也就在 120 左右。总之垃圾佬可以选择性的尝试甜品显卡的魔改版，高端一点的显卡还是不建议买魔改版。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>Hugo 伪加密</title>
       <link>https://blog.aoidayo.site/blog/encrypt/</link>
       <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/encrypt/</guid>
-      <description>&lt;p&gt;Some text is required to be placed here.&lt;/p&gt;
-
-
-&lt;h1 class=&#34;relative group&#34;&gt;You cannot see me unless you&amp;rsquo;ve got the password! 
-    &lt;div id=&#34;you-cannot-see-me-unless-youve-got-the-password&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#you-cannot-see-me-unless-youve-got-the-password&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h1&gt;
-&lt;p&gt;This is the content you want to encrypt!&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Do remember to close the &lt;code&gt;hugo-encryptor&lt;/code&gt; shortcodes tag:&lt;/strong&gt;&lt;/p&gt;
-
-
-&lt;h1 class=&#34;relative group&#34;&gt;测试图片 
-    &lt;div id=&#34;%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h1&gt;
-
-    &lt;figure&gt;
-      &lt;img class=&#34;my-0 rounded-md&#34; loading=&#34;lazy&#34; src=&#34;./assets/index/Clipboard%20-%202025-05-02%2022.50.47.png&#34; alt=&#34;Clipboard - 2025-05-02 22.50.47&#34; /&gt;
-      
-    &lt;/figure&gt;
-
-
-&lt;h1 class=&#34;relative group&#34;&gt;测试 latex 
-    &lt;div id=&#34;%E6%B5%8B%E8%AF%95-latex&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%B5%8B%E8%AF%95-latex&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h1&gt;
-&lt;p&gt;一个简单的 latex 块&lt;/p&gt;</description>
+      <description>此文章包含加密内容。</description>
       
     </item>
-    
     <item>
       <title>GNN中的scatter离散运算</title>
       <link>https://blog.aoidayo.site/blog/scatter-in-gnn/</link>
@@ -353,7 +306,6 @@
 &lt;p&gt;PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg" />
     </item>
-    
     <item>
       <title>Miniforge：Conda solving enviroment终结者</title>
       <link>https://blog.aoidayo.site/blog/conda-or-mamba/</link>
@@ -373,27 +325,15 @@
 &lt;p&gt;conda在不启用libmamba时下载小包的速度就非常慢，一直 &lt;code&gt;solving enviroment...&lt;/code&gt; 容易让人狂躁，更不用说用它来安装 &lt;code&gt;pytorch&lt;/code&gt;。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/conda-or-mamba/feature.png" />
     </item>
-    
     <item>
       <title>24年年终总结</title>
       <link>https://blog.aoidayo.site/blog/24-sum/</link>
       <pubDate>Tue, 18 Mar 2025 07:00:16 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/24-sum/</guid>
-      <description>&lt;h2 class=&#34;relative group&#34;&gt;24年终总结 
-    &lt;div id=&#34;24%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#24%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h2&gt;
-&lt;p&gt;新年伊始，我喜欢在冲浪时刷刷关注的技术博主做的年终总结，看他们的学习工作与对生活的思考，但我几乎从来没有自己写过一篇。写作这件事情就像刚进入大学时的晚睡，如果从来没有晚睡，突然很晚睡觉那可能直接睡不着，但是如果后面天天到那个点再睡，其实也就慢慢适应了。&lt;/p&gt;</description>
+      <description>此文章包含加密内容。</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/24-sum/feature.jpg" />
     </item>
-    
     <item>
       <title>Git 清除.git仓库历史记录中的高存储占用文件</title>
       <link>https://blog.aoidayo.site/blog/git-big/</link>
@@ -413,73 +353,15 @@
 &lt;p&gt;最近使用 Git 管理 Unity 项目，误将 Unity 的&lt;code&gt;Filo Cables&lt;/code&gt;包&lt;code&gt;commit&amp;amp;push&lt;/code&gt;到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有&lt;code&gt;12MB+&lt;/code&gt;, 对于一个 Git 仓库来说还是太大了，所以需要即时从&lt;code&gt;.git&lt;/code&gt;中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/git-big/feature.png" />
     </item>
-    
     <item>
       <title>使用hugo</title>
       <link>https://blog.aoidayo.site/blog/use-hugo/</link>
       <pubDate>Tue, 07 Jan 2025 15:38:16 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/blog/use-hugo/</guid>
-      <description>&lt;h2 class=&#34;relative group&#34;&gt;参考 
-    &lt;div id=&#34;%E5%8F%82%E8%80%83&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E5%8F%82%E8%80%83&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;Hugo安装
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://zhuanlan.zhihu.com/p/440175312&#34; target=&#34;_blank&#34;&gt;零成本搭建个人博客：hugo安装 - 知乎&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://gohugo.io/installation/linux/&#34; target=&#34;_blank&#34;&gt;Hugo安装官方文档&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/gohugoio/hugo/releases&#34; target=&#34;_blank&#34;&gt;Hugo原仓库&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://gohugo.io/getting-started/quick-start/&#34; target=&#34;_blank&#34;&gt;Hugo使用参考文档&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;加密
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blog.tantalum.life/posts/encrypted-blog-posts/&#34; target=&#34;_blank&#34;&gt;Hugo | 为博客文章添加密码 – Zoe&amp;rsquo;s Dumpster.&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/adityatelange/hugo_enc&#34; target=&#34;_blank&#34;&gt;hugo-enc&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;主题
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://blowfish.page/&#34; target=&#34;_blank&#34;&gt;blowfish&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;使用blowfish主题的博客示例
-&lt;ul&gt;
-&lt;li&gt;前三个有github参考可以用于参考&lt;/li&gt;
-&lt;li&gt;捣鼓静态博客时在github上抄别人的配置，比费劲巴拉的看教程文档来的舒服。&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/Ast3risk-ops/website&#34; target=&#34;_blank&#34;&gt;Ast3risk-ops/website&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/utrodus/utrodus.com&#34; target=&#34;_blank&#34;&gt;一位印尼前端的博客&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://enoshima-escar.zen96k.mydns.jp/&#34; target=&#34;_blank&#34;&gt;江ノ島エスカー&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://ohdmire.github.io/posts/loopcount/#%E6%A4%8D%E6%A0%91%E9%97%AE%E9%A2%98&#34; target=&#34;_blank&#34;&gt;详解程序中循环次数的判断 · Ohdmire&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;GithubActions
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://cloud.tencent.com/developer/article/2262171&#34; target=&#34;_blank&#34;&gt;自动部署&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://smc.im/post/deploy-hugo-blog-with-github-actions/&#34; target=&#34;_blank&#34;&gt;使用 Github Actions 自动部署 hugo 博客 | Choi&amp;rsquo;s Notes&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://martinlwx.github.io/zh-cn/use-github-actions-to-automate-hugo-build/&#34; target=&#34;_blank&#34;&gt;使用 GitHub Actions 自动化 Hugo 博客部署 - MartinLwx&amp;rsquo;s Blog&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.lixueduan.com/posts/blog/01-github-action-deploy-hugo/&#34; target=&#34;_blank&#34;&gt;基于 Github Action 自动构建 Hugo 博客 -&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;问题：
-&lt;a href=&#34;https://www.bilibili.com/opus/908761972570325045&#34; target=&#34;_blank&#34;&gt;Hugo主题blowfish搜索功能失效的解决办法之一 - 哔哩哔哩&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;CDN
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.hetong-re4per.com/posts/cdn-for-your-github-page/&#34; target=&#34;_blank&#34;&gt;使用双线 DNS 和 CDN 加速你的 GitHub Page · 瞳のBlog&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Hugo和Blowfish使用固定版本如下，方便后面维护&lt;/p&gt;</description>
+      <description>此文章包含加密内容。</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/use-hugo/feature.jpg" />
     </item>
-    
     <item>
       <title>Blog History</title>
       <link>https://blog.aoidayo.site/blog/blog-history/</link>

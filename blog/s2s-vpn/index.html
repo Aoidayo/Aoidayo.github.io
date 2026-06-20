@@ -12,6 +12,7 @@
   <meta name="title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 &middot; Aoidayo" />
   
   
+  
   <meta name="keywords" content="TailScale, 网络, " />
   
   
@@ -28,8 +29,8 @@
   
   
   
-  <link type="text/css" rel="stylesheet" href="/css/main.bundle.min.04a4bf51cd70cccf148279a2ff321494d22068ac3afbc59466733fc9eaa56900da5f8038eff2ecdbba22473f0b6677467788dd9fe5219375bb0327e895b9398b.css"
-    integrity="sha512-BKS/Uc1wzM8Ugnmi/zIUlNIgaKw6&#43;8WUZnM/yeqlaQDaX4A47/Ls27oiRz8LZndGd4jdn&#43;Uhk3W7Ayfolbk5iw==" />
+  <link type="text/css" rel="stylesheet" href="/css/main.bundle.min.26534365406ab3672200a48a6a08bbc7720d84719ff384916fc93e87b192af106a87baa196141b4718425903a6bd8b1da78b8849700e79eb6b5379de4720cc23.css"
+    integrity="sha512-JlNDZUBqs2ciAKSKagi7x3INhHGf84SRb8k&#43;h7GSrxBqh7qhlhQbRxhCWQOmvYsdp4uISXAOeetrU3neRyDMIw==" />
   
   
   <script type="text/javascript" src="/js/appearance.min.516a16745bea5a9bd011138d254cc0fd3973cd55ce6e15f3dec763e7c7c2c7448f8fe7b54cca811cb821b0c7e12cd161caace1dd794ac3d34d40937cbcc9ee12.js"
@@ -48,8 +49,8 @@
   
   
   
-  <script defer type="text/javascript" id="script-bundle" src="/js/main.bundle.min.a2d78d78672e549fbfc972ece871725b5478ba0b65708dda20cb97ab80a865eae6d247e1b05a4aec6ebbf78647ec3233bad8b2609ed98eee53cd58aa17128bc7.js"
-    integrity="sha512-oteNeGcuVJ&#43;/yXLs6HFyW1R4ugtlcI3aIMuXq4CoZerm0kfhsFpK7G6794ZH7DIzutiyYJ7Zju5TzViqFxKLxw==" data-copy="" data-copied=""></script>
+  <script defer type="text/javascript" id="script-bundle" src="/js/main.bundle.min.3a806f3a5d8c300261f22306cc9479131229c6a337945d87cc9709a1f29abac614de6736c85ac60168bbbdf9520c92c9410edb136a37e7fe638c2625660579e7.js"
+    integrity="sha512-OoBvOl2MMAJh8iMGzJR5ExIpxqM3lF2HzJcJofKausYU3mc2yFrGAWi7vflSDJLJQQ7bE2o35/5jjCYlZgV55w==" data-copy="" data-copied=""></script>
   
   
   
@@ -69,6 +70,7 @@
   
   
   
+  
   <meta property="og:url" content="https://blog.aoidayo.site/blog/s2s-vpn/">
   <meta property="og:site_name" content="Aoidayo">
   <meta property="og:title" content="公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网">
@@ -77,7 +79,7 @@
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
     <meta property="article:published_time" content="2026-03-02T19:45:56+08:00">
-    <meta property="article:modified_time" content="2026-06-14T08:01:09+00:00">
+    <meta property="article:modified_time" content="2026-06-20T10:36:43+00:00">
     <meta property="article:tag" content="TailScale">
     <meta property="article:tag" content="网络">
     <meta property="og:image" content="https://blog.aoidayo.site/blog/s2s-vpn/feature.png">
@@ -108,7 +110,7 @@
     "dateCreated": "2026-03-02T19:45:56\u002b08:00",
     "datePublished": "2026-03-02T19:45:56\u002b08:00",
     
-    "dateModified": "2026-06-14T08:01:09\u002b00:00",
+    "dateModified": "2026-06-20T10:36:43\u002b00:00",
     
     "keywords": ["TailScale","网络"],
     
@@ -118,6 +120,7 @@
   </script>
 
 
+  
   
   
   <meta name="author" content="Aoidayo" />
@@ -418,10 +421,6 @@
 
   <header id="single_header" class="mt-5 max-w-prose">
     
-<div class="post-password">
-  
-</div>
-
     
     <ol class="text-sm text-neutral-500 dark:text-neutral-400 print:hidden">
   
@@ -681,6 +680,10 @@
   <section class="flex flex-col max-w-full mt-0 prose dark:prose-invert lg:flex-row">
     
     
+    
+    
+    
+    
 
       <div class="min-w-0 min-h-0 max-w-fit">
         
@@ -688,6 +691,7 @@
 
 
         <div class="article-content max-w-prose mb-20">
+          
           <p>最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r+淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。</p>
 <p>由于家里的宽带本来也快到期了，续费时大概率还是哪家便宜选哪家，所以公网 IP 被收回对我来说几乎是注定的结果。只是这样一来，一个现实问题就摆在面前：如果不再拥有公网地址，我该如何在外网环境下访问家里的那台小服务器呢？</p>
 <p>这台小服务器配置还不错，功耗也低，常年开着也不心疼电费，完全闲置实在可惜。既然公网直连这条路可能走不通（其实公网直连也有坏处，年前飞牛爆出的0day漏洞让几十万台裸奔机变成了肉鸡，即使我将默认5666端口转发到了1024，也未能幸免），那就只能另辟蹊径。于是，我开始在网上查阅各种资料，系统了解“异地组网”相关的技术方案，希望找到一种既稳定又省心的远程访问方式。</p>
@@ -735,6 +739,7 @@
 <li>TailScale早期客户端：TailScale早期的客户端可以直连http，不过tailscale早期版本在Github上只有Code没有Release安装包。在TailScale官网上找到的最早安装包也是在1.8.x，不支持http连接。</li>
 </ul>
 
+          
           
           
           

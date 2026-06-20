@@ -8,7 +8,6 @@
     <language>zh-cn</language>
     <copyright>© 2026 Aoidayo</copyright>
     <lastBuildDate>Fri, 26 Dec 2025 23:44:14 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/git/index.xml" rel="self" type="application/rss+xml" />
-    
     <item>
       <title>Overleaf集成Git&amp;Github</title>
       <link>https://blog.aoidayo.site/blog/olgit/</link>
@@ -31,7 +30,6 @@
 &lt;p&gt;😋github 上的介绍 / 机翻过来作为参考&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>单电脑git多用户配置</title>
       <link>https://blog.aoidayo.site/blog/git-a-b/</link>
@@ -51,7 +49,6 @@
 &lt;p&gt;场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>Git 清除.git仓库历史记录中的高存储占用文件</title>
       <link>https://blog.aoidayo.site/blog/git-big/</link>

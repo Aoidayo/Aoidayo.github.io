@@ -8,7 +8,6 @@
     <language>zh-cn</language>
     <copyright>© 2026 Aoidayo</copyright>
     <lastBuildDate>Thu, 27 Nov 2025 08:53:55 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/linux/index.xml" rel="self" type="application/rss+xml" />
-    
     <item>
       <title>单电脑git多用户配置</title>
       <link>https://blog.aoidayo.site/blog/git-a-b/</link>
@@ -28,7 +27,6 @@
 &lt;p&gt;场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。&lt;/p&gt;</description>
       
     </item>
-    
     <item>
       <title>Python算法项目 容器化</title>
       <link>https://blog.aoidayo.site/blog/python-container/</link>
