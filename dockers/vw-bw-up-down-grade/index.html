@@ -8,15 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>单电脑git多用户配置 &middot; Aoidayo</title>
-  <meta name="title" content="单电脑git多用户配置 &middot; Aoidayo" />
+  <title>VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 &middot; Aoidayo</title>
+  <meta name="title" content="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 &middot; Aoidayo" />
   
   
   
-  <meta name="keywords" content="Linux, Git, " />
+  <meta name="keywords" content="docker, vaultwarden, bitwarden, " />
   
   
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/git-a-b/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/" />
   
   
   
@@ -71,49 +71,50 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/git-a-b/">
+  <meta property="og:url" content="https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="单电脑git多用户配置">
-  <meta property="og:description" content="A&amp;B # 场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。">
+  <meta property="og:title" content="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法">
+  <meta property="og:description" content="Pre 为什么要升级 # 新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
-    <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2025-11-27T08:53:55+08:00">
+    <meta property="article:section" content="dockers">
+    <meta property="article:published_time" content="2026-07-21T16:44:34+08:00">
     <meta property="article:modified_time" content="2026-07-21T08:51:25+00:00">
-    <meta property="article:tag" content="Linux">
-    <meta property="article:tag" content="Git">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Vaultwarden">
+    <meta property="article:tag" content="Bitwarden">
 
   
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="单电脑git多用户配置">
-  <meta name="twitter:description" content="A&amp;B # 场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。">
+  <meta name="twitter:title" content="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法">
+  <meta name="twitter:description" content="Pre 为什么要升级 # 新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。">
 
   
   <script type="application/ld+json">
   [{
     "@context": "https://schema.org",
     "@type": "Article",
-    "articleSection": "",
-    "name": "单电脑git多用户配置",
-    "headline": "单电脑git多用户配置",
+    "articleSection": "Dockers",
+    "name": "VaultWarden升级\/BW客户端降级: Bitwarden客户端\/插件不能登录VaultWarden的几种解决方法",
+    "headline": "VaultWarden升级\/BW客户端降级: Bitwarden客户端\/插件不能登录VaultWarden的几种解决方法",
     
-    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003eA\u0026amp;B \n    \u003cdiv id=\u0022ab\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#ab\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。\u003c\/p\u003e",
+    "abstract": "\u003ch1 class=\u0022relative group\u0022\u003ePre 为什么要升级 \n    \u003cdiv id=\u0022pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h1\u003e\n\u003cp\u003e新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/git-a-b\/",
+    "url" : "https:\/\/blog.aoidayo.site\/dockers\/vw-bw-up-down-grade\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
-    "copyrightYear": "2025",
-    "dateCreated": "2025-11-27T08:53:55\u002b08:00",
-    "datePublished": "2025-11-27T08:53:55\u002b08:00",
+    "copyrightYear": "2026",
+    "dateCreated": "2026-07-21T16:44:34\u002b08:00",
+    "datePublished": "2026-07-21T16:44:34\u002b08:00",
     
     "dateModified": "2026-07-21T08:51:25\u002b00:00",
     
-    "keywords": ["Linux","Git"],
+    "keywords": ["docker","vaultwarden","bitwarden"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "732"
+    "wordCount": "1574"
   }]
   </script>
 
@@ -469,8 +470,8 @@
   <li class="inline ">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/"
-      >blog</a
+      href="/dockers/"
+      >Dockers</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -478,8 +479,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/git-a-b/"
-      >单电脑git多用户配置</a
+      href="/dockers/vw-bw-up-down-grade/"
+      >VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -488,7 +489,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      单电脑git多用户配置
+      VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -533,7 +534,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2025-11-27T08:53:55&#43;08:00">2025年11月27日 08時53分</time><span class="px-2 text-primary-500">&middot;</span><span>732 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2026-07-21T16:44:34&#43;08:00">2026年07月21日 16時44分</time><span class="px-2 text-primary-500">&middot;</span><span>1574 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -584,18 +585,26 @@
   
   
   
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/linux/&#34;,'_self');return false;">
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/docker/&#34;,'_self');return false;">
     <span class="flex" style="cursor: pointer;">
   <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Linux
+    Docker
   </span>
 </span>
   </span>
   
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/git/&#34;,'_self');return false;">
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/vaultwarden/&#34;,'_self');return false;">
     <span class="flex" style="cursor: pointer;">
   <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Git
+    Vaultwarden
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/bitwarden/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Bitwarden
   </span>
 </span>
   </span>
@@ -711,121 +720,7 @@
     
     
     
-     <div
-      class="order-first lg:ml-auto px-0 lg:order-last ltr:lg:pl-8 rtl:lg:pr-8">
-      <div class="toc ltr:pl-5 rtl:pr-5 print:hidden lg:sticky lg:top-[140px]">
-
-         <details open id="TOCView"
-  class="toc-right mt-0 overflow-y-scroll overscroll-contain scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600 rounded-lg ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 hidden lg:block">
-  <summary
-    class="block py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
-    目录
-  </summary>
-  <div
-    class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#ab">A&amp;B</a></li>
-    <li><a href="#appendix">Appendix</a>
-      <ul>
-        <li><a href="#appendix1修改指定-a-提交为-b-提交">Appendix.1、修改指定 A 提交为 B 提交</a></li>
-        <li><a href="#appendix2修改所有-a-提交为-b-提交">Appendix.2、修改所有 A 提交为 B 提交</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</details>
-<details class="toc-inside mt-0 overflow-hidden rounded-lg ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 lg:hidden">
-  <summary
-    class="py-1 text-lg font-semibold cursor-pointer bg-neutral-100 text-neutral-800 ltr:-ml-5 ltr:pl-5 rtl:-mr-5 rtl:pr-5 dark:bg-neutral-700 dark:text-neutral-100 lg:hidden">
-    目录
-  </summary>
-  <div
-    class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
-    <nav id="TableOfContents">
-  <ul>
-    <li><a href="#ab">A&amp;B</a></li>
-    <li><a href="#appendix">Appendix</a>
-      <ul>
-        <li><a href="#appendix1修改指定-a-提交为-b-提交">Appendix.1、修改指定 A 提交为 B 提交</a></li>
-        <li><a href="#appendix2修改所有-a-提交为-b-提交">Appendix.2、修改所有 A 提交为 B 提交</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-  </div>
-</details>
-
-<script>
-
-  var margin = 200;
-  var marginError = 50;
-
-  (function () {
-    var $window = $(window);
-    var $toc = $('#TOCView');
-    var tocHeight = $toc.height();
-
-    function onResize() {
-      var windowAndMarginHeight = $window.height() - margin;
-      if(tocHeight >= windowAndMarginHeight) {
-        $toc.css("overflow-y", "scroll")
-        $toc.css("max-height", (windowAndMarginHeight + marginError) + "px")
-      } else {
-        $toc.css("overflow-y", "hidden")
-        $toc.css("max-height", "9999999px")
-      }
-    }
-
-    $window.on('resize', onResize);
-    $(document).ready(onResize);
-  })();
-
-
-
-  (function () {
-    var $toc = $('#TableOfContents');
-    if ($toc.length > 0) {
-      var $window = $(window);
-
-      function onScroll() {
-        var currentScroll = $window.scrollTop();
-        var h = $('.anchor');
-        var id = "";
-        h.each(function (i, e) {
-          e = $(e);
-          if (e.offset().top - $(window).height()/3 <= currentScroll) {
-            id = decodeURIComponent(e.attr('id'));
-          }
-        });
-        var active = $toc.find('a.active');      
-        if (active.length == 1 && active.eq(0).attr('href') == '#' + id) return true;
-
-        active.each(function (i, e) {
-          
-            $(e).removeClass('active');
-          
-        });
-        $toc.find('a[href="#' + id + '"]').addClass('active')
-        $toc.find('a[href="#' + id + '"]').parentsUntil('#TableOfContents').each(function (i, e) {
-          $(e).children('a').parents('ul').show();          
-        });
-      }
-
-      $window.on('scroll', onScroll);
-      $(document).ready(function () {
-        
-        onScroll();
-      });
-    }
-  })();
-
-
-</script>
-   </div>
-      </div>
-      
+    
 
       <div class="min-w-0 min-h-0 max-w-fit">
         
@@ -836,139 +731,221 @@
           
           
 
-<h2 class="relative group">A&amp;B 
-    <div id="ab" class="anchor"></div>
+<h1 class="relative group">Pre 为什么要升级 
+    <div id="pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#ab" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7" aria-label="锚点">#</a>
     </span>        
     
-</h2>
-<p>场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。</p>
-<p>1、添加新用户的 sshkey</p>
-<p>假设第一个 key 是</p>
-<pre tabindex="0"><code>~/.ssh/id_rsa
-</code></pre><p>现在创建第二个 key，用不同的名字（比如 id_rsa_work）：</p>
-<pre tabindex="0"><code>ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_B -C &#34;B@B.com&#34;
-</code></pre><p>这里的~为用户目录，可以使用 powershell 的 <code>cd ~</code> 查看</p>
-<pre tabindex="0"><code># powershell
-cd ~
-pwd
-C:\Users\yourusername
-</code></pre><p>2、编辑 <code>code ~/.ssh/config</code>
-如果没有则新建，添加如下内容</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 默认 GitHub 账号（id_rsa）</span>
-</span></span><span class="line"><span class="cl">Host github.com
-</span></span><span class="line"><span class="cl">    HostName github.com
-</span></span><span class="line"><span class="cl">    User git
-</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/id_rsa
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 第二个 GitHub 账号（id_rsa_B）</span>
-</span></span><span class="line"><span class="cl">Host B
-</span></span><span class="line"><span class="cl">    HostName github.com
-</span></span><span class="line"><span class="cl">    User git
-</span></span><span class="line"><span class="cl">    IdentityFile ~/.ssh/id_rsa_B
-</span></span></code></pre></div><p>测试是否正常工作</p>
-<pre tabindex="0"><code>ssh -T github.com
-ssh -T B
-</code></pre><p>返回如下则正常工作</p>
-<pre tabindex="0"><code>Hi another-user! You&#39;ve successfully authenticated...
-</code></pre><p>3、修改远程仓库地址
-然后：</p>
+</h1>
+<p>新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。</p>
+<p>我的vaultwarden版本是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ docker logs vaultwarden <span class="p">|</span> head -n <span class="m">50</span>
+</span></span><span class="line"><span class="cl">/--------------------------------------------------------------------<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="p">|</span>                        Starting Vaultwarden                        <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>                           Version 1.34.1                           <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------<span class="p">|</span>
+</span></span><span class="line"><span class="cl">❯ docker <span class="nb">exec</span> vaultwarden /vaultwarden --version
+</span></span><span class="line"><span class="cl">Vaultwarden 1.34.1
+</span></span><span class="line"><span class="cl">Web-Vault 2025.5.0
+</span></span></code></pre></div><p>换用别的电脑/手机 安装bitwarden <code>ios/android/windows/macos客户端</code> 或者 <code>浏览器插件</code> ，发现都在登录时出现意外错误。</p>
+<p>很难绷的一个问题，刚开始以为是本地服务器上的证书自动化工具<code>certbot</code>向let&rsquo;s encrypt申请的的ssl证书缺少中间证书的问题，经过验证后发现fullchain中的确是两层证书。</p>
+<p>后续发现是vaultwarden服务端不适配最新bitwarden客户端的问题，解决方法有两种：一种是降级bitwarden官方客户端，另外一种是升级vaultwarden的服务端。</p>
+
+
+<h1 class="relative group">A 客户端降级 
+    <div id="a-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%99%8D%E7%BA%A7" class="anchor"></div>
+    
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#a-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%99%8D%E7%BA%A7" aria-label="锚点">#</a>
+    </span>        
+    
+</h1>
+<p>可以在bitwarden的历史页面下载旧版本的客户端/插件</p>
 <ul>
-<li>对于第一个账号克隆的仓库仍用
-<code>git@github.com:xxx/repo.git</code></li>
-<li>对于第二个账号克隆仓库时：
-<code>git@B:xxx/repo.git</code>
-这样 Git 会根据 Host 自动选择 SSH key。</li>
+<li>
+<p><a href="https://github.com/bitwarden/clients/releases" target="_blank">https://github.com/bitwarden/clients/releases</a></p>
+<ul>
+<li><code>tags:browser</code> 下载浏览器插件，解压后拖入浏览器的插件安装页面。</li>
+<li><code>tags:desktop</code> 桌面客户端</li>
 </ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git remote -v
-</span></span><span class="line"><span class="cl"><span class="c1"># 这里显示  origin  git@github:USERNAME/REPO.git (fetch)</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># 你需要替换github为第二个账号对应的 Host</span>
-</span></span><span class="line"><span class="cl">git remote set-url origin git@B:USERNAME/REPO.git
-</span></span><span class="line"><span class="cl"><span class="c1"># 验证</span>
-</span></span><span class="line"><span class="cl">git remote -v
-</span></span></code></pre></div><p>4、修改需要推送的仓库局部 B 的 git 用户名和邮箱</p>
-<p>接着 在你需要推送的仓库中修改用户名和 email</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git config --local user.name B
-</span></span><span class="line"><span class="cl">git config --local user.email B@B.com
-</span></span></code></pre></div><p>最后就可以让 B 在 A 的电脑上提交 commits 了。</p>
+</li>
+<li>
+<p>vaultwarden 1.34.1 可以适配</p>
+<ul>
+<li><a href="https://github.com/bitwarden/clients/releases/tag/browser-v2025.10.1" target="_blank">browser v2025.10.1</a></li>
+<li><a href="https://github.com/bitwarden/clients/releases/tag/desktop-v2025.10.0" target="_blank">desktop v2025.10.0</a></li>
+</ul>
+</li>
+</ul>
+<p>这些服务端上破坏性的变更导致之前的老版本客户端无法使用，这还是挺蛋疼的，可以选择留一份过去版本的客户端。</p>
+<blockquote>
+<p>bitwarden经常对「安卓客户端/macos客户端/windows客户端/浏览器插件」和「server服务端」作修改，导致新版本的bitwarden客户端完全连接不上旧版本的vaultwarden。<del>对于旧版本的浏览器扩展，可以在~~~~<a href="https://www.crx4chrome.com/crx/283645/" target="_blank">crx4chrome</a>~~~~中下载旧版。</del> 对于旧版本的浏览器客户端或者扩展，可在bitwarden的历史页面下载。另外一种方式是 重新修改并部署新版本的vaultwarden。</p></blockquote>
 
 
-<h2 class="relative group">Appendix 
-    <div id="appendix" class="anchor"></div>
+<h1 class="relative group">B 服务端升级 
+    <div id="b-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8D%87%E7%BA%A7" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#appendix" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#b-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8D%87%E7%BA%A7" aria-label="锚点">#</a>
     </span>        
     
-</h2>
-<p>如果 B 使用 A 的 git 账号提交了怎么办？</p>
+</h1>
 
 
-<h3 class="relative group">Appendix.1、修改指定 A 提交为 B 提交 
-    <div id="appendix1%E4%BF%AE%E6%94%B9%E6%8C%87%E5%AE%9A-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" class="anchor"></div>
+<h1 class="relative group">B.1 升级之前 
+    <div id="b1-%E5%8D%87%E7%BA%A7%E4%B9%8B%E5%89%8D" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#appendix1%E4%BF%AE%E6%94%B9%E6%8C%87%E5%AE%9A-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#b1-%E5%8D%87%E7%BA%A7%E4%B9%8B%E5%89%8D" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>例如你想修改 commit hash <code>77f5a0</code> 的作者<code>A</code>：
-1、启动交互式 rebase（从要改的 commit 前一个开始）</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git rebase -i 77f5a0^
-</span></span></code></pre></div><p>2、编辑器修改：</p>
-<pre tabindex="0"><code>pick 77f5a0 B的提交信息
-</code></pre><p>改成：</p>
-<pre tabindex="0"><code>edit 77f5a0 B的提交信息
-</code></pre><p>保存退出。</p>
-<p>3、此时 Git 会停在该提交，执行：</p>
-<pre tabindex="0"><code>git commit --amend --author=&#34;B &lt;B@B.com&gt;&#34;
-</code></pre><p>4、继续 rebase：</p>
-<pre tabindex="0"><code>git rebase --continue
-</code></pre><p>完成后该 commit 的作者就被修改了。</p>
+</h1>
+<p>升级之前确认</p>
+<ul>
+<li>原版本</li>
+<li>vw的数据保存位置</li>
+<li>上一版的docker-compose</li>
+</ul>
+<p>VaultWarden版本</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ docker <span class="nb">exec</span> vaultwarden /vaultwarden --version
+</span></span><span class="line"><span class="cl">Vaultwarden 1.34.1
+</span></span><span class="line"><span class="cl">Web-Vault 2025.5.0
+</span></span></code></pre></div><p>确认数据保存位置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker inspect vaultwarden <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --format <span class="s1">&#39;{{range .Mounts}}{{println .Type .Source &#34;-&gt;&#34; .Destination}}{{end}}&#39;</span>
+</span></span></code></pre></div><p>部署目录的tree显示：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ <span class="nb">pwd</span> <span class="o">&amp;&amp;</span> tree -L <span class="m">2</span>
+</span></span><span class="line"><span class="cl">/home/dockers/vaultwarden
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">├── vw-compose.yml
+</span></span><span class="line"><span class="cl">├── vw-data
+</span></span><span class="line"><span class="cl">│   ├── attachments
+</span></span><span class="line"><span class="cl">│   ├── db.sqlite3
+</span></span><span class="line"><span class="cl">│   ├── db.sqlite3-shm
+</span></span><span class="line"><span class="cl">│   ├── db.sqlite3-wal
+</span></span><span class="line"><span class="cl">│   ├── icon_cache
+</span></span><span class="line"><span class="cl">│   ├── rsa_key.pem
+</span></span><span class="line"><span class="cl">│   ├── sends
+</span></span><span class="line"><span class="cl">│   └── tmp
+</span></span></code></pre></div><p>docker-compose：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ cat vw-compose.yml
+</span></span><span class="line"><span class="cl">services:
+</span></span><span class="line"><span class="cl">  vaultwarden:
+</span></span><span class="line"><span class="cl">    image: vaultwarden/server:latest
+</span></span><span class="line"><span class="cl">    container_name: vaultwarden
+</span></span><span class="line"><span class="cl">    restart: always
+</span></span><span class="line"><span class="cl">    environment:
+</span></span><span class="line"><span class="cl">      DOMAIN: <span class="s2">&#34;https://yoursite&#34;</span> <span class="c1"># 使用反向代理时必填；您的域名；Vaultwarden 需要知道它是 https 才能正确处理附件</span>
+</span></span><span class="line"><span class="cl">      SIGNUPS_ALLOWED: <span class="s2">&#34;false&#34;</span> <span class="c1"># 创建账户后，使用 &#34;false&#34; 停用此选项，这样就不会有陌生人注册了</span>
+</span></span><span class="line"><span class="cl">    volumes:
+</span></span><span class="line"><span class="cl">      - ./vw-data:/data <span class="c1"># : 前面的路径可以修改</span>
+</span></span><span class="line"><span class="cl">    ports:
+</span></span><span class="line"><span class="cl">      - 11001:80 <span class="c1"># 您可以将 11001 替换为您喜欢的端口</span>
+</span></span></code></pre></div>
 
-
-<h3 class="relative group">Appendix.2、修改所有 A 提交为 B 提交 
-    <div id="appendix2%E4%BF%AE%E6%94%B9%E6%89%80%E6%9C%89-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" class="anchor"></div>
+<h1 class="relative group">B.2 升级 
+    <div id="b2-%E5%8D%87%E7%BA%A7" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#appendix2%E4%BF%AE%E6%94%B9%E6%89%80%E6%9C%89-a-%E6%8F%90%E4%BA%A4%E4%B8%BA-b-%E6%8F%90%E4%BA%A4" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#b2-%E5%8D%87%E7%BA%A7" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>使用 git filter-branch，将某个人的所有提交统一改成另外一个身份
-⚠️：filter-branch 会彻底重写历史，请先备份仓库！</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git filter-branch --env-filter <span class="s1">&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">OLD_EMAIL=&#34;A@A.com&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">CORRECT_NAME=&#34;B&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">CORRECT_EMAIL=&#34;B@B.com&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_COMMITTER_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
-</span></span></span><span class="line"><span class="cl"><span class="s1">then
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_NAME=&#34;$CORRECT_NAME&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_EMAIL=&#34;$CORRECT_EMAIL&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">fi
-</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_AUTHOR_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
-</span></span></span><span class="line"><span class="cl"><span class="s1">then
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_NAME=&#34;$CORRECT_NAME&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_EMAIL=&#34;$CORRECT_EMAIL&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">fi
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;</span> --tag-name-filter cat -- --all
-</span></span></code></pre></div><p>检查+提交</p>
-<pre tabindex="0"><code>git log
-# 强推
-git push --force --all # git push -f
-git push --force --tags
-</code></pre>
+</h1>
+<ul>
+<li>1、确认compose识别正常</li>
+<li>2、停止vaultwarden</li>
+<li>3、备份数据和配置</li>
+<li>4、修改compose，固定版本，方便下次升级</li>
+<li>5、拉取镜像、启动</li>
+</ul>
+<p>1、确认compose识别正常</p>
+<pre tabindex="0"><code>cd /home/dockers/vaultwarden
+</code></pre><p>确认 Compose 识别正常：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml config
+</code></pre><p>2、停止容器</p>
+<p>sqlite文件一览：</p>
+<pre tabindex="0"><code>db.sqlite3
+db.sqlite3-shm
+db.sqlite3-wal
+</code></pre><p>说明 SQLite 正在使用 WAL 模式。为了获得一致的数据库备份，建议先停止容器：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml stop vaultwarden
+</code></pre><p>确认已停止：</p>
+<pre tabindex="0"><code>docker ps -a --filter name=vaultwarden
+</code></pre><p>状态应该是 <code>Exited</code>。</p>
+<p>3、备份数据和配置</p>
+<p>执行：</p>
+<pre tabindex="0"><code>mkdir -p backups
+
+sudo tar -czpf \
+  &#34;backups/vaultwarden-$(date +%Y%m%d-%H%M%S).tar.gz&#34; \
+  vw-compose.yml vw-data
+</code></pre><p>检查备份：</p>
+<pre tabindex="0"><code>ls -lh backups
+</code></pre><p>再简单验证压缩包：</p>
+<pre tabindex="0"><code>tar -tzf &#34;$(ls -t backups/vaultwarden-*.tar.gz | head -n 1)&#34; | head -n 30
+</code></pre><p>应该能够看到：</p>
+<pre tabindex="0"><code>vw-compose.yml
+vw-data/
+vw-data/db.sqlite3
+vw-data/attachments/
+vw-data/sends/
+vw-data/rsa_key.pem
+</code></pre><p>为了保险，也可以生成校验值：</p>
+<pre tabindex="0"><code>sha256sum &#34;$(ls -t backups/vaultwarden-*.tar.gz | head -n 1)&#34;
+</code></pre><p>4、修改Compose并固定版本</p>
+<p>不建议继续使用：</p>
+<pre tabindex="0"><code>image: vaultwarden/server:latest
+</code></pre><p>因为以后很难确认每次具体升级到了什么版本，也不方便回滚。</p>
+<p>修改为：</p>
+<pre tabindex="0"><code>services:
+  vaultwarden:
+    image: vaultwarden/server:1.36.0
+    container_name: vaultwarden
+    restart: always
+    environment:
+      DOMAIN: &#34;https://yoursite&#34;
+      SIGNUPS_ALLOWED: &#34;false&#34;
+    volumes:
+      - ./vw-data:/data
+    ports:
+      - &#34;11001:80&#34;
+</code></pre><p>可以直接执行：</p>
+<pre tabindex="0"><code>sed -i \
+  &#39;s#image: vaultwarden/server:latest#image: vaultwarden/server:1.36.0#&#39; \
+  vw-compose.yml
+</code></pre><p>检查修改结果：</p>
+<pre tabindex="0"><code>cat vw-compose.yml
+</code></pre><p>验证语法：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml config
+</code></pre><p>5、拉取并启动</p>
+<p>拉取镜像：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml pull vaultwarden
+</code></pre><p>重新创建容器：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml up -d vaultwarden
+</code></pre><p>注意，<code>up -d</code> 会替换旧容器，但继续挂载原来的：</p>
+<pre tabindex="0"><code>/home/dockers/vaultwarden/vw-data
+</code></pre><p>因此数据不会被清空。</p>
+<p>6、验证安装</p>
+<p>查看日志</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker compose -f vw-compose.yml logs --tail<span class="o">=</span><span class="m">200</span> vaultwarden
+</span></span><span class="line"><span class="cl">docker compose -f vw-compose.yml logs -f vaultwarden
+</span></span><span class="line"><span class="cl">docker <span class="nb">exec</span> vaultwarden /vaultwarden --version
+</span></span></code></pre></div><p>重新安装新版本后，就可以正常使用bitwarden的各种最新客户端了。</p>
+<blockquote>
+<p>一般vaultwarden都是追bitwarden更新的，如果新版官方客户端不能适配最新vaultwarden的话，可以降级客户端使用。</p></blockquote>
+
           
           
           
@@ -1107,118 +1084,6 @@ git push --force --tags
   </a>
 
   
-  
-
-  <a href="/blog/git-big/" class="min-w-full">
-    
-    <div class="min-h-full border border-neutral-200 dark:border-neutral-700 border-2 rounded overflow-hidden shadow-2xl relative">
-        
-        <div class="w-full thumbnail_card_related nozoom" style="background-image:url(/blog/git-big/feature_hu_e68d29da6e8382f2.png);"></div>
-        
-      
-
-      <div class="px-6 py-4">
-
-        
-        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
-          href="/blog/git-big/">Git 清除.git仓库历史记录中的高存储占用文件</div>
-        
-
-        <div class="text-sm text-neutral-500 dark:text-neutral-400">
-          
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  <time datetime="2025-02-28T22:15:00&#43;08:00">2025年02月28日 22時15分</time><span class="px-2 text-primary-500">&middot;</span><span>835 字</span>
-  
-
-  
-  
-</div>
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Blog
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/git/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Git
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-</div>
-
-
-
-
-        </div>
-
-        
-      </div>
-      <div class="px-6 pt-4 pb-2">
-
-      </div>
-    </div>
-  </a>
-
-  
 </section>
 
   
@@ -1232,8 +1097,8 @@ git push --force --tags
           
         
       <script>
-        var oid = "views_blog\/git-A-B\/index.md"
-        var oid_likes = "likes_blog\/git-A-B\/index.md"
+        var oid = "views_dockers\/vw-bw-up-down-grade\/index.md"
+        var oid_likes = "likes_dockers\/vw-bw-up-down-grade\/index.md"
       </script>
       
       
@@ -1245,65 +1110,6 @@ git push --force --tags
 
     
   
-    
-    
-    
-    <div class="pt-8">
-      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
-      <div class="flex justify-between pt-3">
-        <span>
-          
-            <a class="flex group mr-3" href="/blog/python-container/">
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Python算法项目 容器化</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-11-24T17:13:35&#43;08:00">2025年11月24日 17時13分</time>
-                  
-                </span>
-              </span>
-            </a>
-          
-        </span>
-        <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/olgit/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Overleaf集成Git&Github</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-12-26T23:44:14&#43;08:00">2025年12月26日 23時44分</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-            </a>
-          
-        </span>
-      </div>
-    </div>
-  
 
 
     
@@ -1312,7 +1118,7 @@ git push --force --tags
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/git-a-b/" class="leancloud_visitors" data-flag-title="单电脑git多用户配置">
+<span id="/dockers/vw-bw-up-down-grade/" class="leancloud_visitors" data-flag-title="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>
