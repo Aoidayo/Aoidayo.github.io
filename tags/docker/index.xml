@@ -14,7 +14,7 @@
       <pubDate>Tue, 21 Jul 2026 16:44:34 +0800</pubDate>
       
       <guid>https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/</guid>
-      <description>&lt;h1 class=&#34;relative group&#34;&gt;Pre 为什么要升级 
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;Pre 为什么要升级 
     &lt;div id=&#34;pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
     
     &lt;span
@@ -23,7 +23,7 @@
             style=&#34;text-decoration-line: none !important;&#34; href=&#34;#pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
     &lt;/span&gt;        
     
-&lt;/h1&gt;
+&lt;/h2&gt;
 &lt;p&gt;新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。&lt;/p&gt;</description>
       
     </item>
