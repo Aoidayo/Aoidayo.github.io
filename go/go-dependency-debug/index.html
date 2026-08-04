@@ -8,15 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   
-  <title>2025：时间的魔法 &middot; Aoidayo</title>
-  <meta name="title" content="2025：时间的魔法 &middot; Aoidayo" />
+  <title>go mod依赖源码本地修改与调试 &middot; Aoidayo</title>
+  <meta name="title" content="go mod依赖源码本地修改与调试 &middot; Aoidayo" />
   
   
   
+  <meta name="keywords" content="go, " />
   
   
-  
-  <link rel="canonical" href="https://blog.aoidayo.site/blog/25-sum/" />
+  <link rel="canonical" href="https://blog.aoidayo.site/go/go-dependency-debug/" />
   
   
   
@@ -71,49 +71,50 @@
   
   
   
-  <meta property="og:url" content="https://blog.aoidayo.site/blog/25-sum/">
+  <meta property="og:url" content="https://blog.aoidayo.site/go/go-dependency-debug/">
   <meta property="og:site_name" content="Aoidayo">
-  <meta property="og:title" content="2025：时间的魔法">
-  <meta property="og:description" content="孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。 chap1 # 如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 「时间的魔法」。">
+  <meta property="og:title" content="go mod依赖源码本地修改与调试">
+  <meta property="og:description" content="A # 在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c&#43;&#43;和go差不多，python是相对比较复杂的。：">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="article">
-    <meta property="article:section" content="blog">
-    <meta property="article:published_time" content="2026-02-13T10:36:02+08:00">
+    <meta property="article:section" content="go">
+    <meta property="article:published_time" content="2026-08-04T16:21:45+08:00">
     <meta property="article:modified_time" content="2026-08-04T08:53:09+00:00">
-    <meta property="og:image" content="https://blog.aoidayo.site/blog/25-sum/feature.jpeg">
+    <meta property="article:tag" content="Go">
+    <meta property="og:image" content="https://blog.aoidayo.site/go/go-dependency-debug/feature_rc.png">
 
   
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://blog.aoidayo.site/blog/25-sum/feature.jpeg">
-  <meta name="twitter:title" content="2025：时间的魔法">
-  <meta name="twitter:description" content="孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。 chap1 # 如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 「时间的魔法」。">
+  <meta name="twitter:image" content="https://blog.aoidayo.site/go/go-dependency-debug/feature_rc.png">
+  <meta name="twitter:title" content="go mod依赖源码本地修改与调试">
+  <meta name="twitter:description" content="A # 在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c&#43;&#43;和go差不多，python是相对比较复杂的。：">
 
   
   <script type="application/ld+json">
   [{
     "@context": "https://schema.org",
     "@type": "Article",
-    "articleSection": "",
-    "name": "2025：时间的魔法",
-    "headline": "2025：时间的魔法",
+    "articleSection": "Goes",
+    "name": "go mod依赖源码本地修改与调试",
+    "headline": "go mod依赖源码本地修改与调试",
     
-    "abstract": "\u003c!-- ## 2025年终：时间的魔法 --\u003e\n\n  \n  \n  \n  \n\n\n\n\u003cdiv\n  \n    class=\u0022flex px-4 py-3 rounded-md\u0022\n    style=\u0022background-color: #e63946\u0022\n  \u003e\n\n  \u003cspan\n    \n      class=\u0022ltr:pr-3 rtl:pl-3 flex items-center\u0022\n      style=\u0022color: #60A5FA\u0022\n    \u003e\n\n    \n\n  \u003cspan class=\u0022relative block icon\u0022\u003e\n    \u003csvg xmlns=\u0022http:\/\/www.w3.org\/2000\/svg\u0022 viewBox=\u00220 0 448 512\u0022\u003e\n\u003cpath fill=\u0022currentColor\u0022 d=\u0022M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z\u0022\/\u003e\u003c\/svg\u003e\n  \u003c\/span\u003e\n\n\n  \u003c\/span\u003e\n\n  \u003cspan\n    \n      style=\u0022color: #f1faee\u0022\n    \u003e孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。\u003c\/span\u003e\n\u003c\/div\u003e\n\n\n\n\u003ch3 class=\u0022relative group\u0022\u003echap1 \n    \u003cdiv id=\u0022chap1\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#chap1\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h3\u003e\n\u003cp\u003e如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 \u003cstrong\u003e「时间的魔法」\u003c\/strong\u003e。\u003c\/p\u003e",
+    "abstract": "\u003ch2 class=\u0022relative group\u0022\u003eA \n    \u003cdiv id=\u0022a\u0022 class=\u0022anchor\u0022\u003e\u003c\/div\u003e\n    \n    \u003cspan\n        class=\u0022absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100\u0022\u003e\n        \u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022\n            style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#a\u0022 aria-label=\u0022锚点\u0022\u003e#\u003c\/a\u003e\n    \u003c\/span\u003e        \n    \n\u003c\/h2\u003e\n\u003cp\u003e在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c\u002b\u002b和go差不多，python是相对比较复杂的。：\u003c\/p\u003e",
     "inLanguage": "zh-cn",
-    "url" : "https:\/\/blog.aoidayo.site\/blog\/25-sum\/",
+    "url" : "https:\/\/blog.aoidayo.site\/go\/go-dependency-debug\/",
     "author" : {
       "@type": "Person",
       "name": "Aoidayo"
     },
     "copyrightYear": "2026",
-    "dateCreated": "2026-02-13T10:36:02\u002b08:00",
-    "datePublished": "2026-02-13T10:36:02\u002b08:00",
+    "dateCreated": "2026-08-04T16:21:45\u002b08:00",
+    "datePublished": "2026-08-04T16:21:45\u002b08:00",
     
     "dateModified": "2026-08-04T08:53:09\u002b00:00",
     
-    
+    "keywords": ["go"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1144"
+    "wordCount": "717"
   }]
   </script>
 
@@ -411,7 +412,7 @@
   
   
         
-            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/blog/25-sum/feature_hu_3872aa5dc27bbb9.jpeg);"></div>
+            <div class="w-full h-36 md:h-56 lg:h-72 single_hero_basic nozoom" style="background-image:url(/go/go-dependency-debug/feature_rc_hu_dbd2948e8cc09388.png);"></div>
         
     
   
@@ -439,8 +440,8 @@
   <li class="inline ">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/"
-      >blog</a
+      href="/go/"
+      >Goes</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -448,8 +449,8 @@
   <li class="inline hidden">
     <a
       class="hover:underline decoration-neutral-300 dark:underline-neutral-600"
-      href="/blog/25-sum/"
-      >2025：时间的魔法</a
+      href="/go/go-dependency-debug/"
+      >go mod依赖源码本地修改与调试</a
     ><span class="px-1 text-primary-500">/</span>
   </li>
 
@@ -458,7 +459,7 @@
 
     
     <h1 class="mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-      2025：时间的魔法
+      go mod依赖源码本地修改与调试
     </h1>
     <div class="mt-1 mb-6 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
       
@@ -503,7 +504,7 @@
 <div class="flex flex-row flex-wrap items-center">
   
   
-  <time datetime="2026-02-13T10:36:02&#43;08:00">2026年02月13日 10時36分</time><span class="px-2 text-primary-500">&middot;</span><span>1144 字</span><span class="px-2 text-primary-500">&middot;</span>
+  <time datetime="2026-08-04T16:21:45&#43;08:00">2026年08月04日 16時21分</time><span class="px-2 text-primary-500">&middot;</span><span>717 字</span><span class="px-2 text-primary-500">&middot;</span>
 
 
 <script type="text/javascript" src="/js/zen-mode.min.eea5245cf9244ecbdf2c150d1c8833226c1541cadf6e98f63a7c9192b1a3676df2c3ec603b14f4cfaaa53971fd9d8955640c0f405bf3de2b43ee7a5fb29ae721.js" integrity="sha512-7qUkXPkkTsvfLBUNHIgzImwVQcrfbpj2OnyRkrGjZ23yw&#43;xgOxT0z6qlOXH9nYlVZAwPQFvz3itD7npfsprnIQ=="></script>
@@ -551,6 +552,16 @@
   
   
   
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/go/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Go
+  </span>
+</span>
+  </span>
   
   
   
@@ -677,14 +688,8 @@
     class="min-w-[220px] py-2 border-dotted ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li>
-      <ul>
-        <li><a href="#chap1">chap1</a></li>
-        <li><a href="#chap2">chap2</a></li>
-        <li><a href="#chap3">chap3</a></li>
-        <li><a href="#chap4">chap4</a></li>
-      </ul>
-    </li>
+    <li><a href="#a">A</a></li>
+    <li><a href="#b">B</a></li>
   </ul>
 </nav>
   </div>
@@ -698,14 +703,8 @@
     class="py-2 border-dotted border-neutral-300 ltr:-ml-5 ltr:border-l ltr:pl-5 rtl:-mr-5 rtl:border-r rtl:pr-5 dark:border-neutral-600">
     <nav id="TableOfContents">
   <ul>
-    <li>
-      <ul>
-        <li><a href="#chap1">chap1</a></li>
-        <li><a href="#chap2">chap2</a></li>
-        <li><a href="#chap3">chap3</a></li>
-        <li><a href="#chap4">chap4</a></li>
-      </ul>
-    </li>
+    <li><a href="#a">A</a></li>
+    <li><a href="#b">B</a></li>
   </ul>
 </nav>
   </div>
@@ -788,172 +787,64 @@
 
         <div class="article-content max-w-prose mb-20">
           
-          <!-- ## 2025年终：时间的魔法 -->
+          
 
-  
-  
-  
-  
-
-
-
-<div
-  
-    class="flex px-4 py-3 rounded-md"
-    style="background-color: #e63946"
-  >
-
-  <span
-    
-      class="ltr:pr-3 rtl:pl-3 flex items-center"
-      style="color: #60A5FA"
-    >
-
-    
-
-  <span class="relative block icon">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-<path fill="currentColor" d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/></svg>
-  </span>
-
-
-  </span>
-
-  <span
-    
-      style="color: #f1faee"
-    >孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。</span>
-</div>
-
-
-
-<h3 class="relative group">chap1 
-    <div id="chap1" class="anchor"></div>
+<h2 class="relative group">A 
+    <div id="a" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap1" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#a" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 <strong>「时间的魔法」</strong>。</p>
-<p>这个名字来自于游戏「白色相簿2」的一首背景音乐「時の魔法」。相比<a href="https://music.163.com/#/song?id=775895" target="_blank">人声版本</a>，<a href="https://music.163.com/#/song?id=775893" target="_blank">八音盒版本</a> 这种仿佛来自童年的纯粹旋律更贴近人声版本歌词的主旨，一个只属于游戏的美好机制：「Save&amp;Load」，我们知道很多游戏都有这个模式，关键处存档，后续推进游戏遇到棘手情况时读档重开。当然也有像杀戮尖塔这种只允许单把关卡存档的游戏，但不管怎么样，在游戏中我们可以针对一关甚至多关反复重开，通过求多次局部最优的方式达到我们心中的结果最优。
+</h2>
+<p>在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。：</p>
+<ul>
+<li><strong>Java</strong>：得益于类加载机制，只需在自己项目的 source path 下新建一个与目标依赖完全相同的包名（package）和类名，编译时该类会覆盖 classpath 中依赖包里的同名类，从而实现无需修改依赖本身即可调试的效果。Java的这点确实很方便，以前用这个方法定位过<code>easypoi</code>的问题。</li>
+<li><strong>Python</strong>：常见方式是用 <code>pip install -e .</code> 做可编辑安装，或者直接找到 <code>site-packages</code>（<code>pip show &lt;package&gt;</code> 可查看路径）里的源码进行修改；也可以把依赖源码整体拷贝到项目内，通过调整 <code>sys.path</code> 优先级或使用 <code>PYTHONPATH</code> 让本地版本优先加载。</li>
+<li><strong>C++</strong> ：由于普遍采用源码 vendor 或静态/动态链接的方式管理依赖，通常做法是把第三方库源码拷贝到项目的 <code>third_party</code> 或 <code>vendor</code> 目录，通过 CMake 的 <code>add_subdirectory</code>（或 <code>FetchContent</code> 指向本地路径）引入本地修改版本，替代原本从包管理器或远程仓库拉取的版本。</li>
+</ul>
 
 
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="775895"
-  fixed="false"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-  mini="false"
-></meting-js>
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js"></script>
-<style>
-.aplayer-list-title {
-  color: #60a5fa !important;
-}
-.aplayer-title {
-  color: #60a5fa !important;
-}
-
-.aplayer-lrc p.aplayer-lrc-current {
-  color: #60a5fa !important;
-}
-.aplayer.aplayer-fixed .aplayer-lrc {
-  text-shadow: none;
-}
-</style>
-<meting-js
-  server="netease"
-  type="song"
-  id="775893"
-  fixed="false"
-  autoplay="false"
-  loop="all"
-  order="list"
-  theme="#60A5FA"
-  mini="false"
-></meting-js></p>
-<p>现实和游戏的最大区别就是无法「Save&amp;Load」，也正因为这样，这首歌的名字才叫「时间的魔法」。游戏中选错选项可以读档，打不过可以重开，配卡不理想可以重新构筑，只要愿意投入时间，总能获得一个更好的结果。现实更像每把强制的铁人模式，每一个选择都会被永久写入存档，等意识到你某一步操作的影响时，游戏已经默默向前了一大步。</p>
-
-
-<h3 class="relative group">chap2 
-    <div id="chap2" class="anchor"></div>
+<h2 class="relative group">B 
+    <div id="b" class="anchor"></div>
     
     <span
         class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
         <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap2" aria-label="锚点">#</a>
+            style="text-decoration-line: none !important;" href="#b" aria-label="锚点">#</a>
     </span>        
     
-</h3>
-<p>2025对我来说，就是这样的一年。</p>
-<p>很多事情当时看都很普通：要不要多花一点时间在某件事上，要不要早点开始准备，要不要把身体的不适当回事。等到回头看，才发现这些当时随手做的决定，已经慢慢把这一年带到了现在这个样子。</p>
-<p>写年终的时候，很容易去想：如果当时换一个选项，或者再坚持一下，会不会结果不同？但现实没有「重来一次」的机会。错过的就是错过了，只能在现有的基础上继续往下走。</p>
-<p>明年是我的本命年。十二年前还在小学，那时候对时间没什么概念，一年就是一年。现在走到学生阶段的末尾，再回头看这十二年，才发现很多变化都是一点点发生的。你以为只是普通的一年，其实也许是某个长期故事阶段性章节的收尾。</p>
-<p>年末生病之后，不得不把小论文的撰写和投递往前赶，又一次寒假提前回家。本来安排好的节奏被打乱，人也感觉明显的状态下降。游戏里血量掉了可以补回来，现实里却不是这样。身体的消耗是慢慢累积的，不会因为休息几天就完全清零。</p>
-
-
-<h3 class="relative group">chap3 
-    <div id="chap3" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap3" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>如果游戏的机制是通过读档来反复尝试逼近最优解，那现实的机制，大概是通过承担后果，逐步修正决策。这或许才是「时间的魔法」的真正含义：</p>
-<p>不是回溯，而是累积。</p>
-<p>不是重开，而是继续。</p>
-
-
-<h3 class="relative group">chap4 
-    <div id="chap4" class="anchor"></div>
-    
-    <span
-        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
-        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
-            style="text-decoration-line: none !important;" href="#chap4" aria-label="锚点">#</a>
-    </span>        
-    
-</h3>
-<p>今年没有很多想说的话，过年的时候坐在家里闲的没事儿写一下这篇博客，以此纪念下2025，很多年之后再看会不会感觉很唏嘘呢？</p>
-<p>最后祝大家身体健康，吃嘛嘛香。身体才是支撑时间魔法的唯一本钱，大家平时忙的时候也要注意休息，压力大的时候多摆摆烂。毕竟我们不必事事努力，生活只需要健康的身体与继续下去的勇气。</p>
-<p>2025，存档（111真能存档吗，孩子们我想重来了）。</p>
-<p>2026，继续。</p>
+</h2>
+<p>接着说说<strong>Go</strong>：可以利用 <code>go.mod</code> 的 <code>replace</code>，将依赖指向本地拷贝的源码目录，下面详细说明具体步骤：</p>
+<p>先定位依赖源码的缓存位置，可通过 <code>GOPATH</code> 找到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">go env GOPATH
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="k">$(</span>go env GOPATH<span class="k">)</span>/pkg/mod/github.com/example/awesome-pkg@v1.2.3/
+</span></span></code></pre></div><p>在当前项目下新建 <code>third_party</code> 目录，并将其加入 <code>.gitignore</code>（避免把第三方源码提交进仓库），然后把依赖源码拷贝进去：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cp -r <span class="k">$(</span>go env GOPATH<span class="k">)</span>/pkg/mod/github.com/example/awesome-pkg@v1.2.3 ./third_party/awesome-pkg
+</span></span></code></pre></div><p>修改 <code>go.mod</code>，通过 <code>replace</code> 指令让依赖指向本地目录：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 原来</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// require github.com/example/awesome-pkg v1.2.3</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">replace</span> <span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">example</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span> <span class="p">=&gt;</span> <span class="p">.</span><span class="o">/</span><span class="nx">third_party</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// 最终类似如下</span>
+</span></span><span class="line"><span class="cl"><span class="nx">module</span> <span class="nx">my</span><span class="o">-</span><span class="nx">project</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">go</span> <span class="mf">1.25</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">require</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">example</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span> <span class="nx">v1</span><span class="mf">.2.3</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">replace</span> <span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">example</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span> <span class="p">=&gt;</span> <span class="p">.</span><span class="o">/</span><span class="nx">third_party</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span>
+</span></span></code></pre></div><p>接着对本地源码目录赋予相应权限，方便编辑调试：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">chmod -R u+x ./third_party/awesome-pkg 
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> ./third_party/awesome-pkg
+</span></span><span class="line"><span class="cl">nano xxx.go
+</span></span></code></pre></div><p>修改完成后即可正常编译调试，<code>go build</code>/<code>go run</code> 会自动使用本地修改后的版本。</p>
+<p>调试结束后记得移除 <code>replace</code> 指令并删除 <code>third_party</code> 目录，避免影响正式构建。</p>
 
           
           
@@ -980,8 +871,8 @@
           
         
       <script>
-        var oid = "views_blog\/25-sum\/index.md"
-        var oid_likes = "likes_blog\/25-sum\/index.md"
+        var oid = "views_go\/go-dependency-debug\/index.md"
+        var oid_likes = "likes_go\/go-dependency-debug\/index.md"
       </script>
       
       
@@ -993,65 +884,6 @@
 
     
   
-    
-    
-    
-    <div class="pt-8">
-      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
-      <div class="flex justify-between pt-3">
-        <span>
-          
-            <a class="flex group mr-3" href="/blog/debit-card/">
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >境外借记卡简单调研</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-12-27T23:31:36&#43;08:00">2025年12月27日 23時31分</time>
-                  
-                </span>
-              </span>
-            </a>
-          
-        </span>
-        <span>
-          
-            <a class="flex text-right group ml-3" href="/blog/ms-rewards-puzzle/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >薅微软Rewards羊毛：更快的滑动拼图方法</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2026-02-20T16:57:55&#43;08:00">2026年02月20日 16時57分</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ml-3 text-neutral-700 group-hover:text-primary-600 ltr:inline rtl:hidden dark:text-neutral dark:group-hover:text-primary-400"
-                >&rarr;</span
-              >
-              <span
-                class="mr-3 text-neutral-700 group-hover:text-primary-600 ltr:hidden rtl:inline dark:text-neutral dark:group-hover:text-primary-400"
-                >&larr;</span
-              >
-            </a>
-          
-        </span>
-      </div>
-    </div>
-  
 
 
     
@@ -1060,7 +892,7 @@
       <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
       <div class="pt-3">
         
-<span id="/blog/25-sum/" class="leancloud_visitors" data-flag-title="2025：时间的魔法">
+<span id="/go/go-dependency-debug/" class="leancloud_visitors" data-flag-title="go mod依赖源码本地修改与调试">
   <span class="post-meta-item-text">文章阅读量 </span>
   <span class="leancloud-visitors-count">0</span>
   <p></p>
