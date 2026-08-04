@@ -24,7 +24,7 @@
     &lt;/span&gt;        
     
 &lt;/h2&gt;
-&lt;p&gt;在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。：&lt;/p&gt;</description>
+&lt;p&gt;在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。&lt;/p&gt;</description>
       <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/go/go-dependency-debug/feature_rc.png" />
     </item>
     <item>
