@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>© 2026 Aoidayo</copyright>
-    <lastBuildDate>Thu, 27 Nov 2025 08:53:55 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Aug 2026 13:11:40 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>飞牛nmbd进程内存泄露</title>
+      <link>https://blog.aoidayo.site/linux/nmbd/</link>
+      <pubDate>Fri, 07 Aug 2026 13:11:40 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/linux/nmbd/</guid>
+      <description>&lt;p&gt;先亮fnos版本，在26年上半年的0day漏洞导致几十万台公网裸奔的飞牛变成肉鸡之后，我重装了飞牛版本到1.1.18，主要还是眼馋飞牛的美丽UI，最近在一次断电后到现在连续开机27天，某天闲的无聊看了下内存占用，常用进程+系统内存占用杂七杂八的占用2G+，然后一看使用内存4G+，于是有点纳闷剩下来的2G是谁在使用。&lt;/p&gt;</description>
+      
+    </item>
     <item>
       <title>单电脑git多用户配置</title>
       <link>https://blog.aoidayo.site/blog/git-a-b/</link>
