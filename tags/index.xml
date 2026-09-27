@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <copyright>© 2026 Aoidayo</copyright>
-    <lastBuildDate>Fri, 07 Aug 2026 13:11:40 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 27 Sep 2026 21:56:00 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mysql</title>
+      <link>https://blog.aoidayo.site/tags/mysql/</link>
+      <pubDate>Sun, 27 Sep 2026 21:56:00 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/tags/mysql/</guid>
+      <description></description>
+      
+    </item>
     <item>
       <title>Linux</title>
       <link>https://blog.aoidayo.site/tags/linux/</link>
