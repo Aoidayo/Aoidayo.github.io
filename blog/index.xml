@@ -9,6 +9,16 @@
     <copyright>© 2026 Aoidayo</copyright>
     <atom:link href="https://blog.aoidayo.site/blog/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>使用Prometheus和Grafana监控mysql主从延迟和慢查询</title>
+      <link>https://blog.aoidayo.site/blog/mysql-monitor/</link>
+      <pubDate>Tue, 29 Sep 2026 22:01:19 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/mysql-monitor/</guid>
+      <description>&lt;p&gt;将 基于GTID的一主两从复制集群 接入Prometheus和Grafana。&lt;/p&gt;
+&lt;p&gt;具体的，在prometheus.yml的target中设置三个mysql实例的地址，通过&lt;code&gt;/probe?target=127.0.0.1:3306~3308&lt;/code&gt;交给mysqld-exporter，让mysqld-exporter基于mysql协议，通过多目标模式（multi-target）采集这些mysql实例的status信息。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/mysql-monitor/feature.png" />
+    </item>
+    <item>
       <title>Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL</title>
       <link>https://blog.aoidayo.site/blog/mysql-s1mple-ha/</link>
       <pubDate>Sun, 27 Sep 2026 21:56:00 +0800</pubDate>

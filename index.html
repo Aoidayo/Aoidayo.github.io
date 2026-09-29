@@ -81,7 +81,7 @@
   <meta property="og:title" content="Aoidayo">
   <meta property="og:description" content="备用博客 (防止github page挂了)
 学生
-绝望南通人 斗破苍穹/JUMP/阿梓 Recent Blogs Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL 2026年09月27日 21時56分·1804 字 Blog Mysql 飞牛nmbd进程内存泄露 2026年08月07日 13時11分·446 字 Blog Linux go mod依赖源码本地修改与调试 2026年08月04日 16時21分·710 字 Blog Go VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 2026年07月21日 16時44分·1574 字 Blog Docker Vaultwarden Bitwarden 小说Collection 2026年06月20日 15時38分·4049 字 Blog 轻小说 CertBot自动化SSL证书部署 2026年03月02日 19時58分·1707 字 Blog 运维 公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 2026年03月02日 19時45分·1980 字 Blog TailScale 网络 薅微软Rewards羊毛：更快的滑动拼图方法 2026年02月20日 16時57分·3014 字 Blog 2025：时间的魔法 2026年02月13日 10時36分·1144 字 Blog 境外借记卡简单调研 2025年12月27日 23時31分·3250 字 Blog More Posts">
+绝望南通人 斗破苍穹/JUMP/阿梓 Recent Blogs 使用Prometheus和Grafana监控mysql主从延迟和慢查询 2026年09月29日 22時01分·5921 字 Blog Mysql Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL 2026年09月27日 21時56分·1804 字 Blog Mysql 飞牛nmbd进程内存泄露 2026年08月07日 13時11分·446 字 Blog Linux go mod依赖源码本地修改与调试 2026年08月04日 16時21分·710 字 Blog Go VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 2026年07月21日 16時44分·1574 字 Blog Docker Vaultwarden Bitwarden 小说Collection 2026年06月20日 15時38分·4049 字 Blog 轻小说 CertBot自动化SSL证书部署 2026年03月02日 19時58分·1707 字 Blog 运维 公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 2026年03月02日 19時45分·1980 字 Blog TailScale 网络 薅微软Rewards羊毛：更快的滑动拼图方法 2026年02月20日 16時57分·3014 字 Blog 2025：时间的魔法 2026年02月13日 10時36分·1144 字 Blog More Posts">
   <meta property="og:locale" content="zh_cn">
   <meta property="og:type" content="website">
 
@@ -90,7 +90,7 @@
   <meta name="twitter:title" content="Aoidayo">
   <meta name="twitter:description" content="备用博客 (防止github page挂了)
 学生
-绝望南通人 斗破苍穹/JUMP/阿梓 Recent Blogs Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL 2026年09月27日 21時56分·1804 字 Blog Mysql 飞牛nmbd进程内存泄露 2026年08月07日 13時11分·446 字 Blog Linux go mod依赖源码本地修改与调试 2026年08月04日 16時21分·710 字 Blog Go VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 2026年07月21日 16時44分·1574 字 Blog Docker Vaultwarden Bitwarden 小说Collection 2026年06月20日 15時38分·4049 字 Blog 轻小说 CertBot自动化SSL证书部署 2026年03月02日 19時58分·1707 字 Blog 运维 公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 2026年03月02日 19時45分·1980 字 Blog TailScale 网络 薅微软Rewards羊毛：更快的滑动拼图方法 2026年02月20日 16時57分·3014 字 Blog 2025：时间的魔法 2026年02月13日 10時36分·1144 字 Blog 境外借记卡简单调研 2025年12月27日 23時31分·3250 字 Blog More Posts">
+绝望南通人 斗破苍穹/JUMP/阿梓 Recent Blogs 使用Prometheus和Grafana监控mysql主从延迟和慢查询 2026年09月29日 22時01分·5921 字 Blog Mysql Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL 2026年09月27日 21時56分·1804 字 Blog Mysql 飞牛nmbd进程内存泄露 2026年08月07日 13時11分·446 字 Blog Linux go mod依赖源码本地修改与调试 2026年08月04日 16時21分·710 字 Blog Go VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 2026年07月21日 16時44分·1574 字 Blog Docker Vaultwarden Bitwarden 小说Collection 2026年06月20日 15時38分·4049 字 Blog 轻小说 CertBot自动化SSL证书部署 2026年03月02日 19時58分·1707 字 Blog 运维 公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 2026年03月02日 19時45分·1980 字 Blog TailScale 网络 薅微软Rewards羊毛：更快的滑动拼图方法 2026年02月20日 16時57分·3014 字 Blog 2025：时间的魔法 2026年02月13日 10時36分·1144 字 Blog More Posts">
 
   
   <script type="application/ld+json">
@@ -517,6 +517,135 @@ Posts
 
 <section class="space-y-10 w-full mt-10 mb-10">
     
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/mysql-monitor/">
+    
+        
+        <div class="w-full md:w-auto h-full thumbnail nozoom thumbnailshadow md:mr-7" style="background-image:url(/blog/mysql-monitor/feature_hu_87ad0a1525109d79.png);"></div>
+        
+      <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/mysql-monitor/">使用Prometheus和Grafana监控mysql主从延迟和慢查询</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-09-29T22:01:19&#43;08:00">2026年09月29日 22時01分</time><span class="px-2 text-primary-500">&middot;</span><span>5921 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/mysql/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Mysql
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
         
             
                 
@@ -1619,121 +1748,6 @@ Posts
   
   
   <time datetime="2026-02-13T10:36:02&#43;08:00">2026年02月13日 10時36分</time><span class="px-2 text-primary-500">&middot;</span><span>1144 字</span>
-  
-
-  
-  
-</div>
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  
-  
-  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
-    <span class="flex" style="cursor: pointer;">
-  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
-    Blog
-  </span>
-</span>
-  </span>
-  
-  
-  
-  
-  
-  
-  
-  
-</div>
-
-
-
-
-      </div>
-      
-    </div>
-  </a>
-
-            
-        
-            
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <a class="flex flex-wrap article " href="/blog/debit-card/">
-    <div class=" mt-3 md:mt-0">
-      <div class="items-center text-left text-xl font-semibold">
-        
-        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
-          href="/blog/debit-card/">境外借记卡简单调研</div>
-        
-        
-        
-      </div>
-      <div class="text-sm text-neutral-500 dark:text-neutral-400">
-        
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="flex flex-row flex-wrap items-center">
-  
-  
-  <time datetime="2025-12-27T23:31:36&#43;08:00">2025年12月27日 23時31分</time><span class="px-2 text-primary-500">&middot;</span><span>3250 字</span>
   
 
   
