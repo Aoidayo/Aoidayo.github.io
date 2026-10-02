@@ -212,6 +212,19 @@
     window.addEventListener("scroll", updateActiveLink, { passive: true });
   }
 
+  function afterUnlock(box) {
+    if (typeof renderMathInElement === "function") {
+      renderMathInElement(box, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "\\[", right: "\\]", display: true }
+        ]
+      });
+    }
+  }
+
   function createForm(box, payload) {
     var savedPassword = readStoredPassword(payload.id);
 
@@ -222,9 +235,7 @@
         box.innerHTML = html;
         box.classList.remove("hugo-encrypt-box", "hugo-encrypt-pending");
         box.classList.add("hugo-encrypt-unlocked");
-        if (payload.kind === "article") {
-          buildArticleToc(box);
-        }
+        afterUnlock(box);
       }).catch(function () {
         box.classList.remove("hugo-encrypt-pending");
         renderPasswordForm(box, payload, savedPassword);
@@ -263,9 +274,7 @@
         box.innerHTML = html;
         box.classList.remove("hugo-encrypt-box");
         box.classList.add("hugo-encrypt-unlocked");
-        if (payload.kind === "article") {
-          buildArticleToc(box);
-        }
+        afterUnlock(box);
       } catch (error) {
         message.textContent = "密码错误或内容已损坏。";
         input.select();

@@ -1,91 +1,15 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Aoidayo</title>
-    <link>https://blog.aoidayo.site/report/</link>
-    <description>Recent content on Aoidayo</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <copyright>© 2026 Aoidayo</copyright>
-    <atom:link href="https://blog.aoidayo.site/report/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>数据清洗</title>
-      <link>https://blog.aoidayo.site/report/raw-data-process/</link>
-      <pubDate>Sun, 09 Feb 2025 15:38:16 +0800</pubDate>
-      
-      <guid>https://blog.aoidayo.site/report/raw-data-process/</guid>
-      <description>&lt;h2 class=&#34;relative group&#34;&gt;Refer 
-    &lt;div id=&#34;refer&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#refer&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;轨迹数据集
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.kaggle.com/competitions/pkdd-15-predict-taxi-service-trajectory-i/data&#34; target=&#34;_blank&#34;&gt;ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;城市拓扑、路网/POI/城市边界
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;城市拓扑&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;OSM API (OpenStreetMap)
-&lt;ul&gt;
-&lt;li&gt;本质上 &lt;code&gt;osmnx&lt;/code&gt; 和 &lt;code&gt;overpass API&lt;/code&gt; 都是使用OSM的api获取&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 可以用于获取最新时间的路网数据&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Overpass API&lt;/strong&gt; &lt;a href=&#34;https://overpass.kumi.systems/#about&#34; target=&#34;_blank&#34;&gt;Overpass 官网 | Overpass by Private.coffee&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;OSM历史数据服务
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://download.geofabrik.de/&#34; target=&#34;_blank&#34;&gt;GeoFabrik&lt;/a&gt; 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.cnblogs.com/bltstop/p/18090135&#34; target=&#34;_blank&#34;&gt;Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;城市边界&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 直接获取&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://gadm.org/index.html&#34; target=&#34;_blank&#34;&gt;GADM&lt;/a&gt;，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。
-&lt;ul&gt;
-&lt;li&gt;level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息&lt;/li&gt;
-&lt;li&gt;不能单shp文件读取&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;GeoFabrik可以获取部分&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;shapefile&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://wiki.openstreetmap.org/wiki/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF&#34; target=&#34;_blank&#34;&gt;road shapefile的highway枚举值说明&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;路网清洗&lt;/strong&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/zdsjjtTLG/TrackIt&#34; target=&#34;_blank&#34;&gt;zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;h2 class=&#34;relative group&#34;&gt;数据集 
-    &lt;div id=&#34;%E6%95%B0%E6%8D%AE%E9%9B%86&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%95%B0%E6%8D%AE%E9%9B%86&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h2&gt;
-&lt;p&gt;我们能拿到的数据集分为两种：&lt;/p&gt;</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/report/raw-data-process/feature.png" />
-    </item>
-    
-  </channel>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>报告 on Aoidayo</title>
+        <link>https://blog.aoidayo.site/report/</link>
+        <description>Recent content in 报告 on Aoidayo</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-CN</language>
+        <lastBuildDate>Sun, 09 Feb 2025 15:38:16 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/report/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>数据清洗</title>
+            <link>https://blog.aoidayo.site/report/raw-data-process/</link>
+            <pubDate>Sun, 09 Feb 2025 15:38:16 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/report/raw-data-process/</guid>
+            <description>&lt;img src=&#34;https://blog.aoidayo.site/report/raw-data-process/feature.png&#34; alt=&#34;Featured image of post 数据清洗&#34; /&gt;&lt;h2 id=&#34;refer&#34;&gt;Refer&#xA;&lt;/h2&gt;&lt;ul&gt;&#xA;&lt;li&gt;轨迹数据集&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.kaggle.com/competitions/pkdd-15-predict-taxi-service-trajectory-i/data&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;城市拓扑、路网/POI/城市边界&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;城市拓扑&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;OSM API (OpenStreetMap)&#xA;&lt;ul&gt;&#xA;&lt;li&gt;本质上 &lt;code&gt;osmnx&lt;/code&gt; 和 &lt;code&gt;overpass API&lt;/code&gt; 都是使用OSM的api获取&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 可以用于获取最新时间的路网数据&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;Overpass API&lt;/strong&gt; &lt;a class=&#34;link&#34; href=&#34;https://overpass.kumi.systems/#about&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;Overpass 官网 | Overpass by Private.coffee&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;OSM历史数据服务&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://download.geofabrik.de/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;GeoFabrik&lt;/a&gt; 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。&lt;/li&gt;&#xA;&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/bltstop/p/18090135&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;城市边界&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 直接获取&lt;/li&gt;&#xA;&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://gadm.org/index.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;GADM&lt;/a&gt;，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。&#xA;&lt;ul&gt;&#xA;&lt;li&gt;level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息&lt;/li&gt;&#xA;&lt;li&gt;不能单shp文件读取&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;GeoFabrik可以获取部分&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;shapefile&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://wiki.openstreetmap.org/wiki/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;road shapefile的highway枚举值说明&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;路网清洗&lt;/strong&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/zdsjjtTLG/TrackIt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;数据集&#34;&gt;数据集&#xA;&lt;/h2&gt;&lt;p&gt;我们能拿到的数据集分为两种：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;最原始的数据，轨迹数据以&lt;strong&gt;GPS点原始信息&lt;/strong&gt;保留（lng,lat,timestamp,driver_id,user_id or order_id）&lt;/li&gt;&#xA;&lt;li&gt;论文二次处理的数据集，轨迹数据的&lt;strong&gt;GPS点原始信息&lt;/strong&gt;多半在经过降采样/地图匹配转换后丢失，不一定保留。&#xA;&lt;ul&gt;&#xA;&lt;li&gt;恢复GPS点粒度的POI信息困难，只能得到路段粒度的POI信息&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;城市拓扑路网poi城市边界&#34;&gt;城市拓扑、路网/POI/城市边界&#xA;&lt;/h2&gt;&lt;p&gt;目前不管是 &lt;code&gt;osmnx&lt;/code&gt; 还是 &lt;code&gt;overpassApi&lt;/code&gt;，简单的获取城市的boundary体验还不错，但是在框定较大范围的bbox或者boundary后获取数据的体验都不是很好，常给你报 &lt;code&gt;ConnectTimeout&lt;/code&gt; 错误。&lt;/p&gt;&#xA;&lt;p&gt;作为openstreetmap的替代平台，GeoFabrik有几个&lt;strong&gt;优点&lt;/strong&gt;：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;支持下载历史数据，最大限度的保留城市拓扑和poi信息&lt;/li&gt;&#xA;&lt;li&gt;支持下载&lt;strong&gt;部分城市的边界范围&lt;/strong&gt;数据&#xA;&lt;strong&gt;缺点&lt;/strong&gt;就是一般只能下载&lt;strong&gt;国家&lt;/strong&gt;级别的路网数据，需要你再框一次才能得到&lt;strong&gt;城市&lt;/strong&gt;路网。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;关于其他可见 &lt;a class=&#34;link&#34; href=&#34;#Refer&#34; &gt;参考&lt;/a&gt; 。&lt;/p&gt;&#xA;&lt;h4 id=&#34;shapefile&#34;&gt;shapefile&#xA;&lt;/h4&gt;&lt;p&gt;包含这几种后缀的数据&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;.shp&lt;/strong&gt;：几何数据&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;.shx&lt;/strong&gt;：几何索引&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;.dbf&lt;/strong&gt;：属性数据&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;.prj&lt;/strong&gt;：坐标系信息&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;.cpg&lt;/strong&gt;：字符编码&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;shp方面包含如下：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Point&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;mark style=&#34;background: #FFB8EBA6;&#34;&gt;&lt;strong&gt;gis_osm_places_free_1&lt;/strong&gt;：包含城市、小镇、村庄等行政或聚居点的位置信息。&lt;/mark&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;因数据而异，可能没有包含所有的place信息。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&lt;mark style=&#34;background: #FFB8EBA6;&#34;&gt;&lt;strong&gt;gis_osm_pois_free_1&lt;/strong&gt;：兴趣点（Points of Interest，POI）数据，如餐厅、商店、景点等。&lt;/mark&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;mark style=&#34;background: #FFB8EBA6;&#34;&gt;&lt;strong&gt;gis_osm_traffic_free_1&lt;/strong&gt;：交通相关设施，如交通信号灯、停车标志、人行横道等。&lt;/mark&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;Line&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;mark style=&#34;background: #FFB8EBA6;&#34;&gt;&lt;strong&gt;gis_osm_roads_free_1&lt;/strong&gt;：道路网络数据，包括高速公路、主干道、街道、小路、自行车道、人行道等。&lt;/mark&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;PolyGon&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;mark style=&#34;background: #FFB8EBA6;&#34;&gt;&lt;strong&gt;gis_osm_places_a_free_1&lt;/strong&gt;：地点的多边形数据，如城市、小镇、村庄等的边界。&lt;/mark&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;mark style=&#34;background: #FFB8EBA6;&#34;&gt;&lt;strong&gt;gis_osm_pois_a_free_1&lt;/strong&gt;：兴趣点的多边形数据。&lt;/mark&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;需要注意的是，road_shapefile中包含大量的冗余数据（没有必要添加的路段类型fclass），拿porto市举例：&lt;/p&gt;&#xA;&lt;p&gt;&lt;img alt=&#34;image-20250209144000050&#34; class=&#34;gallery-image&#34; data-flex-basis=&#34;473px&#34; data-flex-grow=&#34;197&#34; data-title-escaped=&#34;&amp;lt;span style=&amp;#39;color:#ED508F&amp;#39;&amp;gt;原始&amp;lt;/span&amp;gt; Porto Road Shapefile&#34; height=&#34;934&#34; loading=&#34;lazy&#34; sizes=&#34;(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px&#34; src=&#34;https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144000050.png&#34; srcset=&#34;https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144000050_hu_384788f850f02826.png 800w, https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144000050_hu_5f41caf837c61f70.png 1600w, https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144000050.png 1843w&#34; title=&#34;&lt;span style=&#39;color:#ED508F&#39;&gt;原始&lt;/span&gt; Porto Road Shapefile&#34; width=&#34;1843&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;img alt=&#34;image-20250209144109677&#34; class=&#34;gallery-image&#34; data-flex-basis=&#34;473px&#34; data-flex-grow=&#34;197&#34; data-title-escaped=&#34;&amp;lt;span style=&amp;#39;color:#ED508F&amp;#39;&amp;gt;Libcity&amp;lt;/span&amp;gt; porto road geo/rel&#34; height=&#34;973&#34; loading=&#34;lazy&#34; sizes=&#34;(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px&#34; src=&#34;https://blog.aoidayo.site/report/raw-data-process/feature.png&#34; srcset=&#34;https://blog.aoidayo.site/report/raw-data-process/feature_hu_366f731cb7331073.png 800w, https://blog.aoidayo.site/report/raw-data-process/feature_hu_ed1f1394ddb84564.png 1600w, https://blog.aoidayo.site/report/raw-data-process/feature.png 1920w&#34; title=&#34;&lt;span style=&#39;color:#ED508F&#39;&gt;Libcity&lt;/span&gt; porto road geo/rel&#34; width=&#34;1920&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;对比libcity处理的porto市路网数据，可以发现现有路网中存在许多冗余数据（比如porto市的最南边），所以需要进行路网数据的清洗。&lt;/p&gt;&#xA;&lt;p&gt;因为每个国家的情况不同，国内外的路段保留类型不建议使用相同的策略，对于国外的路网数据，保留如下字段：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;reserved_fclass&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;motorway&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;trunk&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;primary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;secondary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;tertiary&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;unclassified&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;residential&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;motorway_link&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;7&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;trunk_link&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;primary_link&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;9&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;secondary_link&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;tertiary_link&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;living_street&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;road&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;过滤后得到的路网稍显合理，但是仍需要进一步处理。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img alt=&#34;image-20250209144235702&#34; class=&#34;gallery-image&#34; data-flex-basis=&#34;495px&#34; data-flex-grow=&#34;206&#34; data-title-escaped=&#34;&amp;lt;span style=&amp;#39;color:#ED508F&amp;#39;&amp;gt;Filtered&amp;lt;/span&amp;gt; Porto RoadMap&#34; height=&#34;766&#34; loading=&#34;lazy&#34; sizes=&#34;(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px&#34; src=&#34;https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144235702.png&#34; srcset=&#34;https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144235702_hu_d401d62476a7fae2.png 800w, https://blog.aoidayo.site/report/raw-data-process/assets/image-20250209144235702.png 1580w&#34; title=&#34;&lt;span style=&#39;color:#ED508F&#39;&gt;Filtered&lt;/span&gt; Porto RoadMap&#34; width=&#34;1580&#34;&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;路网清洗&#34;&gt;路网清洗&#xA;&lt;/h2&gt;&lt;h3 id=&#34;恢复uv信息&#34;&gt;恢复uv信息&#xA;&lt;/h3&gt;&lt;p&gt;建图不光需要路网的线层信息，同样需要点层信息，这里的点指的是路段OD、uv。&#xA;osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数据，所以只能通过取路段的OD来作为uv。&lt;/p&gt;&#xA;&lt;p&gt;原始road shapefile（统一WGS-84,EPSG:4326坐标系操作）&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;提取路段OD为uv&lt;/li&gt;&#xA;&lt;li&gt;映射 &lt;code&gt;set(uv)&lt;/code&gt; 建立点层&lt;/li&gt;&#xA;&lt;li&gt;建立基础的点层和线层&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;修复路网&#34;&gt;修复路网&#xA;&lt;/h3&gt;&lt;p&gt;路网在恢复uv信息后需要清理环路、自边、自相交、联通性问题，同时进行拓扑优化和路网重塑，规整线层和点层。&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;构建点层信息&#xA;&lt;ul&gt;&#xA;&lt;li&gt;自己构建：使用在恢复uv信息中得到的node构建点层&lt;/li&gt;&#xA;&lt;li&gt;GoTrakIt：使用第三方包从线层构建点层&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;清理线层的环路、自边、自相交&lt;/li&gt;&#xA;&lt;li&gt;处理标准路网的连通性问题&lt;/li&gt;&#xA;&lt;li&gt;重映射点层&lt;/li&gt;&#xA;&lt;li&gt;最后对路网做拓扑优化和路网重塑&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;最后得到构建路网的必须数据： &lt;code&gt;road&lt;/code&gt; 和 &lt;code&gt;node&lt;/code&gt; ，即 &lt;code&gt;rel&lt;/code&gt; 和 &lt;code&gt;geo&lt;/code&gt; 。&lt;/p&gt;&#xA;&lt;h2 id=&#34;轨迹清洗&#34;&gt;轨迹清洗&#xA;&lt;/h2&gt;&lt;ul&gt;&#xA;&lt;li&gt;行程切分&lt;/li&gt;&#xA;&lt;li&gt;停留点删除&lt;/li&gt;&#xA;&lt;li&gt;轨迹点上下采样&lt;/li&gt;&#xA;&lt;li&gt;滑动窗口平均/卡尔曼滤波平滑&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;地图匹配&#34;&gt;地图匹配&#xA;&lt;/h2&gt;&lt;ul&gt;&#xA;&lt;li&gt;FMM：&lt;a class=&#34;link&#34; href=&#34;https://github.com/Aoidayo/fmm-py3&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;fmm-py3: FMM for python3&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;ST-MapMatching：&lt;a class=&#34;link&#34; href=&#34;https://github.com/wenke727/ST-MapMatching&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;wenke727/ST-MapMatching: 基于时间和空间特性的全局地图匹配算法，基础路网可根据 bbox 下载并处理得到&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;GoTrackIt：&lt;a class=&#34;link&#34; href=&#34;https://github.com/zdsjjtTLG/TrackIt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;poi-k近邻&#34;&gt;POI k近邻&#xA;&lt;/h2&gt;&lt;ul&gt;&#xA;&lt;li&gt;可以获取 &lt;a class=&#34;link&#34; href=&#34;#shapefile&#34; &gt;Point和Polygon类型的POI数据&lt;/a&gt;（点、多边形面）&lt;/li&gt;&#xA;&lt;li&gt;处理时为了方便起见，可以统一将坐标系投影到平面坐标系，作k近邻计算。&lt;/li&gt;&#xA;&lt;li&gt;见仁见智：路段 k近邻POI/GPS k近邻POI&lt;/li&gt;&#xA;&lt;li&gt;k近邻可以在collate_fn中实现&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;</description>
+        </item></channel>
 </rss>

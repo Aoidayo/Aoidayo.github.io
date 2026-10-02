@@ -1,62 +1,27 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Hugo on Aoidayo</title>
-    <link>https://blog.aoidayo.site/tags/hugo/</link>
-    <description>Recent content in Hugo on Aoidayo</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>zh-cn</language>
-    <copyright>© 2026 Aoidayo</copyright>
-    <lastBuildDate>Thu, 22 May 2025 15:38:16 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Hugo 伪加密</title>
-      <link>https://blog.aoidayo.site/blog/encrypt/</link>
-      <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
-      
-      <guid>https://blog.aoidayo.site/blog/encrypt/</guid>
-      <description>此文章包含加密内容。</description>
-      
-    </item>
-    <item>
-      <title>使用hugo</title>
-      <link>https://blog.aoidayo.site/blog/use-hugo/</link>
-      <pubDate>Tue, 07 Jan 2025 15:38:16 +0800</pubDate>
-      
-      <guid>https://blog.aoidayo.site/blog/use-hugo/</guid>
-      <description>此文章包含加密内容。</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/use-hugo/feature.jpg" />
-    </item>
-    <item>
-      <title>Blog History</title>
-      <link>https://blog.aoidayo.site/blog/blog-history/</link>
-      <pubDate>Sat, 04 Jan 2025 15:38:16 +0800</pubDate>
-      
-      <guid>https://blog.aoidayo.site/blog/blog-history/</guid>
-      <description>&lt;h2 class=&#34;relative group&#34;&gt;FrameWork 
-    &lt;div id=&#34;framework&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#framework&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h2&gt;
-
-
-&lt;h3 class=&#34;relative group&#34;&gt;Typecho 24/1/? 
-    &lt;div id=&#34;typecho-241&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
-    
-    &lt;span
-        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
-        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
-            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#typecho-241&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
-    &lt;/span&gt;        
-    
-&lt;/h3&gt;
-&lt;p&gt;wordpress的精简版本，用docker装容易产生&lt;code&gt;nginx的user:www-data&lt;/code&gt; 权限问题，在使用时必须没写完一篇文章就&lt;code&gt;sudo chmod -Rf 777 typecho/&lt;/code&gt;一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。&lt;/p&gt;</description>
-      
-    </item>
-    
-  </channel>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Hugo on Aoidayo</title>
+        <link>https://blog.aoidayo.site/tags/hugo/</link>
+        <description>Recent content in Hugo on Aoidayo</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-CN</language>
+        <lastBuildDate>Thu, 22 May 2025 15:38:16 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/hugo/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>Hugo 伪加密</title>
+            <link>https://blog.aoidayo.site/blog/encrypt/</link>
+            <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/blog/encrypt/</guid>
+            <description>此文章包含加密内容。</description>
+        </item><item>
+            <title>使用hugo</title>
+            <link>https://blog.aoidayo.site/blog/use-hugo/</link>
+            <pubDate>Tue, 07 Jan 2025 15:38:16 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/blog/use-hugo/</guid>
+            <description>&lt;img src=&#34;https://blog.aoidayo.site/blog/use-hugo/feature.jpg&#34; alt=&#34;Featured image of post 使用hugo&#34; /&gt;此文章包含加密内容。</description>
+        </item><item>
+            <title>Blog History</title>
+            <link>https://blog.aoidayo.site/blog/blog-history/</link>
+            <pubDate>Sat, 04 Jan 2025 15:38:16 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/blog/blog-history/</guid>
+            <description>&lt;h2 id=&#34;framework&#34;&gt;FrameWork&#xA;&lt;/h2&gt;&lt;h3 id=&#34;typecho-241&#34;&gt;Typecho 24/1/?&#xA;&lt;/h3&gt;&lt;p&gt;wordpress的精简版本，用docker装容易产生&lt;code&gt;nginx的user:www-data&lt;/code&gt; 权限问题，在使用时必须没写完一篇文章就&lt;code&gt;sudo chmod -Rf 777 typecho/&lt;/code&gt;一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。&lt;/p&gt;&#xA;&lt;p&gt;因为权限问题弃用。&lt;/p&gt;&#xA;&lt;h3 id=&#34;hello-hexo-24414&#34;&gt;Hello Hexo 24/4/14&#xA;&lt;/h3&gt;&lt;p&gt;第一个博客在github.io上使用Hexo和GithubActions搭建。&lt;/p&gt;&#xA;&lt;p&gt;Github原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。&lt;/p&gt;&#xA;&lt;p&gt;这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 &lt;code&gt;clone&lt;/code&gt;一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 &lt;code&gt;simple starter&lt;/code&gt;再搭配一个接入github评论的 &lt;code&gt;mkdocs&lt;/code&gt;让大家来讨论，这就是前端的奇奇怪怪之处吧。&lt;/p&gt;&#xA;&lt;p&gt;我尝试过如下几种静博框架的不同主题：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Hexo&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Butterfly&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;Hugo&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Blowfish&lt;/li&gt;&#xA;&lt;li&gt;Stack&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;Jekyll&#xA;&lt;ul&gt;&#xA;&lt;li&gt;tmaize-blog&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;hello-hugo-24414&#34;&gt;Hello Hugo 24/4/14&#xA;&lt;/h3&gt;&lt;p&gt;Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。&lt;/p&gt;&#xA;&lt;p&gt;总之Hugo我很喜欢，但是配置和使用太麻烦了。&lt;/p&gt;&#xA;&lt;p&gt;顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。&lt;/p&gt;&#xA;&lt;h3 id=&#34;hello-wordpress-245&#34;&gt;Hello Wordpress 24/5/?&#xA;&lt;/h3&gt;&lt;p&gt;Wordpress的&lt;code&gt;Sakurairo&lt;/code&gt;很好，但是太重了，我的小带宽承受不了。&lt;/p&gt;&#xA;&lt;h3 id=&#34;hello-halo-241012&#34;&gt;Hello Halo 24/10/12&#xA;&lt;/h3&gt;&lt;p&gt;争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。&lt;/p&gt;&#xA;&lt;p&gt;抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。&lt;/p&gt;&#xA;&lt;h2 id=&#34;deployment&#34;&gt;DeployMent&#xA;&lt;/h2&gt;&lt;h3 id=&#34;旅游地图-24111&#34;&gt;旅游地图 24/11/1&#xA;&lt;/h3&gt;&lt;p&gt;偶尔看看部署的这个小玩具，可以想起旅游的快乐时光。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img alt=&#34;map2.png&#34; class=&#34;gallery-image&#34; data-flex-basis=&#34;491px&#34; data-flex-grow=&#34;204&#34; height=&#34;880&#34; loading=&#34;lazy&#34; sizes=&#34;(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px&#34; src=&#34;https://blog.aoidayo.site/blog/blog-history/assets/map2.png&#34; srcset=&#34;https://blog.aoidayo.site/blog/blog-history/assets/map2_hu_2881fccbacb77458.png 800w, https://blog.aoidayo.site/blog/blog-history/assets/map2_hu_57070d1abb3ee98c.png 1600w, https://blog.aoidayo.site/blog/blog-history/assets/map2.png 1801w&#34; width=&#34;1801&#34;&gt;&lt;/p&gt;&#xA;&lt;h3 id=&#34;nas导航-24111&#34;&gt;Nas导航 24/11/1&#xA;&lt;/h3&gt;&lt;p&gt;copy一个学弟的导航页，用来重定向到我的nas服务。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img alt=&#34;navi2.png&#34; class=&#34;gallery-image&#34; data-flex-basis=&#34;384px&#34; data-flex-grow=&#34;160&#34; data-title-escaped=&#34;&amp;lt;span style=&amp;#39;color:#ED508F&amp;#39;&amp;gt;Photo by &amp;lt;a class=&amp;#34;link&amp;#34; href=&amp;#34;https://www.mi.com/xiaomi-14&amp;#34;  target=&amp;#34;_blank&amp;#34; rel=&amp;#34;noopener&amp;#34;\n    &amp;gt;Xiaomi 14&amp;lt;/a&amp;gt;&amp;lt;/span&amp;gt;&#34; height=&#34;757&#34; loading=&#34;lazy&#34; sizes=&#34;(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px&#34; src=&#34;https://blog.aoidayo.site/blog/blog-history/assets/navi2.png&#34; srcset=&#34;https://blog.aoidayo.site/blog/blog-history/assets/navi2_hu_45965b003be796f3.png 800w, https://blog.aoidayo.site/blog/blog-history/assets/navi2.png 1214w&#34; title=&#34;&lt;span style=&#39;color:#ED508F&#39;&gt;Photo by &lt;a class=\&#34;link\&#34; href=\&#34;https://www.mi.com/xiaomi-14\&#34;  target=\&#34;_blank\&#34; rel=\&#34;noopener\&#34;\n    &gt;Xiaomi 14&lt;/a&gt;&lt;/span&gt;&#34; width=&#34;1214&#34;&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;transfer&#34;&gt;Transfer&#xA;&lt;/h2&gt;&lt;h3 id=&#34;博客迁移-25123&#34;&gt;博客迁移 25/1/23&#xA;&lt;/h3&gt;&lt;p&gt;其实更早，大概在&lt;code&gt;25/1/11&lt;/code&gt;左右就已经迁移到家里的服务器上了。&lt;/p&gt;&#xA;&lt;p&gt;因为没有给80和443端口，所以只能用端口访问了😭。&lt;/p&gt;&#xA;</description>
+        </item></channel>
 </rss>
