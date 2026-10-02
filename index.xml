@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Aoidayo</title>
+    <link>https://blog.aoidayo.site/</link>
+    <description>Recent content on Aoidayo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>© 2026 Aoidayo</copyright>
+    <atom:link href="https://blog.aoidayo.site/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用Prometheus和Grafana监控mysql主从延迟和慢查询</title>
+      <link>https://blog.aoidayo.site/blog/mysql-monitor/</link>
+      <pubDate>Tue, 29 Sep 2026 22:01:19 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/mysql-monitor/</guid>
+      <description>&lt;p&gt;将 基于GTID的一主两从复制集群 接入Prometheus和Grafana。&lt;/p&gt;
+&lt;p&gt;具体的，在prometheus.yml的target中设置三个mysql实例的地址，通过&lt;code&gt;/probe?target=127.0.0.1:3306~3308&lt;/code&gt;交给mysqld-exporter，让mysqld-exporter基于mysql协议，通过多目标模式（multi-target）采集这些mysql实例的status信息。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/mysql-monitor/feature.png" />
+    </item>
+    <item>
+      <title>Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL</title>
+      <link>https://blog.aoidayo.site/blog/mysql-s1mple-ha/</link>
+      <pubDate>Sun, 27 Sep 2026 21:56:00 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/mysql-s1mple-ha/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;为什么需要高可用？ 
+    &lt;div id=&#34;%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E9%AB%98%E5%8F%AF%E7%94%A8&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E9%AB%98%E5%8F%AF%E7%94%A8&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;规模越大、业务越关键，单点故障带来的代价越难以承受。单台数据库实例，无论硬件多可靠，故障是必然会发生的：磁盘损坏、内存故障、机房断电、误操作,这些都可能让这台唯一的主库瞬间不可用。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/mysql-s1mple-ha/feature.jpg" />
+    </item>
+    <item>
+      <title>飞牛nmbd进程内存泄露</title>
+      <link>https://blog.aoidayo.site/linux/nmbd/</link>
+      <pubDate>Fri, 07 Aug 2026 13:11:40 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/linux/nmbd/</guid>
+      <description>&lt;p&gt;先亮fnos版本，在26年上半年的0day漏洞导致几十万台公网裸奔的飞牛变成肉鸡之后，我重装了飞牛版本到1.1.18，主要还是眼馋飞牛的美丽UI，最近在一次断电后到现在连续开机27天，某天闲的无聊看了下内存占用，常用进程+系统内存占用杂七杂八的占用2G+，然后一看使用内存4G+，于是有点纳闷剩下来的2G是谁在使用。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>go mod依赖源码本地修改与调试</title>
+      <link>https://blog.aoidayo.site/go/go-dependency-debug/</link>
+      <pubDate>Tue, 04 Aug 2026 16:21:45 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/go/go-dependency-debug/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;A 
+    &lt;div id=&#34;a&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#a&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/go/go-dependency-debug/feature_rc.png" />
+    </item>
+    <item>
+      <title>VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法</title>
+      <link>https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/</link>
+      <pubDate>Tue, 21 Jul 2026 16:44:34 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;Pre 为什么要升级 
+    &lt;div id=&#34;pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#pre-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%8D%87%E7%BA%A7&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>小说Collection</title>
+      <link>https://blog.aoidayo.site/blog/novel-collection/</link>
+      <pubDate>Sat, 20 Jun 2026 15:38:52 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/novel-collection/</guid>
+      <description>此文章包含加密内容。</description>
+      
+    </item>
+    <item>
+      <title>CertBot自动化SSL证书部署</title>
+      <link>https://blog.aoidayo.site/blog/auto-ssl/</link>
+      <pubDate>Mon, 02 Mar 2026 19:58:04 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/auto-ssl/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;前言 
+    &lt;div id=&#34;%E5%89%8D%E8%A8%80&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E5%89%8D%E8%A8%80&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;为什么需要使用SSL证书自动部署？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。&lt;/li&gt;
+&lt;li&gt;现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。&lt;/li&gt;
+&lt;li&gt;现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;证书自动化的机制：&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网</title>
+      <link>https://blog.aoidayo.site/blog/s2s-vpn/</link>
+      <pubDate>Mon, 02 Mar 2026 19:45:56 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/s2s-vpn/</guid>
+      <description>&lt;p&gt;最近家里的联通光猫的3poe拨号上网的用户名和密码都变更了，导致路由器拿不到公网，因此家里的网络瘫痪了小一段时间。本来我是觉得可能是刷openwrt的路由坏了，因为这个路由器虽然配置不错（指AX3000），但其实是我在咸鱼上50r+淘的运营商定制路由器。当时春节前一天，打10010电话叫师傅过来的时候刚开始师傅脾气很冲（指师傅想跟我无限制格斗），后面耐心和他说明情况后倒没什么，发现就是路由器的3poe账号密码变了，同步修改路由和光猫两边的上网方式（从3poe改成dhcp）就可以了。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/s2s-vpn/feature.png" />
+    </item>
+    <item>
+      <title>薅微软Rewards羊毛：更快的滑动拼图方法</title>
+      <link>https://blog.aoidayo.site/blog/ms-rewards-puzzle/</link>
+      <pubDate>Fri, 20 Feb 2026 16:57:55 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/ms-rewards-puzzle/</guid>
+      <description>&lt;p&gt;Windows自带的Edge浏览器使用bing必应搜索的时候，会给你Rewards，如果你的Rewards积分积攒到一定程度（去年是17000+，现在是19000+）可以兑换&lt;strong&gt;肯德基/盒马生鲜等的百元代金券&lt;/strong&gt;。这个积分主要通过你对必应的使用频率来给予积分，一般攒个半年就可以拿到这个大奖了，当然&lt;strong&gt;如果你还玩玩它的滑动拼图🧩小游戏（或者一些人喜欢叫它为数字华容道、八数码）的话，可能会攒的更快&lt;/strong&gt;。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>2025：时间的魔法</title>
+      <link>https://blog.aoidayo.site/blog/25-sum/</link>
+      <pubDate>Fri, 13 Feb 2026 10:36:02 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/25-sum/</guid>
+      <description>&lt;!-- ## 2025年终：时间的魔法 --&gt;
+
+  
+  
+  
+  
+
+
+
+&lt;div
+  
+    class=&#34;flex px-4 py-3 rounded-md&#34;
+    style=&#34;background-color: #e63946&#34;
+  &gt;
+
+  &lt;span
+    
+      class=&#34;ltr:pr-3 rtl:pl-3 flex items-center&#34;
+      style=&#34;color: #60A5FA&#34;
+    &gt;
+
+    
+
+  &lt;span class=&#34;relative block icon&#34;&gt;
+    &lt;svg xmlns=&#34;http://www.w3.org/2000/svg&#34; viewBox=&#34;0 0 448 512&#34;&gt;
+&lt;path fill=&#34;currentColor&#34; d=&#34;M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416H416c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3H224 160c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z&#34;/&gt;&lt;/svg&gt;
+  &lt;/span&gt;
+
+
+  &lt;/span&gt;
+
+  &lt;span
+    
+      style=&#34;color: #f1faee&#34;
+    &gt;孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。&lt;/span&gt;
+&lt;/div&gt;
+
+
+
+&lt;h3 class=&#34;relative group&#34;&gt;chap1 
+    &lt;div id=&#34;chap1&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#chap1&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h3&gt;
+&lt;p&gt;如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 &lt;strong&gt;「时间的魔法」&lt;/strong&gt;。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/25-sum/feature.jpeg" />
+    </item>
+    <item>
+      <title>境外借记卡简单调研</title>
+      <link>https://blog.aoidayo.site/blog/debit-card/</link>
+      <pubDate>Sat, 27 Dec 2025 23:31:36 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/debit-card/</guid>
+      <description>&lt;p&gt;最近 GPT 和 Gemini 越来越强，于是萌生了办理境外借记卡的想法。之前也不太了解银行卡的类型，简单做个调研。&lt;/p&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;A. 信用卡、借记卡 
+    &lt;div id=&#34;a-%E4%BF%A1%E7%94%A8%E5%8D%A1%E5%80%9F%E8%AE%B0%E5%8D%A1&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#a-%E4%BF%A1%E7%94%A8%E5%8D%A1%E5%80%9F%E8%AE%B0%E5%8D%A1&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://zh.wikipedia.org/wiki/%E4%BF%A1%E7%94%A8%E5%8D%A1&#34; target=&#34;_blank&#34;&gt;信用卡 - 维基百科，自由的百科全书&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://zh.wikipedia.org/wiki/%E5%80%9F%E8%AE%B0%E5%8D%A1&#34; target=&#34;_blank&#34;&gt;借记卡 - 维基百科，自由的百科全书&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;先说说借记卡（Debit Card），又称储蓄卡，主要特点是&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>Overleaf集成Git&amp;Github</title>
+      <link>https://blog.aoidayo.site/blog/olgit/</link>
+      <pubDate>Fri, 26 Dec 2025 23:44:14 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/olgit/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;Olgitbridge 
+    &lt;div id=&#34;olgitbridge&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#olgitbridge&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;Olgitbridge: Overleaf Git Bridge&lt;/p&gt;
+&lt;p&gt;鉴于 Overleaf 开源版本无法集成 git，在 github 上逛了一圈发现还是&lt;a href=&#34;https://gitlab.com/axkibe/olgitbridge&#34; target=&#34;_blank&#34;&gt;olgitbridge&lt;/a&gt;最好用，本篇博客做&lt;strong&gt;部署和使用&lt;/strong&gt;的相关介绍。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;😋github 上的介绍 / 机翻过来作为参考&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>单电脑git多用户配置</title>
+      <link>https://blog.aoidayo.site/blog/git-a-b/</link>
+      <pubDate>Thu, 27 Nov 2025 08:53:55 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/git-a-b/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;A&amp;amp;B 
+    &lt;div id=&#34;ab&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#ab&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;场景：A 和 B 同时维护一个项目，B 电脑出问题了，在 A 电脑上改了代码后需要 push，但是 A 不想 B 用他的账号提交，所以需要添加新的 git 用户。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>Python算法项目 容器化</title>
+      <link>https://blog.aoidayo.site/blog/python-container/</link>
+      <pubDate>Mon, 24 Nov 2025 17:13:35 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/python-container/</guid>
+      <description>&lt;p&gt;实验室的一套 Python 算法项目在部署阶段需要以容器/虚拟化方式运行，因此整理了整个 Docker 化流程，方便后续参考。&lt;/p&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;背景 
+    &lt;div id=&#34;%E8%83%8C%E6%99%AF&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E8%83%8C%E6%99%AF&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;算法部分：包含 PyTorch、XGBoost&lt;/li&gt;
+&lt;li&gt;后端部分：使用 Flask 提供简单 API 服务&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;将算法后端打包成可直接部署的 Docker 镜像。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>Windows Scoop包管理，Terminal优化，WSL配置</title>
+      <link>https://blog.aoidayo.site/blog/windows-use/</link>
+      <pubDate>Fri, 17 Oct 2025 12:42:24 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/windows-use/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;1 / Windows 包管理 
+    &lt;div id=&#34;1--windows-%E5%8C%85%E7%AE%A1%E7%90%86&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#1--windows-%E5%8C%85%E7%AE%A1%E7%90%86&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;scoop 
+    &lt;div id=&#34;scoop&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#scoop&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;scoop 多开发环境配置使用教程：&lt;a href=&#34;https://www.xrgzs.top/posts/scoop-dev-setup&#34; target=&#34;_blank&#34;&gt;Scoop 搭建 Windows 开发环境 | 潇然工作室&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;scoop 必不可少的一环：如何使用 &lt;a href=&#34;https://zhuanlan.zhihu.com/p/463284082&#34; target=&#34;_blank&#34;&gt;(63 封私信 / 82 条消息) Scoop——也许是 Windows 平台最好用的软件（包）管理器 - 知乎&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.suqingyu.com/archives/b3803be6-a713-4aea-8638-58b5402811c5&#34; target=&#34;_blank&#34;&gt;Scoop | Windows 下的软件包管理神器 - 苏青羽的小窝&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;官网：&lt;a href=&#34;https://scoop.sh/#/&#34; target=&#34;_blank&#34;&gt;Scoop&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;windows 的包管理器之一，使用它下载一些比较轻量的软件/命令行工具、以及一些开发环境（类似 Debian 的 apt / brew）。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>魔改版RTX 2060 12G装驱动 的傻瓜式补充</title>
+      <link>https://blog.aoidayo.site/blog/2060m-extra/</link>
+      <pubDate>Tue, 14 Oct 2025 22:38:24 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/2060m-extra/</guid>
+      <description>&lt;p&gt;本文对这篇&lt;a href=&#34;https://221.ltd/archives/295&#34; target=&#34;_blank&#34;&gt;魔改版 RTX 2060 12G 装驱动 解决 43 错误 - Shaw&amp;rsquo;s Blog&lt;/a&gt; 做更详细的傻瓜式补充。&lt;/p&gt;
+&lt;p&gt;实验室的这块 GPU 我在咸鱼上看了一下市价，6G 普遍都是四五百，12G 都要七八百了，这类魔改显卡芯片都是笔记本的。去年的时候我看值得买，里面讨论的 4090m 魔改版功耗比 Desltop 版差了一倍多，实际性能只能和 4070ti 掰手腕，我手上的这块 2060m 跑甜甜圈功耗也就在 120 左右。总之垃圾佬可以选择性的尝试甜品显卡的魔改版，高端一点的显卡还是不建议买魔改版。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>25-8</title>
+      <link>https://blog.aoidayo.site/moments/25-8/25-8/</link>
+      <pubDate>Wed, 03 Sep 2025 21:09:23 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/moments/25-8/25-8/</guid>
+      <description>&lt;p&gt;记录一点八月的流水账&lt;/p&gt;
+&lt;p&gt;八月总共就放了十天假，假期的最后几天先去上海找同学，在那边住了一晚后一起坐飞机去温州玩了两天。&lt;/p&gt;
+&lt;p&gt;在上海的时候，我们晚上从新天地那边游荡到外滩，然后又一路从和平饭店那一路游荡到八佰那栋四方仓库。&lt;/p&gt;</description>
+      
+    </item>
+    <item>
+      <title>Hugo 伪加密</title>
+      <link>https://blog.aoidayo.site/blog/encrypt/</link>
+      <pubDate>Thu, 22 May 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/encrypt/</guid>
+      <description>此文章包含加密内容。</description>
+      
+    </item>
+    <item>
+      <title>GNN中的scatter离散运算</title>
+      <link>https://blog.aoidayo.site/blog/scatter-in-gnn/</link>
+      <pubDate>Mon, 21 Apr 2025 20:25:21 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/scatter-in-gnn/</guid>
+      <description>&lt;link rel=&#34;stylesheet&#34; href=&#34;https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css&#34; /&gt;
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js&#34;&gt;&lt;/script&gt;
+
+&lt;script src=&#34;https://cdn.jsdelivr.net/npm/meting@2.0.1/dist/Meting.min.js&#34;&gt;&lt;/script&gt;
+&lt;style&gt;
+.aplayer-list-title {
+  color: #60a5fa !important;
+}
+.aplayer-title {
+  color: #60a5fa !important;
+}
+
+.aplayer-lrc p.aplayer-lrc-current {
+  color: #60a5fa !important;
+}
+.aplayer.aplayer-fixed .aplayer-lrc {
+  text-shadow: none;
+}
+&lt;/style&gt;
+&lt;meting-js
+  server=&#34;netease&#34;
+  type=&#34;song&#34;
+  id=&#34;2666749200&#34;
+  fixed=&#34;true&#34;
+  autoplay=&#34;false&#34;
+  loop=&#34;all&#34;
+  order=&#34;list&#34;
+  theme=&#34;#60A5FA&#34;
+  mini=&#34;false&#34;
+&gt;&lt;/meting-js&gt;
+&lt;p&gt;PyG中的图神经网络中，scatter和gather运算（离散和聚集）都是非常常见的操作。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/scatter-in-gnn/feature.jpeg" />
+    </item>
+    <item>
+      <title>Miniforge：Conda solving enviroment终结者</title>
+      <link>https://blog.aoidayo.site/blog/conda-or-mamba/</link>
+      <pubDate>Wed, 19 Mar 2025 22:00:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/conda-or-mamba/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;引言 
+    &lt;div id=&#34;%E5%BC%95%E8%A8%80&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E5%BC%95%E8%A8%80&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;conda在不启用libmamba时下载小包的速度就非常慢，一直 &lt;code&gt;solving enviroment...&lt;/code&gt; 容易让人狂躁，更不用说用它来安装 &lt;code&gt;pytorch&lt;/code&gt;。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/conda-or-mamba/feature.png" />
+    </item>
+    <item>
+      <title>24年年终总结</title>
+      <link>https://blog.aoidayo.site/blog/24-sum/</link>
+      <pubDate>Tue, 18 Mar 2025 07:00:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/24-sum/</guid>
+      <description>此文章包含加密内容。</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/24-sum/feature.jpg" />
+    </item>
+    <item>
+      <title>Git 清除.git仓库历史记录中的高存储占用文件</title>
+      <link>https://blog.aoidayo.site/blog/git-big/</link>
+      <pubDate>Fri, 28 Feb 2025 22:15:00 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/git-big/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;前言 
+    &lt;div id=&#34;%E5%89%8D%E8%A8%80&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E5%89%8D%E8%A8%80&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;最近使用 Git 管理 Unity 项目，误将 Unity 的&lt;code&gt;Filo Cables&lt;/code&gt;包&lt;code&gt;commit&amp;amp;push&lt;/code&gt;到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有&lt;code&gt;12MB+&lt;/code&gt;, 对于一个 Git 仓库来说还是太大了，所以需要即时从&lt;code&gt;.git&lt;/code&gt;中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/git-big/feature.png" />
+    </item>
+    <item>
+      <title>数据清洗</title>
+      <link>https://blog.aoidayo.site/report/raw-data-process/</link>
+      <pubDate>Sun, 09 Feb 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/report/raw-data-process/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;Refer 
+    &lt;div id=&#34;refer&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#refer&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;轨迹数据集
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.kaggle.com/competitions/pkdd-15-predict-taxi-service-trajectory-i/data&#34; target=&#34;_blank&#34;&gt;ECML/PKDD 15: Taxi Trajectory Prediction (I) | Kaggle&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;城市拓扑、路网/POI/城市边界
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;城市拓扑&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;OSM API (OpenStreetMap)
+&lt;ul&gt;
+&lt;li&gt;本质上 &lt;code&gt;osmnx&lt;/code&gt; 和 &lt;code&gt;overpass API&lt;/code&gt; 都是使用OSM的api获取&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 可以用于获取最新时间的路网数据&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Overpass API&lt;/strong&gt; &lt;a href=&#34;https://overpass.kumi.systems/#about&#34; target=&#34;_blank&#34;&gt;Overpass 官网 | Overpass by Private.coffee&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;OSM历史数据服务
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://download.geofabrik.de/&#34; target=&#34;_blank&#34;&gt;GeoFabrik&lt;/a&gt; 下载指定历史时间的城市路网数据（shp格式,由osm格式转换，路网数据丢失uv信息，当然包含很多富余数据）；同时提供osm.pbf格式的osm压缩数据,没有丢失信息，但是格式转换相当麻烦。&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.cnblogs.com/bltstop/p/18090135&#34; target=&#34;_blank&#34;&gt;Fabrik上下载的shp转OSM数据介绍及下载 - 百里屠苏top - 博客园&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;城市边界&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;osmnx&lt;/code&gt; 直接获取&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://gadm.org/index.html&#34; target=&#34;_blank&#34;&gt;GADM&lt;/a&gt;，提供全球行政区边界数据的网站，同时也可以下载路网数据。它支持按国家或地区单独索引和下载。不支持历史数据下载。
+&lt;ul&gt;
+&lt;li&gt;level0为国家信息，level1为省份边界信息，level2为城市边界信息，level3为县级信息&lt;/li&gt;
+&lt;li&gt;不能单shp文件读取&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;GeoFabrik可以获取部分&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;shapefile&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://wiki.openstreetmap.org/wiki/Zh-hans:Map_Features#.E5.85.AC.E8.B7.AF&#34; target=&#34;_blank&#34;&gt;road shapefile的highway枚举值说明&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;路网清洗&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/zdsjjtTLG/TrackIt&#34; target=&#34;_blank&#34;&gt;zdsjjtTLG/TrackIt: Map Matching Python Package Based on Hidden Markov Model(HMM)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2 class=&#34;relative group&#34;&gt;数据集 
+    &lt;div id=&#34;%E6%95%B0%E6%8D%AE%E9%9B%86&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%E6%95%B0%E6%8D%AE%E9%9B%86&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+&lt;p&gt;我们能拿到的数据集分为两种：&lt;/p&gt;</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/report/raw-data-process/feature.png" />
+    </item>
+    <item>
+      <title>使用hugo</title>
+      <link>https://blog.aoidayo.site/blog/use-hugo/</link>
+      <pubDate>Tue, 07 Jan 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/use-hugo/</guid>
+      <description>此文章包含加密内容。</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://blog.aoidayo.site/blog/use-hugo/feature.jpg" />
+    </item>
+    <item>
+      <title>Blog History</title>
+      <link>https://blog.aoidayo.site/blog/blog-history/</link>
+      <pubDate>Sat, 04 Jan 2025 15:38:16 +0800</pubDate>
+      
+      <guid>https://blog.aoidayo.site/blog/blog-history/</guid>
+      <description>&lt;h2 class=&#34;relative group&#34;&gt;FrameWork 
+    &lt;div id=&#34;framework&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#framework&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h2&gt;
+
+
+&lt;h3 class=&#34;relative group&#34;&gt;Typecho 24/1/? 
+    &lt;div id=&#34;typecho-241&#34; class=&#34;anchor&#34;&gt;&lt;/div&gt;
+    
+    &lt;span
+        class=&#34;absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100&#34;&gt;
+        &lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34;
+            style=&#34;text-decoration-line: none !important;&#34; href=&#34;#typecho-241&#34; aria-label=&#34;锚点&#34;&gt;#&lt;/a&gt;
+    &lt;/span&gt;        
+    
+&lt;/h3&gt;
+&lt;p&gt;wordpress的精简版本，用docker装容易产生&lt;code&gt;nginx的user:www-data&lt;/code&gt; 权限问题，在使用时必须没写完一篇文章就&lt;code&gt;sudo chmod -Rf 777 typecho/&lt;/code&gt;一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。&lt;/p&gt;</description>
+      
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr" class="scroll-smooth" data-default-appearance="dark"
+  data-auto-appearance="true"><head>
+	<meta name="generator" content="Hugo 0.143.1">
+  <meta charset="utf-8" />
+  
+  <meta http-equiv="content-language" content="zh-cn" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  
+  <title>Aoidayo</title>
+  <meta name="title" content="Aoidayo" />
+  
+  
+  
+  
+  
+  
+  <link rel="canonical" href="https://blog.aoidayo.site/" />
+  
+  <link rel="alternate" type="application/rss+xml" href="/index.xml" title="Aoidayo" />
+  
+  <link rel="alternate" type="application/json" href="/index.json" title="Aoidayo" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link type="text/css" rel="stylesheet" href="/css/main.bundle.min.209b963de9cd9addd8aefce3e3383d6b892ec30ca78d585ea5193da43fa54f34f578a89313b4d415e129f0b1056d4853bf2e8fc7e957cf8cbd200210f1ed3399.css"
+    integrity="sha512-IJuWPenNmt3Yrvzj4zg9a4kuwwynjVhepRk9pD&#43;lTzT1eKiTE7TUFeEp8LEFbUhTvy6Px&#43;lXz4y9IAIQ8e0zmQ==" />
+  
+  
+  <script type="text/javascript" src="/js/appearance.min.516a16745bea5a9bd011138d254cc0fd3973cd55ce6e15f3dec763e7c7c2c7448f8fe7b54cca811cb821b0c7e12cd161caace1dd794ac3d34d40937cbcc9ee12.js"
+    integrity="sha512-UWoWdFvqWpvQERONJUzA/TlzzVXObhXz3sdj58fCx0SPj&#43;e1TMqBHLghsMfhLNFhyqzh3XlKw9NNQJN8vMnuEg=="></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script defer type="text/javascript" id="script-bundle" src="/js/main.bundle.min.3a806f3a5d8c300261f22306cc9479131229c6a337945d87cc9709a1f29abac614de6736c85ac60168bbbdf9520c92c9410edb136a37e7fe638c2625660579e7.js"
+    integrity="sha512-OoBvOl2MMAJh8iMGzJR5ExIpxqM3lF2HzJcJofKausYU3mc2yFrGAWi7vflSDJLJQQ7bE2o35/5jjCYlZgV55w==" data-copy="" data-copied=""></script>
+  
+  
+  
+  <script src="/lib/zoom/zoom.min.37d2094687372da3f7343a221a470f6b8806f7891aa46a5a03966af7f0ebd38b9fe536cb154e6ad28f006d184b294525a7c4054b6bbb4be62d8b453b42db99bd.js" integrity="sha512-N9IJRoc3LaP3NDoiGkcPa4gG94kapGpaA5Zq9/Dr04uf5TbLFU5q0o8AbRhLKUUlp8QFS2u7S&#43;Yti0U7QtuZvQ=="></script>
+  
+  
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:url" content="https://blog.aoidayo.site/">
+  <meta property="og:site_name" content="Aoidayo">
+  <meta property="og:title" content="Aoidayo">
+  <meta property="og:description" content="备用博客 (防止github page挂了)
+学生
+绝望南通人 斗破苍穹/JUMP/阿梓 Recent Blogs 使用Prometheus和Grafana监控mysql主从延迟和慢查询 2026年09月29日 22時01分·5921 字 Blog Mysql Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL 2026年09月27日 21時56分·1804 字 Blog Mysql 飞牛nmbd进程内存泄露 2026年08月07日 13時11分·446 字 Blog Linux go mod依赖源码本地修改与调试 2026年08月04日 16時21分·710 字 Blog Go VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 2026年07月21日 16時44分·1574 字 Blog Docker Vaultwarden Bitwarden 小说Collection 2026年06月20日 15時38分·4049 字 Blog 轻小说 CertBot自动化SSL证书部署 2026年03月02日 19時58分·1707 字 Blog 运维 公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 2026年03月02日 19時45分·1980 字 Blog TailScale 网络 薅微软Rewards羊毛：更快的滑动拼图方法 2026年02月20日 16時57分·3014 字 Blog 2025：时间的魔法 2026年02月13日 10時36分·1144 字 Blog More Posts">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="website">
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Aoidayo">
+  <meta name="twitter:description" content="备用博客 (防止github page挂了)
+学生
+绝望南通人 斗破苍穹/JUMP/阿梓 Recent Blogs 使用Prometheus和Grafana监控mysql主从延迟和慢查询 2026年09月29日 22時01分·5921 字 Blog Mysql Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL 2026年09月27日 21時56分·1804 字 Blog Mysql 飞牛nmbd进程内存泄露 2026年08月07日 13時11分·446 字 Blog Linux go mod依赖源码本地修改与调试 2026年08月04日 16時21分·710 字 Blog Go VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法 2026年07月21日 16時44分·1574 字 Blog Docker Vaultwarden Bitwarden 小说Collection 2026年06月20日 15時38分·4049 字 Blog 轻小说 CertBot自动化SSL证书部署 2026年03月02日 19時58分·1707 字 Blog 运维 公网ip收回后：利用TailScale&#43;自建中转Derp实现异地组网 2026年03月02日 19時45分·1980 字 Blog TailScale 网络 薅微软Rewards羊毛：更快的滑动拼图方法 2026年02月20日 16時57分·3014 字 Blog 2025：时间的魔法 2026年02月13日 10時36分·1144 字 Blog More Posts">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https:\/\/blog.aoidayo.site\/",
+    "name": "Aoidayo",
+    
+    "inLanguage": "zh-cn",
+    "url": "https:\/\/blog.aoidayo.site\/",
+    
+    "publisher" : {
+      "@type": "Person",
+      "name": "Aoidayo"
+    }
+  }
+  </script>
+
+
+  
+  
+  
+  <meta name="author" content="Aoidayo" />
+  
+  
+  
+  <link href="https://github.com/aoidayo" rel="me" />
+  
+  
+  <link href="https://space.bilibili.com/23522093" rel="me" />
+  
+  
+  
+  
+
+<script src="/lib/jquery/jquery.slim.min.b0dca576e87d7eaa5850ae4e61759c065786cdb6489d68fcc82240539eebd5da522bdb4fda085ffd245808c8fe2acb2516408eb774ef26b5f6015fc6737c0ea8.js" integrity="sha512-sNylduh9fqpYUK5OYXWcBleGzbZInWj8yCJAU57r1dpSK9tP2ghf/SRYCMj&#43;KsslFkCOt3TvJrX2AV/Gc3wOqA=="></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script defer src="/lib/typeit/typeit.umd.57f9bc6e047efc875cb4f2e9ca74c802de33638d2c3aff6d9b7eb3c7588c24649b6c3e51cd45f49c0ed0cf72aedbd694bf2d35f358a34076d63f9febabc0bd6f.js" integrity="sha512-V/m8bgR&#43;/IdctPLpynTIAt4zY40sOv9tm36zx1iMJGSbbD5RzUX0nA7Qz3Ku29aUvy0181ijQHbWP5/rq8C9bw=="></script>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-L93JFY81SM');
+</script>
+
+
+
+  
+  
+  <meta name="theme-color"/>
+  
+  
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/style.min.css" />
+</head>
+<body
+  class="flex flex-col h-screen px-6 m-auto text-lg leading-7 max-w-7xl bg-neutral text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32 scrollbar-thin scrollbar-track-neutral-200 scrollbar-thumb-neutral-400 dark:scrollbar-track-neutral-800 dark:scrollbar-thumb-neutral-600">
+  <div id="the-top" class="absolute flex self-center">
+    <a class="px-3 py-1 text-sm -translate-y-8 rounded-b-lg bg-primary-200 focus:translate-y-0 dark:bg-neutral-600"
+      href="#main-content"><span
+        class="font-bold text-primary-600 ltr:pr-2 rtl:pl-2 dark:text-primary-400">&darr;</span>跳过正文</a>
+  </div>
+  
+  
+  <div class="min-h-[148px]"></div>
+<div class="fixed inset-x-0 pl-[24px] pr-[24px]" style="z-index:100">
+  <div id="menu-blur" class="absolute opacity-0 inset-x-0 top-0 h-full single_hero_background nozoom backdrop-blur-2xl shadow-2xl"></div>
+  <div class="relative max-w-[64rem] ml-auto mr-auto">
+    <div style="padding-left:0;padding-right:0;padding-top:2px;padding-bottom:3px"
+    class="main-menu flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start gap-x-3">
+    
+    <div class="flex flex-1 items-center justify-between">
+        <nav class="flex space-x-3">
+
+            
+            <a href="/" class="text-base font-medium text-gray-500 hover:text-gray-900">Aoidayo</a>
+            
+
+        </nav>
+        <nav class="hidden md:flex items-center gap-x-5 md:ml-12 h-12">
+
+            
+            
+            
+  <a href="/blog/"  class="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+    
+    <p class="text-base font-medium" title="">
+        blog
+    </p>
+</a>
+
+
+
+            
+            
+
+            
+
+
+            
+            <button id="search-button" aria-label="Search" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
+                title="">
+                
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+            </button>
+            
+
+
+            
+            
+            <div
+                class=" flex items-center">
+                <button id="appearance-switcher" aria-label="Dark mode switcher" type="button" class="text-base hover:text-primary-600 dark:hover:text-primary-400">
+                    <div class="flex items-center justify-center dark:hidden">
+                        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M32 256c0-123.8 100.3-224 223.8-224c11.36 0 29.7 1.668 40.9 3.746c9.616 1.777 11.75 14.63 3.279 19.44C245 86.5 211.2 144.6 211.2 207.8c0 109.7 99.71 193 208.3 172.3c9.561-1.805 16.28 9.324 10.11 16.95C387.9 448.6 324.8 480 255.8 480C132.1 480 32 379.6 32 256z"/></svg>
+
+  </span>
+
+
+                    </div>
+                    <div class="items-center justify-center hidden dark:flex">
+                        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 159.1c-53.02 0-95.1 42.98-95.1 95.1S202.1 351.1 256 351.1s95.1-42.98 95.1-95.1S309 159.1 256 159.1zM509.3 347L446.1 255.1l63.15-91.01c6.332-9.125 1.104-21.74-9.826-23.72l-109-19.7l-19.7-109c-1.975-10.93-14.59-16.16-23.72-9.824L256 65.89L164.1 2.736c-9.125-6.332-21.74-1.107-23.72 9.824L121.6 121.6L12.56 141.3C1.633 143.2-3.596 155.9 2.736 164.1L65.89 256l-63.15 91.01c-6.332 9.125-1.105 21.74 9.824 23.72l109 19.7l19.7 109c1.975 10.93 14.59 16.16 23.72 9.824L256 446.1l91.01 63.15c9.127 6.334 21.75 1.107 23.72-9.822l19.7-109l109-19.7C510.4 368.8 515.6 356.1 509.3 347zM256 383.1c-70.69 0-127.1-57.31-127.1-127.1c0-70.69 57.31-127.1 127.1-127.1s127.1 57.3 127.1 127.1C383.1 326.7 326.7 383.1 256 383.1z"/></svg>
+
+  </span>
+
+
+                    </div>
+                </button>
+            </div>
+            
+
+        </nav>
+        <div class="flex md:hidden items-center gap-x-5 md:ml-12 h-12">
+
+            <span></span>
+
+            
+
+
+            
+            <button id="search-button-mobile" aria-label="Search" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
+                title="">
+                
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+            </button>
+            
+
+            
+            
+            <button id="appearance-switcher-mobile" aria-label="Dark mode switcher" type="button" class="text-base hover:text-primary-600 dark:hover:text-primary-400 ltr:mr-1 rtl:ml-1">
+                <div class="flex items-center justify-center dark:hidden">
+                    
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M32 256c0-123.8 100.3-224 223.8-224c11.36 0 29.7 1.668 40.9 3.746c9.616 1.777 11.75 14.63 3.279 19.44C245 86.5 211.2 144.6 211.2 207.8c0 109.7 99.71 193 208.3 172.3c9.561-1.805 16.28 9.324 10.11 16.95C387.9 448.6 324.8 480 255.8 480C132.1 480 32 379.6 32 256z"/></svg>
+
+  </span>
+
+
+                </div>
+                <div class="items-center justify-center hidden dark:flex">
+                    
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 159.1c-53.02 0-95.1 42.98-95.1 95.1S202.1 351.1 256 351.1s95.1-42.98 95.1-95.1S309 159.1 256 159.1zM509.3 347L446.1 255.1l63.15-91.01c6.332-9.125 1.104-21.74-9.826-23.72l-109-19.7l-19.7-109c-1.975-10.93-14.59-16.16-23.72-9.824L256 65.89L164.1 2.736c-9.125-6.332-21.74-1.107-23.72 9.824L121.6 121.6L12.56 141.3C1.633 143.2-3.596 155.9 2.736 164.1L65.89 256l-63.15 91.01c-6.332 9.125-1.105 21.74 9.824 23.72l109 19.7l19.7 109c1.975 10.93 14.59 16.16 23.72 9.824L256 446.1l91.01 63.15c9.127 6.334 21.75 1.107 23.72-9.822l19.7-109l109-19.7C510.4 368.8 515.6 356.1 509.3 347zM256 383.1c-70.69 0-127.1-57.31-127.1-127.1c0-70.69 57.31-127.1 127.1-127.1s127.1 57.3 127.1 127.1C383.1 326.7 326.7 383.1 256 383.1z"/></svg>
+
+  </span>
+
+
+                </div>
+            </button>
+            
+
+        </div>
+    </div>
+    <div class="-my-2 md:hidden">
+
+        <label id="menu-button" class="block">
+            
+            <div class="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+                
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/></svg>
+
+  </span>
+
+
+            </div>
+            <div id="menu-wrapper" style="padding-top:5px;"
+                class="fixed inset-0 z-30 invisible w-screen h-screen m-0 overflow-auto transition-opacity opacity-0 cursor-default bg-neutral-100/50 backdrop-blur-sm dark:bg-neutral-900/50">
+                <ul
+                    class="flex space-y-2 mt-3 flex-col items-end w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl">
+
+                    <li id="menu-close-button">
+                        <span
+                            class="cursor-pointer inline-block align-text-bottom hover:text-primary-600 dark:hover:text-primary-400">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/></svg>
+
+  </span>
+
+</span>
+                    </li>
+
+                    
+
+                    
+  <li class="mt-1">
+    <a href="/blog/"  class="flex items-center text-gray-500 hover:text-primary-600 dark:hover:text-primary-400">
+        
+        <p class="text-bg font-bg" title="">
+            blog
+        </p>
+    </a>
+</li>
+
+
+
+
+                    
+
+                </ul>
+                
+                
+
+            </div>
+        </label>
+    </div>
+</div>
+
+
+
+
+<script>
+    (function () {
+        var $mainmenu = $('.main-menu');
+        var path = window.location.pathname;
+        $mainmenu.find('a[href="' + path + '"]').each(function (i, e) {
+            $(e).children('p').addClass('active');
+        });
+    })();
+</script>
+
+
+  </div>
+</div>
+<script>
+  window.addEventListener('scroll', function (e) {
+    var scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    var background_blur = document.getElementById('menu-blur');
+    background_blur.style.opacity = (scroll / 300);
+  });
+</script>
+
+  
+  <div class="relative flex flex-col grow">
+    <main id="main-content" class="grow">
+      
+  
+  
+    
+<article class="max-w-full prose dark:prose-invert">
+    <div class="relative">
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gray-100"></div>
+        <div class="mx-auto max-w-7xl p-0">
+            <div class="relative sm:overflow-hidden">
+                <div class="fixed inset-x-0 top-0" style="z-index:-10">
+                    
+                    
+                        
+                            
+                        
+                    
+                    
+                        
+                            
+                        
+                    
+                    
+                    <img class="w-full h-[1000px] object-cover m-0 nozoom" src="/background-azusa-bear_17006142351649898244.png" role="presentation">
+                    <div
+                        class="absolute inset-0 h-[1000px] bg-gradient-to-t from-neutral dark:from-neutral-800 to-transparent mix-blend-normal">
+                    </div>
+                    <div
+                        class="opacity-60 absolute inset-0 h-[1000px] bg-gradient-to-t from-neutral dark:from-neutral-800 to-neutral-100 dark:to-neutral-800 mix-blend-normal">
+                    </div>
+                    
+                </div>
+                <div class="relative px-1 py-1 flex flex-col items-center justify-center text-center">
+                    
+                        
+                        
+                            
+                        
+                        
+                            
+                                
+                            
+                            <img class="mb-2 rounded-full h-36 w-36" width="144" height="144"
+                                alt="Aoidayo" src="/img/icon_hu_338d8b026b402e47.jpeg" />
+                        
+                    
+                    <h1 class="mb-2 text-4xl font-extrabold text-neutral-800 dark:text-neutral-200">
+                        Aoidayo
+                    </h1>
+                    
+                    <h2 class="mt-0 mb-0 text-xl text-neutral-800 dark:text-neutral-300">
+                        语言的界限
+                    </h2>
+                    
+                    <div class="mt-3 mb-10 text-2xl">
+                        
+                        <div class="flex flex-wrap">
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="https://github.com/aoidayo" target="_blank"
+                                aria-label="Github" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+
+  </span>
+
+</a>
+                            
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="https://space.bilibili.com/23522093" target="_blank"
+                                aria-label="Bilibili" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+  </span>
+
+</a>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                    <section class="prose dark:prose-invert"><p><a href="https://you.aoidayo.site:1024/" target="_self">备用博客</a> (防止github page挂了)<br></p>
+<div>
+学生<br>
+绝望南通人 <br>
+<a href='https://book.qidian.com/info/1209977/' target="_blank">斗破苍穹</a>/JUMP/<a href="https://space.bilibili.com/7706705" target="_blank">阿梓</a> <br>
+</div>
+<!-- <a
+  class="!rounded-md bg-primary-600 px-4 py-2 !text-neutral !no-underline hover:!bg-primary-500 dark:bg-primary-800 dark:hover:!bg-primary-700"
+  href="/posts"
+  target="_self"
+  
+  role="button"
+>
+  
+Posts
+
+</a>
+ -->
+<!-- <div class="lead text-neutral-500 dark:text-neutral-400 !mb-9 text-xl">
+  :wave: Hi there!
+</div>
+ -->
+<!-- I game too much. I also write words onto this site sometimes.  -->
+<!-- <the-fold></the-fold> -->
+
+
+
+
+
+
+
+<h2 class="mt-20 text-2xl font-extrabold mb-10">Recent Blogs</h2>
+
+
+
+
+<section class="space-y-10 w-full mt-10 mb-10">
+    
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/mysql-monitor/">
+    
+        
+        <div class="w-full md:w-auto h-full thumbnail nozoom thumbnailshadow md:mr-7" style="background-image:url(/blog/mysql-monitor/feature_hu_87ad0a1525109d79.png);"></div>
+        
+      <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/mysql-monitor/">使用Prometheus和Grafana监控mysql主从延迟和慢查询</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-09-29T22:01:19&#43;08:00">2026年09月29日 22時01分</time><span class="px-2 text-primary-500">&middot;</span><span>5921 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/mysql/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Mysql
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/mysql-s1mple-ha/">
+    
+        
+        <div class="w-full md:w-auto h-full thumbnail nozoom thumbnailshadow md:mr-7" style="background-image:url(/blog/mysql-s1mple-ha/feature_hu_a17c38748df60fcf.jpg);"></div>
+        
+      <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/mysql-s1mple-ha/">Mysql简单高可用搭建: 异步主从复制+Orchestrator+ProxySQL</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-09-27T21:56:00&#43;08:00">2026年09月27日 21時56分</time><span class="px-2 text-primary-500">&middot;</span><span>1804 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/mysql/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Mysql
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/linux/nmbd/">
+    <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/linux/nmbd/">飞牛nmbd进程内存泄露</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-08-07T13:11:40&#43;08:00">2026年08月07日 13時11分</time><span class="px-2 text-primary-500">&middot;</span><span>446 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/linux/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Linux
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/go/go-dependency-debug/">
+    
+        
+        <div class="w-full md:w-auto h-full thumbnail nozoom thumbnailshadow md:mr-7" style="background-image:url(/go/go-dependency-debug/feature_rc_hu_fca1cf01ebe475be.png);"></div>
+        
+      <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/go/go-dependency-debug/">go mod依赖源码本地修改与调试</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-08-04T16:21:45&#43;08:00">2026年08月04日 16時21分</time><span class="px-2 text-primary-500">&middot;</span><span>710 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/go/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Go
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/dockers/vw-bw-up-down-grade/">
+    <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/dockers/vw-bw-up-down-grade/">VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-07-21T16:44:34&#43;08:00">2026年07月21日 16時44分</time><span class="px-2 text-primary-500">&middot;</span><span>1574 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/docker/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Docker
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/vaultwarden/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Vaultwarden
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/bitwarden/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Bitwarden
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/novel-collection/">
+    <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/novel-collection/">小说Collection</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-06-20T15:38:52&#43;08:00">2026年06月20日 15時38分</time><span class="px-2 text-primary-500">&middot;</span><span>4049 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/%E8%BD%BB%E5%B0%8F%E8%AF%B4/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    轻小说
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/auto-ssl/">
+    <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/auto-ssl/">CertBot自动化SSL证书部署</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-03-02T19:58:04&#43;08:00">2026年03月02日 19時58分</time><span class="px-2 text-primary-500">&middot;</span><span>1707 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/%E8%BF%90%E7%BB%B4/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    运维
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/s2s-vpn/">
+    
+        
+        <div class="w-full md:w-auto h-full thumbnail nozoom thumbnailshadow md:mr-7" style="background-image:url(/blog/s2s-vpn/feature_hu_38aadaafd86bae85.png);"></div>
+        
+      <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/s2s-vpn/">公网ip收回后：利用TailScale+自建中转Derp实现异地组网</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-03-02T19:45:56&#43;08:00">2026年03月02日 19時45分</time><span class="px-2 text-primary-500">&middot;</span><span>1980 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/tailscale/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    TailScale
+  </span>
+</span>
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/%E7%BD%91%E7%BB%9C/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    网络
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/ms-rewards-puzzle/">
+    <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/ms-rewards-puzzle/">薅微软Rewards羊毛：更快的滑动拼图方法</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-02-20T16:57:55&#43;08:00">2026年02月20日 16時57分</time><span class="px-2 text-primary-500">&middot;</span><span>3014 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+            
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article " href="/blog/25-sum/">
+    
+        
+        <div class="w-full md:w-auto h-full thumbnail nozoom thumbnailshadow md:mr-7" style="background-image:url(/blog/25-sum/feature_hu_da25c71f2272a840.jpeg);"></div>
+        
+      <div class=" mt-3 md:mt-0">
+      <div class="items-center text-left text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/blog/25-sum/">2025：时间的魔法</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2026-02-13T10:36:02&#43;08:00">2026年02月13日 10時36分</time><span class="px-2 text-primary-500">&middot;</span><span>1144 字</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/categories/blog/&#34;,'_self');return false;">
+    <span class="flex" style="cursor: pointer;">
+  <span class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">
+    Blog
+  </span>
+</span>
+  </span>
+  
+  
+  
+  
+  
+  
+  
+  
+</div>
+
+
+
+
+      </div>
+      
+    </div>
+  </a>
+
+            
+        
+    
+</section>
+
+
+
+<!-- 
+
+
+
+
+
+
+<h2 class="mt-20 text-2xl font-extrabold mb-10">Samples</h2>
+
+
+
+
+<section class="space-y-10 w-full mt-10 mb-10">
+    
+        
+    
+</section>
+
+
+ -->
+<a
+  class="!rounded-md bg-primary-600 px-4 py-2 !text-neutral !no-underline hover:!bg-primary-500 dark:bg-primary-800 dark:hover:!bg-primary-700"
+  href="/blog"
+  target="_self"
+  
+  role="button"
+>
+  
+More Posts
+
+</a>
+
+<!-- <h3 style='color:#CBD5E1'> -->
+<div class="typeit-random-quote">
+    <h3 id="typeit-ba99f2ea1ca0c81d8373454e26729d34"></h3>
+    <div id="typeit-ba99f2ea1ca0c81d8373454e26729d34-speaker" class="typeit-quote-speaker" hidden></div>
+    <div id="typeit-ba99f2ea1ca0c81d8373454e26729d34-source" class="typeit-quote-source" hidden></div>
+</div><script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const contentStrings = [""];
+      const quoteData = [{"en":"I do not want to work, whatever it may be said by whom.","source":"无职转生 小说 第一卷 卷首语","zh":"眼前是悬崖。要往前踏出一步狠狠摔向地面，或者想裹足不前继续承受辱骂，都是你的自由。"},{"en":"It is difficult for inoccupation to attach a leg to the ground and to work.","source":"无职转生 小说 第二卷 卷首语","zh":"获得自由羽翼的人，将会失去双脚作为代价吧。"},{"en":"Since working is very difficult, please do not say simply.","source":"无职转生 小说 第三卷 卷首语","zh":"我能轻松办到的事情，你无法办到；你能轻松办到的事情，我无法办到。就只是这么一回事。"},{"en":"It will not be blameed if it can be the same as everybody.","source":"无职转生 小说 第四卷 卷首语","zh":"人人不同，每个人都好；人人相同，那就更好。"},{"en":"The way of daring to become inoccupation.","source":"无职转生 小说 第五卷 卷首语","zh":"懂得败北滋味的人，是强者。"},{"en":"The moment hope could be seen, it is the easiest to be thrust down into hell.","source":"无职转生 小说 第六卷 卷首语","zh":"并非每个人，都能够活得自由自在。"},{"en":"Two dimensions are most as expected.","source":"无职转生 小说 第七卷 卷首语","zh":"要在女人面前耍猴戏是无所谓，但是要被当猴子耍可就完全免谈。"},{"en":"True prosperity is ahead of the pain.","source":"无职转生 小说 第八卷 卷首语","zh":"若想求苦，就往前行；如要寻乐，另去他方。"},{"en":"When having to exert oneself, I have that.","source":"无职转生 小说 第九卷 卷首语","zh":"即使被人摆布、嘲笑，仍然会有所收获。"},{"en":"Neet is zombie.","source":"无职转生 小说 第十卷 卷首语","zh":"结婚是人生的坟墓。"},{"en":"When it coule be understood so, it'll be the best family.","source":"无职转生 小说 第十一卷 卷首语","zh":"兄弟姊妹适合自己最接近，最相像，也是最难以理解的生物。"},{"en":"When my father dies and my mother has got ill, what should be made neatness?","source":"无职转生 小说 第十二卷 卷首语","zh":"残酷到让人无法正视的现实想必会到来。"},{"en":"The person who abandoned his family has got the family who isn't deserted.","source":"无职转生 小说 第十三卷 卷首语","zh":"把认定为多余并舍弃的事物再度捡回时，就会明白其价值。"},{"en":"It's because I'm looking for the place where I should aim at an unemployed one.","source":"无职转生 小说 第十四卷 卷首语","zh":"我没有在努力？是因为你的目标在其他地方，才会这么认为。"},{"en":"Defeat isn't shame. Compliance is significant.","source":"无职转生 小说 第十五卷 卷首语","zh":"就算吃了败仗，人生还是得继续过下去。"},{"en":"People wish for the king who can shower cheer.","source":"无职转生 小说 第十六卷 卷首语","zh":"与其辱骂，不如给予喝彩。"},{"en":"The will which isn't broken maintains trust.","source":"无职转生 小说 第十七卷 卷首语","zh":"行动、言语以及金钱，有各式各样的事物会破坏信赖。"},{"en":"It's decided whether a person or doesn't permit.","source":"无职转生 小说 第十八卷 卷首语","zh":"在这个世上，有些事能够原谅，有些事则无法饶恕。"},{"en":"After died understand.","source":"无职转生 小说 第十九卷 卷首语","zh":"我一辈子都无法和他互相理解。"},{"en":"Time is gentle. Always make us choose.","source":"无职转生 小说 第二十卷 卷首语","zh":"时间残酷。总是会要求我们做出选择。"},{"en":"Ever if it's wrongit's affection.","source":"无职转生 小说 第二十一卷 卷首语","zh":"再怎么混蛋，父母还是父母。"},{"en":"Grow in my communication ability.","source":"无职转生 小说 第二十二卷 卷首语","zh":"是从何时开始呢？回过神来，已经能轻松地拜托朋友。"},{"en":"I don't need anything special happily.","source":"无职转生 小说 第二十三卷 卷首语","zh":"不幸是由细枝末节的小事开始。"},{"en":"There is man who accomplished a great achievement.","source":"无职转生 小说 第二十四卷 卷首语","zh":"根本没有天才。"},{"en":"When challenging to exceed one hundred percent, it can grow.","source":"无职转生 小说 第二十五卷 卷首语","zh":"只要以七成的力量或者，人生就会一帆风顺。"},{"en":"I worked hard, lived hard, died happy. I was satisfied.","source":"无职转生 小说 第二十六卷 卷首语","zh":"我踏出了一步，因为诸多幸运的加持，让我走完了自己的人生。不是每个人都会死，也不是每个人都很好运。要怎么做，是你的自由。"},{"en":"It may look like a calm life, but it's hard.","source":"无职转生 特典 蛇足篇 第一卷 卷首语","zh":"即使看在旁人眼里过着平稳的人生，对本人而言却经历了风风雨雨。"},{"en":"Do what you want to do even if you are angry.","source":"无职转生 特典 蛇足篇 第二卷 卷首语","zh":"即使身处压迫之中，梦想也不会终结。"},{"en":"People will always have their charms.","source":"无职转生 特典 蛇足篇 第三卷 卷首语","zh":"没有人是完美的。每个人都一定会有某个缺点。"},{"en":"I do not want to work, whatever it may be said by whom.","source":"无职转生 漫画 第一卷 卷首语","zh":"眼前是悬崖。要往前踏出一步狠狠摔向地面，或者想裹足不前继续承受辱骂，都是你的自由。"},{"en":"It is difficult for inoccupation to attach a leg to the ground and to work.","source":"无职转生 漫画 第二卷 卷首语","zh":"获得自由羽翼的人，将会失去双脚作为代价吧。"},{"en":"The resolution judged from a white eye from the world.","source":"无职转生 漫画 第三卷 卷首语","zh":"金钱名誉皆非必须，唯有觉悟才是。"},{"en":"Since working is very difficult, please do not say simply.","source":"无职转生 漫画 第四卷 卷首语","zh":"我能轻松办到的事情，你无法办到；然而也有你才能轻易完成的事。如此而已。"},{"en":"Friendship is made with time and behabior.","source":"无职转生 漫画 第五卷 卷首语","zh":"以言语开始的友情，十分脆弱易毁。"},{"en":"It will not be blameed if it can be the same as everybody.","source":"无职转生 漫画 第六卷 卷首语","zh":"人人不同，每个人都好；人人相同，那就更好。"},{"en":"The way of daring to become inoccupation.","source":"无职转生 漫画 第七卷 卷首语","zh":"懂得败北滋味的人，是强者。"},{"en":"I get away for the friend who doesn't have to be good man.","source":"无职转生 漫画 第八卷 卷首语","zh":"新朋友未必是品行良善之人。"},{"en":"The moment hope could be seen, it is the easiest to be thrust down into hell.","source":"无职转生 漫画 第九卷 卷首语","zh":"并非每个人，都能够活得自由自在。"},{"en":"Two dimensions are most as expected.","source":"无职转生 漫画 第十卷 卷首语","zh":"要在女人面前耍猴戏是无所谓，但是要被当猴子耍可就完全免谈。"},{"en":"True prosperity is ahead of the pain.","source":"无职转生 漫画 第十一卷 卷首语","zh":"若想求苦，就往前行；如要寻乐，另去他方。"},{"en":"When having to exert oneself, I have that.","source":"无职转生 漫画 第十二卷 卷首语","zh":"即使被人摆布、嘲笑，仍然会有所收获。"},{"en":"Only the person who brought up with affection can make a flower of a large wheelbloom.","source":"无职转生 漫画 第十三卷 卷首语","zh":"唯有伸出手的人，才能摘得高岭之花。"},{"en":"It's unnecessary, I'm afraid.","source":"无职转生 漫画 第十四卷 卷首语","zh":"狐假虎威之人，无需恐惧。"},{"en":"The home for you is the foreign land fo me.","source":"无职转生 漫画 第十五卷 卷首语","zh":"有两处家乡者，会视何处为他乡？"},{"en":"When there is also help by an impoosible thing by itself, it's got over.","source":"无职转生 漫画 第十六卷 卷首语","zh":"即使如何努力，仍然会有无能为力的事。"},{"en":"Neet is zombie.","source":"无职转生 漫画 第十七卷 卷首语","zh":"结婚是人生的坟墓。"},{"en":"Living means connecting with people and blending into the environment.","source":"无职转生 漫画 第十八卷 卷首语","zh":"食衣住行的住，并非仅是指床铺而已。（衣食住の住は、寝床だけを指す言葉ではない。）"},{"en":"When it could be understood so, it'll be the best family.","source":"无职转生 漫画 第十九卷 卷首语","zh":"兄弟姊妹是和自己最接近，最相像，也是最难以理解的生物。"},{"en":"Families are not neighbors.","source":"无职转生 漫画 第二十卷 卷首语","zh":"姐妹之间不存在友情。（姉妹に友情は存在しない）"},{"en":"You don't know how great a father is until you become one yourself.","source":"无职转生 漫画 第二十一卷 卷首语","zh":"父亲就是偶尔很伟大，平时却渺小，仿佛朋友的人。（父とは時として偉大であるが、常は矮小であり、友人のようでもある。）"},{"en":"Time flies when you turn your back on reality.","source":"无职转生 漫画 第二十二卷 卷首语","zh":"怀抱着希望勇往直前，明天必定会到来。（希望を見据えて前を向けば、明日は必ずやってくる。）"},{"en":"When my father dies and my mother has got ill, what should be made neatness?","source":"无职转生 漫画 第二十三卷 卷首语","zh":"残酷到让人无法正视的显示想必会到来。（目を背けたくなるほど残酷な現実は、必すやってくるだろう。）"},{"en":"You can forgive others on your own terms.","source":"无职转生 漫画 第二十四卷（无台版） 卷首语","zh":"人には許せないことが存在する。"},{"en":"It's important to make an effort even without a goal.","source":"无职转生 漫画 第二十五卷（无台版） 卷首语","zh":"努力が裏切ることはないが、努力が実を結ぶとは限らない（努力不会背叛你，但努力也未必一定会结出果实。）"},{"en":"The one you have got is the compilation by which everything is the past.","source":"无职转生 特典 转移迷宫篇广播剧CD（无台版） 卷首语","zh":"昨天失去的东西很多，但明天得到的东西会更多。"}];
+      const randomCount = Math.min( 1 , quoteData.length);
+      const escapeHtml = function (value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          }[character];
+        });
+      };
+
+      let strings = contentStrings;
+      if (randomCount > 0) {
+        const shuffled = quoteData.slice();
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+          const randomIndex = Math.floor(Math.random() * (index + 1));
+          [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+        }
+
+        const selectedQuotes = shuffled.slice(0, randomCount);
+        const speakerElement = document.getElementById("typeit-ba99f2ea1ca0c81d8373454e26729d34-speaker");
+        const sourceElement = document.getElementById("typeit-ba99f2ea1ca0c81d8373454e26729d34-source");
+        const speakers = selectedQuotes.map(function (quote) {
+          return quote.speaker || "鲁迪乌斯";
+        }).filter(Boolean);
+        const sources = selectedQuotes.map(function (quote) {
+          return quote.source || "";
+        }).filter(Boolean);
+
+        if (speakers.length > 0) {
+          speakerElement.textContent = [...new Set(speakers)].join(" / ");
+          speakerElement.hidden = false;
+        }
+
+        if (sources.length > 0) {
+          sourceElement.textContent = sources.join(" / ");
+          sourceElement.hidden = false;
+        }
+
+        strings = [selectedQuotes.map(function (quote) {
+          const zh = escapeHtml(quote.zh || "");
+          const en = escapeHtml(quote.en || "");
+          return `<span class="typeit-quote-zh">${zh}</span><br><span class="typeit-quote-en">${en}</span>`;
+        }).join("<br><br>")];
+      }
+
+      new TypeIt("#typeit-ba99f2ea1ca0c81d8373454e26729d34", {
+        strings: strings,
+        speed:  150 ,
+        lifeLike:  true ,
+        startDelay:  0 ,
+        breakLines:  false ,
+        waitUntilVisible:  false ,
+        loop:  false 
+      }).go();
+    });
+</script>
+
+<blockquote>
+<!-- </h3> --></blockquote>
+</section>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+<section>
+    
+
+
+
+</section>
+
+
+  
+
+      <div id="top-scroller" class="pointer-events-none absolute top-[110vh] bottom-0 w-12 ltr:right-0 rtl:left-0">
+  <a href="#the-top"
+    class="pointer-events-auto sticky top-[calc(100vh-5.5rem)] flex h-12 w-12 mb-16 items-center justify-center rounded-full bg-neutral/50 text-xl text-neutral-700 hover:text-primary-600 dark:bg-neutral-800/50 dark:text-neutral dark:hover:text-primary-400"
+    aria-label="返回顶部" title="返回顶部">
+    &uarr;
+  </a>
+</div>
+    </main><footer id="site-footer" class="py-10 print:hidden">
+    
+  <nav class="flex flex-row pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400">
+    <ul class="flex flex-col list-none sm:flex-row">
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/categories/"
+          title="Categories"
+        >
+           Categories
+        </a>
+      </li>
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/tags/"
+          title="Tags"
+        >
+           Tags
+        </a>
+      </li>
+      
+      <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+        <a
+          class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2 flex items-center"
+          href="/moments/"
+          title="Moments"
+        >
+           Moments
+        </a>
+      </li>
+      
+    </ul>
+  </nav>
+   
+  <div class="flex items-center justify-between">
+     
+    <p class="text-sm text-neutral-500 dark:text-neutral-400"> &copy; 2026 Aoidayo
+    </p>
+      
+  </div>
+  <script>
+    
+    mediumZoom(document.querySelectorAll("img:not(.nozoom)"), {
+      margin: 24,
+      background: 'rgba(0,0,0,0.5)',
+      scrollOffset: 0,
+    })
+    
+  </script>
+   
+  <script type="text/javascript" src="/js/process.min.ee03488f19c93c2efb199e2e3014ea5f3cb2ce7d45154adb3399a158cac27ca52831db249ede5bb602700ef87eb02434139de0858af1818ab0fb4182472204a4.js" integrity="sha512-7gNIjxnJPC77GZ4uMBTqXzyyzn1FFUrbM5mhWMrCfKUoMdsknt5btgJwDvh&#43;sCQ0E53ghYrxgYqw&#43;0GCRyIEpA=="></script>
+   
+</footer>
+<div
+  id="search-wrapper"
+  class="invisible fixed inset-0 flex h-screen w-screen cursor-default flex-col bg-neutral-500/50 p-4 backdrop-blur-sm dark:bg-neutral-900/50 sm:p-6 md:p-[10vh] lg:p-[12vh]"
+  data-url="https://blog.aoidayo.site/"
+  style="z-index:500"
+>
+  <div
+    id="search-modal"
+    class="flex flex-col w-full max-w-3xl min-h-0 mx-auto border rounded-md shadow-lg top-20 border-neutral-200 bg-neutral dark:border-neutral-700 dark:bg-neutral-800"
+  >
+    <header class="relative z-10 flex items-center justify-between flex-none px-2">
+      <form class="flex items-center flex-auto min-w-0">
+        <div class="flex items-center justify-center w-8 h-8 text-neutral-400">
+          
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+        </div>
+        <input
+          type="search"
+          id="search-query"
+          class="flex flex-auto h-12 mx-1 bg-transparent appearance-none focus:outline-dotted focus:outline-2 focus:outline-transparent"
+          placeholder="搜索"
+          tabindex="0"
+        />
+      </form>
+      <button
+        id="close-search-button"
+        class="flex items-center justify-center w-8 h-8 text-neutral-700 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400"
+        title="关闭 (Esc)"
+      >
+        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/></svg>
+
+  </span>
+
+
+      </button>
+    </header>
+    <section class="flex-auto px-2 overflow-auto">
+      <ul id="search-results">
+        
+      </ul>
+    </section>
+  </div>
+</div>
+
+  </div>
+</body>
+
+</html>
