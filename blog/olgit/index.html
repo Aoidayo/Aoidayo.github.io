@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Olgitbridge Olgitbridge: Overleaf Git Bridge\n鉴于 Overleaf 开源版本无法集成 git，在 github 上逛了一圈发现还是olgitbridge最好用，本篇博客做部署和使用的相关介绍。\n😋github 上的介绍 / 机翻过来作为参考\n另一个 Overleaf git 桥。这个方法允许你通过 git 在 Overleaf 社区版（CE）或 Pro 服务器上拉取和推送更改，就像官方 Overleaf SaaS 宣布中展示的一样。只需使用 git clone http://your.server.invalid/ ，你的项目 ID 可以从你的 Overleaf 实例中查看。 这个 gitbridge 使用 Overleaf 的 web API 来同步更改。这意味着它不需要运行在与 Overleaf 相同的服务器上。实际上，建议在另一台服务器上运行它，以便可以直接使用 https 端口 443。 请注意，与云版本不同，这个桥不使用实时更改操作，任何通过 git 修改的文件都会在在线编辑器中导致“此文件已被外部修改”的中断。\nA.部署 使用 DockerFile 部署\n1、clone 代码 chazeon/olgitbridge: Overleaf git bridge, fork of https://gitlab.com/axkibe/olgitbridge with support for the Overleaf v4 frontend 2、修改 config.js，创建 data 文件夹 3、修改 dockerfile 与 src/server.js，构建 image 2、修改 config.js\n">
+<title>Overleaf集成Git&amp;Github</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/blog/olgit/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Overleaf集成Git&Github">
+<meta property='og:description' content="Olgitbridge Olgitbridge: Overleaf Git Bridge\n鉴于 Overleaf 开源版本无法集成 git，在 github 上逛了一圈发现还是olgitbridge最好用，本篇博客做部署和使用的相关介绍。\n😋github 上的介绍 / 机翻过来作为参考\n另一个 Overleaf git 桥。这个方法允许你通过 git 在 Overleaf 社区版（CE）或 Pro 服务器上拉取和推送更改，就像官方 Overleaf SaaS 宣布中展示的一样。只需使用 git clone http://your.server.invalid/ ，你的项目 ID 可以从你的 Overleaf 实例中查看。 这个 gitbridge 使用 Overleaf 的 web API 来同步更改。这意味着它不需要运行在与 Overleaf 相同的服务器上。实际上，建议在另一台服务器上运行它，以便可以直接使用 https 端口 443。 请注意，与云版本不同，这个桥不使用实时更改操作，任何通过 git 修改的文件都会在在线编辑器中导致“此文件已被外部修改”的中断。\nA.部署 使用 DockerFile 部署\n1、clone 代码 chazeon/olgitbridge: Overleaf git bridge, fork of https://gitlab.com/axkibe/olgitbridge with support for the Overleaf v4 frontend 2、修改 config.js，创建 data 文件夹 3、修改 dockerfile 与 src/server.js，构建 image 2、修改 config.js\n">
+<meta property='og:url' content='https://blog.aoidayo.site/blog/olgit/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Git' /><meta property='article:tag' content='overleaf' /><meta property='article:tag' content='latex' /><meta property='article:published_time' content='2025-12-26T23:44:14&#43;08:00'/><meta property='article:modified_time' content='2025-12-26T23:44:14&#43;08:00'/>
+<meta name="twitter:title" content="Overleaf集成Git&Github">
+<meta name="twitter:description" content="Olgitbridge Olgitbridge: Overleaf Git Bridge\n鉴于 Overleaf 开源版本无法集成 git，在 github 上逛了一圈发现还是olgitbridge最好用，本篇博客做部署和使用的相关介绍。\n😋github 上的介绍 / 机翻过来作为参考\n另一个 Overleaf git 桥。这个方法允许你通过 git 在 Overleaf 社区版（CE）或 Pro 服务器上拉取和推送更改，就像官方 Overleaf SaaS 宣布中展示的一样。只需使用 git clone http://your.server.invalid/ ，你的项目 ID 可以从你的 Overleaf 实例中查看。 这个 gitbridge 使用 Overleaf 的 web API 来同步更改。这意味着它不需要运行在与 Overleaf 相同的服务器上。实际上，建议在另一台服务器上运行它，以便可以直接使用 https 端口 443。 请注意，与云版本不同，这个桥不使用实时更改操作，任何通过 git 修改的文件都会在在线编辑器中导致“此文件已被外部修改”的中断。\nA.部署 使用 DockerFile 部署\n1、clone 代码 chazeon/olgitbridge: Overleaf git bridge, fork of https://gitlab.com/axkibe/olgitbridge with support for the Overleaf v4 frontend 2、修改 config.js，创建 data 文件夹 3、修改 dockerfile 与 src/server.js，构建 image 2、修改 config.js\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li  class='current'>
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#olgitbridge">Olgitbridge</a>
+      <ul>
+        <li><a href="#a部署">A.部署</a></li>
+        <li><a href="#b使用">B.使用</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/olgit/">Overleaf集成Git&amp;Github</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2025-12-26T23:44:14&#43;08:00'>Friday, December 26, 2025</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#olgitbridge">Olgitbridge</a>
+      <ul>
+        <li><a href="#a部署">A.部署</a></li>
+        <li><a href="#b使用">B.使用</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="olgitbridge">Olgitbridge
+</h2><p>Olgitbridge: Overleaf Git Bridge</p>
+<p>鉴于 Overleaf 开源版本无法集成 git，在 github 上逛了一圈发现还是<a class="link" href="https://gitlab.com/axkibe/olgitbridge"  target="_blank" rel="noopener"
+    >olgitbridge</a>最好用，本篇博客做<strong>部署和使用</strong>的相关介绍。</p>
+
+    <blockquote>
+        <p>😋github 上的介绍 / 机翻过来作为参考</p>
+<p>另一个 Overleaf git 桥。这个方法允许你通过 git 在 Overleaf 社区版（CE）或 Pro 服务器上拉取和推送更改，就像官方 Overleaf SaaS 宣布中展示的一样。只需使用 git clone <a class="link" href="http://your.server.invalid/"  target="_blank" rel="noopener"
+    >http://your.server.invalid/</a><project-id> ，你的项目 ID 可以从你的 Overleaf 实例中查看。
+这个 gitbridge 使用 Overleaf 的 web API 来同步更改。这意味着它不需要运行在与 Overleaf 相同的服务器上。实际上，建议在另一台服务器上运行它，以便可以直接使用 https 端口 443。
+请注意，与云版本不同，这个桥不使用实时更改操作，任何通过 git 修改的文件都会在在线编辑器中导致“此文件已被外部修改”的中断。</p>
+
+    </blockquote>
+<h3 id="a部署">A.部署
+</h3><p>使用 DockerFile 部署</p>
+<ul>
+<li>1、clone 代码 <a class="link" href="https://github.com/chazeon/olgitbridge"  target="_blank" rel="noopener"
+    >chazeon/olgitbridge: Overleaf git bridge, fork of https://gitlab.com/axkibe/olgitbridge with support for the Overleaf v4 frontend</a></li>
+<li>2、修改 config.js，创建 data 文件夹</li>
+<li>3、修改 dockerfile 与 src/server.js，构建 image</li>
+</ul>
+<p><strong>2、修改 config.js</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="c1">// overleaf server
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 修改为我们的overleaf server ip + port
+</span></span></span><span class="line"><span class="cl"><span class="nx">config</span><span class="p">.</span><span class="nx">olServer</span> <span class="o">=</span> <span class="s2">&#34;http://192.168.10.4:9999&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// used if all the working directories in one place
+</span></span></span><span class="line"><span class="cl"><span class="c1">// must be absolute path ending with &#39;/&#39;
+</span></span></span><span class="line"><span class="cl"><span class="nx">config</span><span class="p">.</span><span class="nx">baseDir</span> <span class="o">=</span> <span class="s2">&#34;/var/olgitbridge/data/&#34;</span><span class="p">;</span>
+</span></span></code></pre></div><p>创建 data 文件夹 <code>/var/olgitbridge/data/</code>，以便后续挂载</p>
+<p><strong>3、修改 dockerfile，构建 image</strong>
+3.1、dockerfile</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="s">node:18.14.2-slim</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/var/olgitbridge</span>/<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">COPY</span> . .<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">RUN</span> apt-get update <span class="o">&amp;&amp;</span> apt-get upgrade -y <span class="o">&amp;&amp;</span> apt-get install --no-install-recommends git ca-certificates -y <span class="o">&amp;&amp;</span> apt-get clean<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">RUN</span> npm install<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">RUN</span> git config --global user.email <span class="s2">&#34;overleaf-git-bridge@system.changeme.invalid&#34;</span> <span class="o">&amp;&amp;</span> git config --global user.name <span class="s2">&#34;Overleaf Git Bridge&#34;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">RUN</span> mkdir -p /var/olgitbridge/data<span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">EXPOSE</span><span class="w"> </span><span class="s">5000</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="k">ENTRYPOINT</span> <span class="p">[</span> <span class="s2">&#34;node&#34;</span><span class="p">,</span> <span class="s2">&#34;src/server.js&#34;</span> <span class="p">]</span><span class="err">
+</span></span></span></code></pre></div><p>构建</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker build -t olgitbridge:latest -f Dockerfile .
+</span></span></code></pre></div><p><strong>值得注意的是</strong>，这里设置的 git user，将会被作为后续你 pull / push overleaf latex 时的 user 使用，这里推荐可以改成自己的</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">RUN git config --global user.email <span class="s2">&#34;overleaf-git-bridge@system.changeme.invalid&#34;</span> <span class="o">&amp;&amp;</span> git config --global user.name <span class="s2">&#34;Overleaf Git Bridge&#34;</span>
+</span></span></code></pre></div><p>另外，如果使用自己的 user，可以顺手修改 <code>src/server.js</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="c1">//  await git.save( count, project.padDir, &#39;synced by olgitbridge&#39; );
+</span></span></span><span class="line"><span class="cl"><span class="kr">await</span> <span class="nx">git</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="nx">count</span><span class="p">,</span> <span class="nx">project</span><span class="p">.</span><span class="nx">padDir</span><span class="p">,</span> <span class="s2">&#34;synced with olgitbridge by your name&#34;</span><span class="p">);</span>
+</span></span></code></pre></div><p>3.2、docker run v1，仅仅挂载 data 目录</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker run -d --name olgitbridge <span class="se">\
+</span></span></span><span class="line"><span class="cl">  -v ./data:/var/olgitbridge/data
+</span></span><span class="line"><span class="cl">  -p 5000:5000 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --restart unless-stopped <span class="se">\
+</span></span></span><span class="line"><span class="cl">  olgitbridge:latest
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">docker run -d --name olgitbridge -v ./data:/var/olgitbridge/data -p 5000:5000 --restart unless-stopped olgitbridge:latest
+</span></span></code></pre></div><p>3.3、docker run v2，挂载 olgitbridge 整个源码目录</p>
+<p>3.4、检查命令</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker logs -f olgitbridge      <span class="c1"># 看日志</span>
+</span></span><span class="line"><span class="cl">docker ps                       <span class="c1"># 看是否在跑</span>
+</span></span><span class="line"><span class="cl">docker <span class="nb">exec</span> -it olgitbridge sh  <span class="c1"># 进容器</span>
+</span></span></code></pre></div><h3 id="b使用">B.使用
+</h3><p>1、直接使用 git 拉取</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git clone http://localhost:5000/&lt;project-id&gt;
+</span></span></code></pre></div><ul>
+<li>project-id 在 overleaf 对应文档的网页后缀中可得</li>
+</ul>
+<p>2、拉取完成后 origin 仓库</p>
+<pre tabindex="0"><code>➜ git remote -v
+origin  http://localhost:5000/694b4ac659ee1b0088f18f2d (fetch)
+origin  http://localhost:5000/694b4ac659ee1b0088f18f2d (push)
+</code></pre><p>3、添加 github 仓库</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git remote add gh xxx
+</span></span><span class="line"><span class="cl"><span class="c1"># 可得</span>
+</span></span><span class="line"><span class="cl">➜ git remote -v
+</span></span><span class="line"><span class="cl">gh      git@github.com:Username/xxx.git <span class="o">(</span>fetch<span class="o">)</span>
+</span></span><span class="line"><span class="cl">gh      git@github.com:Username/xxx.git <span class="o">(</span>push<span class="o">)</span>
+</span></span></code></pre></div><p>4、使用</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 与overleaf互相同步</span>
+</span></span><span class="line"><span class="cl">git pull
+</span></span><span class="line"><span class="cl">git push
+</span></span><span class="line"><span class="cl"><span class="c1"># 相应的、与gh同步</span>
+</span></span><span class="line"><span class="cl">git pull gh
+</span></span><span class="line"><span class="cl">git push gh
+</span></span></code></pre></div>
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/git/">Git</a>
+        
+            <a href="/tags/overleaf/">Overleaf</a>
+        
+            <a href="/tags/latex/">Latex</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/blog/git-a-b/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">单电脑git多用户配置</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="has-image">
+    <a href="/blog/git-big/">
+        
+        <div class="article-image">
+            <img alt="Featured image of post Git 清除.git仓库历史记录中的高存储占用文件" height="150" loading="lazy" src="/blog/git-big/feature_hu_c62ab323bd9e2f00.png" srcset="/blog/git-big/feature_hu_c62ab323bd9e2f00.png 1x, /blog/git-big/feature_hu_8f96cac1c0ec8e50.png 2x" width="250">
+
+        </div>
+        
+
+        <div class="article-details"style="background: linear-gradient(0deg, #314f4e80 0%, #ccc3bfC0 100%);">
+            <h2 class="article-title">Git 清除.git仓库历史记录中的高存储占用文件</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/blog/olgit/" class="leancloud_visitors" data-flag-title="Overleaf集成Git&amp;Github">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>

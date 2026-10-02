@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="最近 GPT 和 Gemini 越来越强，于是萌生了办理境外借记卡的想法。之前也不太了解银行卡的类型，简单做个调研。\nA. 信用卡、借记卡 信用卡 - 维基百科，自由的百科全书 借记卡 - 维基百科，自由的百科全书 先说说借记卡（Debit Card），又称储蓄卡，主要特点是\n消费/转账/取现，都是扣卡中的活期账户余额 存取款、转账、代发工资、绑定微信/支付宝、缴费等 一般日常说的“工资卡、银行卡、储蓄卡”，都是借记卡 没有透支额度，必须有余额才能花钱 借记卡里面可以存定期，定期的利息一般比活期高点 随大学录取通知书寄过来的就是一些学校指定银行的借记卡，当年寄过来的是中国银行的借记卡。另外常有说的一二类账户卡指的是转账限额，因为这是我第一张中行的卡，所以在 app 里面看默认就是一类。（不过目前也没那么多钱）\n信用卡（Credit Card），也称贷记卡，这个一般用的比较少\n先花银行的钱：有授信额度（额度内透支消费）。刷卡时不从存款账户立刻扣钱，而是记到“欠银行的钱”（形成信用账款）。从会计/记账角度，这类卡对应“贷记/信用”体系，所以叫“贷记卡”。 账单日出账、还款日还款；按规则按时全额还款通常免息，逾期/最低还款会有利息/费用。 可能有年费、权益（里程、返现、积分等），也可能有分期。 取现通常成本更高（手续费/利息），不建议当“取现金工具”。 以前国内有过 “准贷记卡”（介于两者之间，要求先存款但也可小额透支），现在已经比较少见。日常可以办到的主流“信用卡”基本都是“贷记卡”。\nB. 信用卡组织 国际上主要的发卡组织有 Visa、万事达卡、美国运通、大来国际、JCB、中国银联及发现卡等。\n它们主要是卡组织/支付网络（payment network / scheme）：负责把刷卡的信息在“商户收单行 → 卡组织网络 → 发卡行（银行）”之间完成授权、清算、结算。银行是“发卡方”，发卡组织是“跨机构的支付高速公路”。\n银联（UnionPay）：中国的卡组织，国内覆盖最强；境外很多国家也能用（尤其亚洲、部分旅游商户/ATM 覆盖不错），但在欧美一些小商户的刷卡覆盖通常不如 Visa/万事达。 Visa / 万事达（Mastercard）：全球范围最通用的两家卡组织，海外线下刷卡、线上电商/订阅支付的兼容性普遍最好。 American Express（运通/Amex）：既是卡组织，很多情况下也更“自营/闭环”（和商户、持卡人关系更强），常见在高端权益、商旅场景更突出；但受理范围通常不如 Visa/万事达广。 C. 境外借记卡 关于境外借记卡，有几种不同的类型\n肉身出境办的卡，这就是纯纯的境外卡了，不过因为我在国内不能去国外，所以这个不考虑。 要去的话，貌似是美国办卡更加好一点。 U 卡 这个卡类特别神奇，U 卡里面存的是 USDT，通过服务商在支付时自动换算成法定货币。 本质是“加密资产余额 + 结算时换汇 + 卡组织支付”的组合产品。 风险在于 不确定 U 卡的服务商能撑几年，还有就是加密货币的风险性。 USDT 由 Tether 公司发行，USDC 由 Circle 发行，透明度更高。不过目前貌似在支付一些境外服务的时候，都是使用 USDT 结算的。 港卡 香港卡，听同学说近些年办港卡的政策在逐步收紧，例如 26 年 1 月 1 日起对于非港户口的新开用户，账户余额低于一万港币的需要收取每月 100 港元的管理费。 接下来说说国内常见的境外借记卡：\n">
+<title>境外借记卡简单调研</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/blog/debit-card/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="境外借记卡简单调研">
+<meta property='og:description' content="最近 GPT 和 Gemini 越来越强，于是萌生了办理境外借记卡的想法。之前也不太了解银行卡的类型，简单做个调研。\nA. 信用卡、借记卡 信用卡 - 维基百科，自由的百科全书 借记卡 - 维基百科，自由的百科全书 先说说借记卡（Debit Card），又称储蓄卡，主要特点是\n消费/转账/取现，都是扣卡中的活期账户余额 存取款、转账、代发工资、绑定微信/支付宝、缴费等 一般日常说的“工资卡、银行卡、储蓄卡”，都是借记卡 没有透支额度，必须有余额才能花钱 借记卡里面可以存定期，定期的利息一般比活期高点 随大学录取通知书寄过来的就是一些学校指定银行的借记卡，当年寄过来的是中国银行的借记卡。另外常有说的一二类账户卡指的是转账限额，因为这是我第一张中行的卡，所以在 app 里面看默认就是一类。（不过目前也没那么多钱）\n信用卡（Credit Card），也称贷记卡，这个一般用的比较少\n先花银行的钱：有授信额度（额度内透支消费）。刷卡时不从存款账户立刻扣钱，而是记到“欠银行的钱”（形成信用账款）。从会计/记账角度，这类卡对应“贷记/信用”体系，所以叫“贷记卡”。 账单日出账、还款日还款；按规则按时全额还款通常免息，逾期/最低还款会有利息/费用。 可能有年费、权益（里程、返现、积分等），也可能有分期。 取现通常成本更高（手续费/利息），不建议当“取现金工具”。 以前国内有过 “准贷记卡”（介于两者之间，要求先存款但也可小额透支），现在已经比较少见。日常可以办到的主流“信用卡”基本都是“贷记卡”。\nB. 信用卡组织 国际上主要的发卡组织有 Visa、万事达卡、美国运通、大来国际、JCB、中国银联及发现卡等。\n它们主要是卡组织/支付网络（payment network / scheme）：负责把刷卡的信息在“商户收单行 → 卡组织网络 → 发卡行（银行）”之间完成授权、清算、结算。银行是“发卡方”，发卡组织是“跨机构的支付高速公路”。\n银联（UnionPay）：中国的卡组织，国内覆盖最强；境外很多国家也能用（尤其亚洲、部分旅游商户/ATM 覆盖不错），但在欧美一些小商户的刷卡覆盖通常不如 Visa/万事达。 Visa / 万事达（Mastercard）：全球范围最通用的两家卡组织，海外线下刷卡、线上电商/订阅支付的兼容性普遍最好。 American Express（运通/Amex）：既是卡组织，很多情况下也更“自营/闭环”（和商户、持卡人关系更强），常见在高端权益、商旅场景更突出；但受理范围通常不如 Visa/万事达广。 C. 境外借记卡 关于境外借记卡，有几种不同的类型\n肉身出境办的卡，这就是纯纯的境外卡了，不过因为我在国内不能去国外，所以这个不考虑。 要去的话，貌似是美国办卡更加好一点。 U 卡 这个卡类特别神奇，U 卡里面存的是 USDT，通过服务商在支付时自动换算成法定货币。 本质是“加密资产余额 + 结算时换汇 + 卡组织支付”的组合产品。 风险在于 不确定 U 卡的服务商能撑几年，还有就是加密货币的风险性。 USDT 由 Tether 公司发行，USDC 由 Circle 发行，透明度更高。不过目前貌似在支付一些境外服务的时候，都是使用 USDT 结算的。 港卡 香港卡，听同学说近些年办港卡的政策在逐步收紧，例如 26 年 1 月 1 日起对于非港户口的新开用户，账户余额低于一万港币的需要收取每月 100 港元的管理费。 接下来说说国内常见的境外借记卡：\n">
+<meta property='og:url' content='https://blog.aoidayo.site/blog/debit-card/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:published_time' content='2025-12-27T23:31:36&#43;08:00'/><meta property='article:modified_time' content='2025-12-27T23:31:36&#43;08:00'/>
+<meta name="twitter:title" content="境外借记卡简单调研">
+<meta name="twitter:description" content="最近 GPT 和 Gemini 越来越强，于是萌生了办理境外借记卡的想法。之前也不太了解银行卡的类型，简单做个调研。\nA. 信用卡、借记卡 信用卡 - 维基百科，自由的百科全书 借记卡 - 维基百科，自由的百科全书 先说说借记卡（Debit Card），又称储蓄卡，主要特点是\n消费/转账/取现，都是扣卡中的活期账户余额 存取款、转账、代发工资、绑定微信/支付宝、缴费等 一般日常说的“工资卡、银行卡、储蓄卡”，都是借记卡 没有透支额度，必须有余额才能花钱 借记卡里面可以存定期，定期的利息一般比活期高点 随大学录取通知书寄过来的就是一些学校指定银行的借记卡，当年寄过来的是中国银行的借记卡。另外常有说的一二类账户卡指的是转账限额，因为这是我第一张中行的卡，所以在 app 里面看默认就是一类。（不过目前也没那么多钱）\n信用卡（Credit Card），也称贷记卡，这个一般用的比较少\n先花银行的钱：有授信额度（额度内透支消费）。刷卡时不从存款账户立刻扣钱，而是记到“欠银行的钱”（形成信用账款）。从会计/记账角度，这类卡对应“贷记/信用”体系，所以叫“贷记卡”。 账单日出账、还款日还款；按规则按时全额还款通常免息，逾期/最低还款会有利息/费用。 可能有年费、权益（里程、返现、积分等），也可能有分期。 取现通常成本更高（手续费/利息），不建议当“取现金工具”。 以前国内有过 “准贷记卡”（介于两者之间，要求先存款但也可小额透支），现在已经比较少见。日常可以办到的主流“信用卡”基本都是“贷记卡”。\nB. 信用卡组织 国际上主要的发卡组织有 Visa、万事达卡、美国运通、大来国际、JCB、中国银联及发现卡等。\n它们主要是卡组织/支付网络（payment network / scheme）：负责把刷卡的信息在“商户收单行 → 卡组织网络 → 发卡行（银行）”之间完成授权、清算、结算。银行是“发卡方”，发卡组织是“跨机构的支付高速公路”。\n银联（UnionPay）：中国的卡组织，国内覆盖最强；境外很多国家也能用（尤其亚洲、部分旅游商户/ATM 覆盖不错），但在欧美一些小商户的刷卡覆盖通常不如 Visa/万事达。 Visa / 万事达（Mastercard）：全球范围最通用的两家卡组织，海外线下刷卡、线上电商/订阅支付的兼容性普遍最好。 American Express（运通/Amex）：既是卡组织，很多情况下也更“自营/闭环”（和商户、持卡人关系更强），常见在高端权益、商旅场景更突出；但受理范围通常不如 Visa/万事达广。 C. 境外借记卡 关于境外借记卡，有几种不同的类型\n肉身出境办的卡，这就是纯纯的境外卡了，不过因为我在国内不能去国外，所以这个不考虑。 要去的话，貌似是美国办卡更加好一点。 U 卡 这个卡类特别神奇，U 卡里面存的是 USDT，通过服务商在支付时自动换算成法定货币。 本质是“加密资产余额 + 结算时换汇 + 卡组织支付”的组合产品。 风险在于 不确定 U 卡的服务商能撑几年，还有就是加密货币的风险性。 USDT 由 Tether 公司发行，USDC 由 Circle 发行，透明度更高。不过目前貌似在支付一些境外服务的时候，都是使用 USDT 结算的。 港卡 香港卡，听同学说近些年办港卡的政策在逐步收紧，例如 26 年 1 月 1 日起对于非港户口的新开用户，账户余额低于一万港币的需要收取每月 100 港元的管理费。 接下来说说国内常见的境外借记卡：\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li  class='current'>
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#a-信用卡借记卡">A. 信用卡、借记卡</a></li>
+    <li><a href="#b-信用卡组织">B. 信用卡组织</a></li>
+    <li><a href="#c-境外借记卡">C. 境外借记卡</a></li>
+    <li><a href="#d-其他">D. 其他</a></li>
+    <li><a href="#e-参考">E. 参考</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/debit-card/">境外借记卡简单调研</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2025-12-27T23:31:36&#43;08:00'>Saturday, December 27, 2025</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#a-信用卡借记卡">A. 信用卡、借记卡</a></li>
+    <li><a href="#b-信用卡组织">B. 信用卡组织</a></li>
+    <li><a href="#c-境外借记卡">C. 境外借记卡</a></li>
+    <li><a href="#d-其他">D. 其他</a></li>
+    <li><a href="#e-参考">E. 参考</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>最近 GPT 和 Gemini 越来越强，于是萌生了办理境外借记卡的想法。之前也不太了解银行卡的类型，简单做个调研。</p>
+<h2 id="a-信用卡借记卡">A. 信用卡、借记卡
+</h2><ul>
+<li><a class="link" href="https://zh.wikipedia.org/wiki/%E4%BF%A1%E7%94%A8%E5%8D%A1"  target="_blank" rel="noopener"
+    >信用卡 - 维基百科，自由的百科全书</a></li>
+<li><a class="link" href="https://zh.wikipedia.org/wiki/%E5%80%9F%E8%AE%B0%E5%8D%A1"  target="_blank" rel="noopener"
+    >借记卡 - 维基百科，自由的百科全书</a></li>
+</ul>
+<p>先说说借记卡（Debit Card），又称储蓄卡，主要特点是</p>
+<ul>
+<li>消费/转账/取现，都是扣卡中的活期账户余额
+<ul>
+<li>存取款、转账、代发工资、绑定微信/支付宝、缴费等</li>
+<li>一般日常说的“工资卡、银行卡、储蓄卡”，都是借记卡</li>
+</ul>
+</li>
+<li>没有透支额度，必须有余额才能花钱</li>
+<li>借记卡里面可以存定期，定期的利息一般比活期高点</li>
+</ul>
+<p>随大学录取通知书寄过来的就是一些学校指定银行的借记卡，当年寄过来的是中国银行的借记卡。另外常有说的一二类账户卡指的是转账限额，因为这是我第一张中行的卡，所以在 app 里面看默认就是一类。<del>（不过目前也没那么多钱）</del></p>
+<p>信用卡（Credit Card），也称贷记卡，这个一般用的比较少</p>
+<ul>
+<li>先花银行的钱：有授信额度（额度内透支消费）。刷卡时不从存款账户立刻扣钱，而是记到“欠银行的钱”（形成信用账款）。从会计/记账角度，这类卡对应“贷记/信用”体系，所以叫“贷记卡”。</li>
+<li>账单日出账、还款日还款；按规则按时全额还款通常免息，逾期/最低还款会有利息/费用。</li>
+<li>可能有年费、权益（里程、返现、积分等），也可能有分期。</li>
+<li>取现通常成本更高（手续费/利息），不建议当“取现金工具”。</li>
+</ul>
+<p>以前国内有过 “准贷记卡”（介于两者之间，要求先存款但也可小额透支），现在已经比较少见。日常可以办到的主流“信用卡”基本都是“贷记卡”。</p>
+<h2 id="b-信用卡组织">B. 信用卡组织
+</h2><p>国际上主要的发卡组织有 Visa、万事达卡、美国运通、大来国际、JCB、中国银联及发现卡等。</p>
+<p>它们主要是卡组织/支付网络（payment network / scheme）：负责把刷卡的信息在“商户收单行 → 卡组织网络 → 发卡行（银行）”之间完成授权、清算、结算。银行是“发卡方”，发卡组织是“跨机构的支付高速公路”。</p>
+<ul>
+<li>银联（UnionPay）：中国的卡组织，国内覆盖最强；境外很多国家也能用（尤其亚洲、部分旅游商户/ATM 覆盖不错），但在欧美一些小商户的刷卡覆盖通常不如 Visa/万事达。</li>
+<li>Visa / 万事达（Mastercard）：全球范围最通用的两家卡组织，海外线下刷卡、线上电商/订阅支付的兼容性普遍最好。</li>
+<li>American Express（运通/Amex）：既是卡组织，很多情况下也更“自营/闭环”（和商户、持卡人关系更强），常见在高端权益、商旅场景更突出；但受理范围通常不如 Visa/万事达广。</li>
+</ul>
+<h2 id="c-境外借记卡">C. 境外借记卡
+</h2><p>关于境外借记卡，有几种不同的类型</p>
+<ul>
+<li>肉身出境办的卡，这就是纯纯的境外卡了，不过因为我在国内不能去国外，所以这个不考虑。
+<ul>
+<li>要去的话，貌似是美国办卡更加好一点。</li>
+</ul>
+</li>
+<li>U 卡
+<ul>
+<li>这个卡类特别神奇，U 卡里面存的是 USDT，通过服务商在支付时自动换算成法定货币。</li>
+<li>本质是“加密资产余额 + 结算时换汇 + 卡组织支付”的组合产品。</li>
+<li>风险在于 不确定 U 卡的服务商能撑几年，还有就是加密货币的风险性。</li>
+<li>USDT 由 Tether 公司发行，USDC 由 Circle 发行，透明度更高。不过目前貌似在支付一些境外服务的时候，都是使用 USDT 结算的。</li>
+</ul>
+</li>
+<li>港卡
+<ul>
+<li>香港卡，听同学说近些年办港卡的政策在逐步收紧，例如 26 年 1 月 1 日起对于非港户口的新开用户，账户余额低于一万港币的需要收取每月 100 港元的管理费。</li>
+</ul>
+</li>
+</ul>
+<p>接下来说说国内常见的境外借记卡：</p>
+<p><strong>1、第一个是中国银行的</strong></p>
+<p>中行每天在一食堂都有个桌子用来给同学们办卡，实验室学弟最近在食堂申请中行的境外借记卡。
+中行的境外借记卡一般对应长城跨境通国际借记卡，信用卡组织一般是万事达和 Visa。</p>
+<p>1.1、 关于费用
+初始费用可以分为两类</p>
+<ul>
+<li>管理费（年费/账户管理费）</li>
+<li>交易手续费
+而跨境汇款的收费就比较多，这个我自己都搞不太清，以后真自己有了一张再去了解吧。</li>
+</ul>
+<p>1.2、
+这里的跨境借记卡参考：</p>
+<ul>
+<li><a class="link" href="https://www.boc.cn/bcservice/bc3/bc31/201704/t20170426_9329452.html"  target="_blank" rel="noopener"
+    >长城跨境通国际借记卡使用指南及交易限额</a></li>
+<li><a class="link" href="https://www.boc.cn/bcservice/bc2/201704/t20170426_9329829.html?utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >长城跨境通国际借记卡</a></li>
+</ul>
+<p>1.3、</p>
+<ul>
+<li>外币卡，需要配合一张中行 I 类卡提前购汇（这个可以用学校发的银行卡）</li>
+<li>冻结比例：预授权冻结 100%的金额，非美元是 102%，账户里没有对应货币则默认以美元结算</li>
+<li>年费：没有年费</li>
+<li>3DS：支持 3-D Secure 支付安全认证（简称 3DS），在支持 3DS 的平台上消费时会弹出手机验证码验证页面</li>
+<li>币种支持：多币种（共 19 币种，美元、欧元、日元、港币、英镑、加拿大元、澳大利亚元、瑞士法朗、新加坡元、澳门元、韩国元、丹麦克朗、挪威克朗、新西兰元、菲律宾比索、俄罗斯卢布、瑞典克朗、泰国铢、南非兰特）</li>
+<li>网络评价：总体较好
+<ul>
+<li>支持的商户会比运通多（大部分的商户一般都支持 VISA、万事达）</li>
+<li>支持 HMV、日本亚马逊、Rakuten Books（※实体商品貌似不行）、日区 Play 商店、国区 PayPal、DLSite、TOWER RECORDS、honto、turgame（购买土区 Apple 礼品卡）</li>
+<li>评价：本卡也算是国内外币借记卡的经典之作了，发行快十年，经久不衰，甚至中行最近几年还在对这卡做优化（比如提供免费短信通知、冻结比例减小），而中行的境外支付也是一如既往的稳定，唯一可惜的就是 VISA 这两款比较丑，风头被万事达系列的卡和自家冬奥卡盖过去了。</li>
+<li>注：一般而言，无人民币户的外币借记卡并无设置非柜面限额的必要。但由于“断卡行动”、线下网点柜员业务不熟等客观原因，本卡在开卡、换卡及日后用卡可能会被网点/后台批量设置非柜面限额，占用的非柜面限额将会换算为外币等值人民币。非柜面限额影响包括但不限于：境外线上/线下支付、境外 ATM 取现、向其他账户转出外汇/跨境汇款等业务。若您被设置不满足日常使用额度的非柜面限额，请与开户网点进行妥善沟通处理。</li>
+</ul>
+</li>
+</ul>
+<p><strong>2、招行万事达借记卡</strong>
+又称万事网联普卡</p>
+<ul>
+<li>冻结比例：100%</li>
+<li>网付：完整支持，需手动开启（APP 我的-银行卡-快捷支付-万事达卡跨境线上支付）</li>
+<li>3DS：有</li>
+<li>自动购汇：有（使用卡组织汇率）</li>
+<li>FTF：无</li>
+<li>年费：无</li>
+<li>优惠政策：境外消费笔笔 0.5%返现、境外 ATM 查询免无限笔、取现免每月前 1 笔（有效期至 2026 年 12 月 31 日）</li>
+<li>发行情况：网申或线下办理均可。</li>
+<li>币种支持：单币种（人民币）（人民币户可用于境内外正常消费）</li>
+<li>网络评价：相当好</li>
+</ul>
+<p>说到招行的万事达卡：今天是星期六，我上午做完调研后想去招行碰碰运气，顺便办一张境外借记卡。不过周末很多网点不一定能办这种业务，具体还得看网点安排。我花了 5 块打车到万达旁边的支行，结果果然办不了，心情一下就有点低落。原本想直接走回学校，6 公里路走了快 3 公里，天气太冷又没带帽子和口罩，实在扛不住，最后又花了 3 块打车回去了。得亏今天高德有活动，半价打车，不然血亏 😭。</p>
+<h2 id="d-其他">D. 其他
+</h2><p>关于 5 万美元的结汇/购汇限制：</p>
+<ul>
+<li>这个貌似不是一刀卡死的，我估计自己也不弄股票和玩币，就是订阅软件/AI 服务，花不了那么多，且先记在这里 😂。</li>
+</ul>
+<p>关于风控</p>
+<ul>
+<li>借记卡风控
+<ul>
+<li>买境外服务前需要先往卡里预存一点钱，以免绑定支付方式时平台扣费验证账号的时候没钱，导致卡被风控后面用不了。</li>
+</ul>
+</li>
+<li>平台风控
+<ul>
+<li>不要频繁绑定/解绑卡片，避免深夜用卡</li>
+<li>Play 商店：绑卡时账单地址必须是账号所在区域对应的地址。如果绑卡失败，检查余额是否充足、尝试联系客服解决。</li>
+<li>亚马逊：注册的新账号或者没有完成过一次订单的账号不要购买虚拟充值卡类产品（包括但不限于亚马逊礼品卡、Google Play 礼品卡、Apple 礼品卡等，用礼品卡下单也是一样），否则大概率会支付失败并导致账号被风控。</li>
+<li>HMV（日本）：这个网站风控挺迷的。比如从购物车进入到结算界面，已经绑了卡，会先验证卡（冻结 1 日元），如果频繁进入这个界面（如下图）而不下单的话，会触发风控。另外，新账号也有几率触发风控</li>
+</ul>
+</li>
+</ul>
+<p>关于预授权</p>
+<ul>
+<li>商户先发起一笔“预授权”，银行/发卡机构会在账户里先冻结等额资金，确保有钱支付（但此时还没真正扣款）。</li>
+<li>冻结比例，比如中行的“预授权冻结 100% / 非美元 102%”
+<ul>
+<li>使用美元交易，如果要付 100 美元，那么就会先冻结卡里的等额 100 美元。</li>
+<li>如果使用欧元，比如 100 欧则需要先冻结 102 欧。</li>
+<li>冻结比例越高，代表同样一笔交易会占用更多可用余额，资金流动性变差。体感上酒店/租车的押金可能会延迟好几天，另外当多笔预授权叠加，容易导致“明明有钱但可用余额不够”。</li>
+</ul>
+</li>
+</ul>
+<h2 id="e-参考">E. 参考
+</h2><ul>
+<li><a class="link" href="https://www.bilibili.com/opus/815568414974148661"  target="_blank" rel="noopener"
+    >国际借记卡的使用体验和海淘的经验分享 - 哔哩哔哩</a></li>
+<li><a class="link" href="https://faint-store-ef0.notion.site/231bd9fa7ac18093b18ccbc035740193"  target="_blank" rel="noopener"
+    >可能是全网最全的国内国际借记卡分析</a></li>
+</ul>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/blog/debit-card/" class="leancloud_visitors" data-flag-title="境外借记卡简单调研">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>

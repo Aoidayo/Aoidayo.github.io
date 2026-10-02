@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="为什么需要高可用？ 规模越大、业务越关键，单点故障带来的代价越难以承受。单台数据库实例，无论硬件多可靠，故障是必然会发生的：磁盘损坏、内存故障、机房断电、误操作,这些都可能让这台唯一的主库瞬间不可用。\n如果不使用高可用架构，那么RPO和RTO都无法保证。必须要有自动化的、即时的高可用方案，来将「数据丢失」和「恢复时间」保证在可控范围。\n搭建结构 这里使用一个简单的高可用方案：\n角色 最少机器数量 高可用的说明 基于GTID异步复制的MySQL一主两从 至少 3台（每台一个MySQL实例） mysql1/2/3 分布在不同物理机/可用区，才能真正做到高可用 Orchestrator + 元数据库 建议独立 1台（或多台组集群） Orchestrator自身也建议3节点做Raft集群，避免它自己是单点 ProxySQL 建议独立 1-2台（多台做负载均衡） 作为流量入口，也要避免单点故障 总结 最低高可用配置：mysql3台，orch+orch元数据库 1台， ProxySQL1台，至少需要5台。 其中：\n基于GTID异步复制的MySQL一主两从：用GTID简化基于传统位点的主从复制，但是复制本身仍然是异步复制（主库不等从库确认就返回成功），所以RPO较大，没有被GTID解决。可以使用半同步方案来减少这一数据丢失风险。 Orchestrator 负责拓扑发现、故障检测、候选主库选举和自动切换。 ProxySQL 提供固定的读写、只读入口，并根据 Orchestrator API 和 MySQL read_only 状态更新路由。 在单机上实现，或者在腾讯云/阿里云的弹性ECS上按小时租，这里我在单机上实现：\nCompose 服务 管理地址 角色 mysql1 127.0.0.1:3306 master，可写 mysql2 127.0.0.1:3307 GTID slave 从库，只读 mysql3 127.0.0.1:3308 GTID slave 从库，只读 orchestrator-db 127.0.0.1:3309 Orchestrator 元数据库 orchestrator 127.0.0.1:3000 拓扑管理、自动故障切换主库 ，旧主库重启后不会回归 proxysql 127.0.0.1:6032(管理)/6033(读)/6034(写) 读写分离和连接路由 GTID异步复制的Mysql Replication拓扑 二进制安装几个mysql实例：单二进制脚本🔗link\n">
+<title>Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/blog/mysql-s1mple-ha/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Mysql简单高可用搭建: 异步主从复制+Orchestrator+ProxySQL">
+<meta property='og:description' content="为什么需要高可用？ 规模越大、业务越关键，单点故障带来的代价越难以承受。单台数据库实例，无论硬件多可靠，故障是必然会发生的：磁盘损坏、内存故障、机房断电、误操作,这些都可能让这台唯一的主库瞬间不可用。\n如果不使用高可用架构，那么RPO和RTO都无法保证。必须要有自动化的、即时的高可用方案，来将「数据丢失」和「恢复时间」保证在可控范围。\n搭建结构 这里使用一个简单的高可用方案：\n角色 最少机器数量 高可用的说明 基于GTID异步复制的MySQL一主两从 至少 3台（每台一个MySQL实例） mysql1/2/3 分布在不同物理机/可用区，才能真正做到高可用 Orchestrator + 元数据库 建议独立 1台（或多台组集群） Orchestrator自身也建议3节点做Raft集群，避免它自己是单点 ProxySQL 建议独立 1-2台（多台做负载均衡） 作为流量入口，也要避免单点故障 总结 最低高可用配置：mysql3台，orch+orch元数据库 1台， ProxySQL1台，至少需要5台。 其中：\n基于GTID异步复制的MySQL一主两从：用GTID简化基于传统位点的主从复制，但是复制本身仍然是异步复制（主库不等从库确认就返回成功），所以RPO较大，没有被GTID解决。可以使用半同步方案来减少这一数据丢失风险。 Orchestrator 负责拓扑发现、故障检测、候选主库选举和自动切换。 ProxySQL 提供固定的读写、只读入口，并根据 Orchestrator API 和 MySQL read_only 状态更新路由。 在单机上实现，或者在腾讯云/阿里云的弹性ECS上按小时租，这里我在单机上实现：\nCompose 服务 管理地址 角色 mysql1 127.0.0.1:3306 master，可写 mysql2 127.0.0.1:3307 GTID slave 从库，只读 mysql3 127.0.0.1:3308 GTID slave 从库，只读 orchestrator-db 127.0.0.1:3309 Orchestrator 元数据库 orchestrator 127.0.0.1:3000 拓扑管理、自动故障切换主库 ，旧主库重启后不会回归 proxysql 127.0.0.1:6032(管理)/6033(读)/6034(写) 读写分离和连接路由 GTID异步复制的Mysql Replication拓扑 二进制安装几个mysql实例：单二进制脚本🔗link\n">
+<meta property='og:url' content='https://blog.aoidayo.site/blog/mysql-s1mple-ha/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Mysql' /><meta property='article:published_time' content='2026-09-27T21:56:00&#43;08:00'/><meta property='article:modified_time' content='2026-09-27T21:56:00&#43;08:00'/><meta property='og:image' content='https://blog.aoidayo.site/blog/mysql-s1mple-ha/feature.jpg' />
+<meta name="twitter:title" content="Mysql简单高可用搭建: 异步主从复制+Orchestrator+ProxySQL">
+<meta name="twitter:description" content="为什么需要高可用？ 规模越大、业务越关键，单点故障带来的代价越难以承受。单台数据库实例，无论硬件多可靠，故障是必然会发生的：磁盘损坏、内存故障、机房断电、误操作,这些都可能让这台唯一的主库瞬间不可用。\n如果不使用高可用架构，那么RPO和RTO都无法保证。必须要有自动化的、即时的高可用方案，来将「数据丢失」和「恢复时间」保证在可控范围。\n搭建结构 这里使用一个简单的高可用方案：\n角色 最少机器数量 高可用的说明 基于GTID异步复制的MySQL一主两从 至少 3台（每台一个MySQL实例） mysql1/2/3 分布在不同物理机/可用区，才能真正做到高可用 Orchestrator + 元数据库 建议独立 1台（或多台组集群） Orchestrator自身也建议3节点做Raft集群，避免它自己是单点 ProxySQL 建议独立 1-2台（多台做负载均衡） 作为流量入口，也要避免单点故障 总结 最低高可用配置：mysql3台，orch+orch元数据库 1台， ProxySQL1台，至少需要5台。 其中：\n基于GTID异步复制的MySQL一主两从：用GTID简化基于传统位点的主从复制，但是复制本身仍然是异步复制（主库不等从库确认就返回成功），所以RPO较大，没有被GTID解决。可以使用半同步方案来减少这一数据丢失风险。 Orchestrator 负责拓扑发现、故障检测、候选主库选举和自动切换。 ProxySQL 提供固定的读写、只读入口，并根据 Orchestrator API 和 MySQL read_only 状态更新路由。 在单机上实现，或者在腾讯云/阿里云的弹性ECS上按小时租，这里我在单机上实现：\nCompose 服务 管理地址 角色 mysql1 127.0.0.1:3306 master，可写 mysql2 127.0.0.1:3307 GTID slave 从库，只读 mysql3 127.0.0.1:3308 GTID slave 从库，只读 orchestrator-db 127.0.0.1:3309 Orchestrator 元数据库 orchestrator 127.0.0.1:3000 拓扑管理、自动故障切换主库 ，旧主库重启后不会回归 proxysql 127.0.0.1:6032(管理)/6033(读)/6034(写) 读写分离和连接路由 GTID异步复制的Mysql Replication拓扑 二进制安装几个mysql实例：单二进制脚本🔗link\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://blog.aoidayo.site/blog/mysql-s1mple-ha/feature.jpg' />
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li  class='current'>
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#为什么需要高可用">为什么需要高可用？</a>
+      <ul>
+        <li><a href="#搭建结构">搭建结构</a></li>
+        <li><a href="#gtid异步复制的mysql-replication拓扑">GTID异步复制的Mysql Replication拓扑</a></li>
+        <li><a href="#orchestrator">Orchestrator</a></li>
+        <li><a href="#proxysql">proxySQL</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="has-image main-article">
+    <header class="article-header">
+    <div class="article-image">
+        <a href="/blog/mysql-s1mple-ha/">
+            <img alt="Featured image of post Mysql简单高可用搭建: 异步主从复制+Orchestrator+ProxySQL" height="985" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/blog/mysql-s1mple-ha/feature.jpg" srcset="/blog/mysql-s1mple-ha/feature_hu_e4adee0d756f7d0a.jpg 800w, /blog/mysql-s1mple-ha/feature_hu_947499ac3d0e2bbb.jpg 1600w, /blog/mysql-s1mple-ha/feature.jpg 1752w" width="1752">
+        </a>
+    </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/mysql-s1mple-ha/">Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-09-27T21:56:00&#43;08:00'>Sunday, September 27, 2026</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#为什么需要高可用">为什么需要高可用？</a>
+      <ul>
+        <li><a href="#搭建结构">搭建结构</a></li>
+        <li><a href="#gtid异步复制的mysql-replication拓扑">GTID异步复制的Mysql Replication拓扑</a></li>
+        <li><a href="#orchestrator">Orchestrator</a></li>
+        <li><a href="#proxysql">proxySQL</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="为什么需要高可用">为什么需要高可用？
+</h2><p>规模越大、业务越关键，单点故障带来的代价越难以承受。单台数据库实例，无论硬件多可靠，故障是必然会发生的：磁盘损坏、内存故障、机房断电、误操作,这些都可能让这台唯一的主库瞬间不可用。</p>
+<p>如果不使用高可用架构，那么RPO和RTO都无法保证。必须要有自动化的、即时的高可用方案，来将「数据丢失」和「恢复时间」保证在可控范围。</p>
+<h3 id="搭建结构">搭建结构
+</h3><p>这里使用一个简单的高可用方案：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>角色</th>
+					<th>最少机器数量</th>
+					<th>高可用的说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>基于GTID异步复制的MySQL一主两从</td>
+					<td>至少 3台（每台一个MySQL实例）</td>
+					<td>mysql1/2/3 分布在不同物理机/可用区，才能真正做到高可用</td>
+			</tr>
+			<tr>
+					<td>Orchestrator + 元数据库</td>
+					<td>建议独立 1台（或多台组集群）</td>
+					<td>Orchestrator自身也建议3节点做Raft集群，避免它自己是单点</td>
+			</tr>
+			<tr>
+					<td>ProxySQL</td>
+					<td>建议独立 1-2台（多台做负载均衡）</td>
+					<td>作为流量入口，也要避免单点故障</td>
+			</tr>
+			<tr>
+					<td><strong>总结</strong></td>
+					<td><strong>最低高可用配置：mysql3台，orch+orch元数据库 1台，</strong> <br /><strong>ProxySQL1台，至少需要5台。</strong></td>
+					<td></td>
+			</tr>
+	</tbody>
+</table></div>
+<p>其中：</p>
+<ul>
+<li>基于GTID异步复制的MySQL一主两从：用GTID简化基于传统位点的主从复制，但是复制本身仍然是异步复制（主库不等从库确认就返回成功），所以RPO较大，没有被GTID解决。可以使用半同步方案来减少这一数据丢失风险。</li>
+<li>Orchestrator 负责拓扑发现、故障检测、候选主库选举和自动切换。</li>
+<li>ProxySQL 提供固定的读写、只读入口，并根据 Orchestrator API 和 MySQL <code>read_only</code> 状态更新路由。</li>
+</ul>
+<p>在单机上实现，或者在腾讯云/阿里云的弹性ECS上按小时租，这里我在单机上实现：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th><strong>Compose 服务</strong></th>
+					<th><strong>管理地址</strong></th>
+					<th><strong>角色</strong></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>mysql1</td>
+					<td><code>127.0.0.1:3306</code></td>
+					<td>master，可写</td>
+			</tr>
+			<tr>
+					<td>mysql2</td>
+					<td><code>127.0.0.1:3307</code></td>
+					<td>GTID slave 从库，只读</td>
+			</tr>
+			<tr>
+					<td>mysql3</td>
+					<td><code>127.0.0.1:3308</code></td>
+					<td>GTID slave 从库，只读</td>
+			</tr>
+			<tr>
+					<td>orchestrator-db</td>
+					<td><code>127.0.0.1:3309</code></td>
+					<td>Orchestrator 元数据库</td>
+			</tr>
+			<tr>
+					<td>orchestrator</td>
+					<td><code>127.0.0.1:3000</code></td>
+					<td>拓扑管理、自动故障切换主库 <del>，旧主库重启后不会回归</del></td>
+			</tr>
+			<tr>
+					<td>proxysql</td>
+					<td><code>127.0.0.1:6032(管理)/6033(读)/6034(写)</code></td>
+					<td>读写分离和连接路由</td>
+			</tr>
+	</tbody>
+</table></div>
+<h3 id="gtid异步复制的mysql-replication拓扑">GTID异步复制的Mysql Replication拓扑
+</h3><p>二进制安装几个mysql实例：<a class="link" href="https://gist.github.com/Aoidayo/62f61391ac7f7f06b14f6448b1f288fd"  target="_blank" rel="noopener"
+    >单二进制脚本🔗link</a></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">sudo</span><span class="w"> </span><span class="n">python3</span><span class="w"> </span><span class="n">mysql_binary_install</span><span class="p">.</span><span class="n">py</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--md5sum 4ef87d5f5160a6565e767ec10002ce74 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--root-password &#39;Your@password123&#39; \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--port 3306 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--bind-address 0.0.0.0 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--server-id 101 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--report-host 127.0.0.1 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--report-port 3306
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">sudo</span><span class="w"> </span><span class="n">python3</span><span class="w"> </span><span class="n">mysql_binary_install</span><span class="p">.</span><span class="n">py</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--md5sum 4ef87d5f5160a6565e767ec10002ce74 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--root-password &#39;Your@password123&#39; \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--port 3307 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--bind-address 0.0.0.0 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--server-id 102 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--report-host 127.0.0.1 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--report-port 3307 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--datadir /var/lib/mysql-3307 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--config /etc/my-3307.cnf
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">sudo</span><span class="w"> </span><span class="n">python3</span><span class="w"> </span><span class="n">mysql_binary_install</span><span class="p">.</span><span class="n">py</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--md5sum 4ef87d5f5160a6565e767ec10002ce74 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--root-password &#39;Your@password123&#39; \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--port 3308 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--bind-address 0.0.0.0 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--server-id 103 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--report-host 127.0.0.1 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--report-port 3308 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--datadir /var/lib/mysql-3308 \
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c1">--config /etc/my-3308.cnf
+</span></span></span></code></pre></div><p>修改3307和3308上的slave配置：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="o">//</span><span class="w"> </span><span class="n">etc</span><span class="o">/</span><span class="n">my</span><span class="o">-</span><span class="mi">3307</span><span class="p">.</span><span class="n">cnf</span><span class="p">,</span><span class="w"> </span><span class="n">etc</span><span class="o">/</span><span class="n">my</span><span class="o">-</span><span class="mi">3308</span><span class="p">.</span><span class="n">cnf</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">[</span><span class="n">mysqld</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">read_only</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">super_read_only</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="w">
+</span></span></span></code></pre></div><p>在主库上添加replication账号：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">&#39;repl&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;Your@password123&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">GRANT</span><span class="w"> </span><span class="n">REPLICATION</span><span class="w"> </span><span class="n">SLAVE</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;repl&#39;</span><span class="o">@</span><span class="s1">&#39;%&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>在从库上进行复制配置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="o">#</span><span class="w"> </span><span class="err">开启</span><span class="n">tls</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">CHANGE</span><span class="w"> </span><span class="n">REPLICATION</span><span class="w"> </span><span class="k">SOURCE</span><span class="w"> </span><span class="k">TO</span><span class="w"> </span><span class="n">SOURCE_SSL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">#</span><span class="w"> </span><span class="err">设置主库</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">CHANGE</span><span class="w"> </span><span class="n">REPLICATION</span><span class="w"> </span><span class="k">SOURCE</span><span class="w"> </span><span class="k">TO</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">SOURCE_HOST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">SOURCE_USER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;repl&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">SOURCE_PASSWORD</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Your@password123&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">SOURCE_PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3306</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">SOURCE_AUTO_POSITION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">#</span><span class="w"> </span><span class="err">作为主从的</span><span class="w"> </span><span class="err">从节点</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">START</span><span class="w"> </span><span class="n">REPLICA</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">#</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">REPLICA</span><span class="w"> </span><span class="n">STATUS</span><span class="err">\</span><span class="k">G</span><span class="w">
+</span></span></span></code></pre></div><p>此时主从搭建完成，等待主从同步结束，两个slave 3307和3308上面也有了replication的账号。</p>
+<h3 id="orchestrator">Orchestrator
+</h3>
+    <blockquote>
+        <p>个人还是推荐docker安装，本地部署需要查不少手册，有点累。</p>
+
+    </blockquote>
+<p>安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">wget</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="p">.</span><span class="n">com</span><span class="o">/</span><span class="n">openark</span><span class="o">/</span><span class="n">orchestrator</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="n">v3</span><span class="p">.</span><span class="mi">2</span><span class="p">.</span><span class="mi">6</span><span class="o">/</span><span class="n">orchestrator_3</span><span class="p">.</span><span class="mi">2</span><span class="p">.</span><span class="mi">6</span><span class="n">_amd64</span><span class="p">.</span><span class="n">deb</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">dpkg</span><span class="w"> </span><span class="o">-</span><span class="n">i</span><span class="w"> </span><span class="p">...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">dpkg</span><span class="w"> </span><span class="o">-</span><span class="n">r</span><span class="w"> </span><span class="n">orchestrator</span><span class="w">
+</span></span></span></code></pre></div><p>安装目录</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="err">安装目录：</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">orchestrator</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">orchestrator</span><span class="o">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="err">├──</span><span class="w"> </span><span class="n">orchestrator</span><span class="w">                        </span><span class="o">#</span><span class="w"> </span><span class="err">主程序二进制（</span><span class="mi">19</span><span class="n">MB</span><span class="err">，</span><span class="mi">2021</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">27</span><span class="err">）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="err">├──</span><span class="w"> </span><span class="n">orchestrator</span><span class="o">-</span><span class="n">sample</span><span class="p">.</span><span class="n">conf</span><span class="p">.</span><span class="n">json</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="err">├──</span><span class="w"> </span><span class="n">orchestrator</span><span class="o">-</span><span class="n">sample</span><span class="o">-</span><span class="n">sqlite</span><span class="p">.</span><span class="n">conf</span><span class="p">.</span><span class="n">json</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="err">└──</span><span class="w"> </span><span class="n">resources</span><span class="o">/</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">├──</span><span class="w"> </span><span class="n">bin</span><span class="o">/</span><span class="n">orchestrator</span><span class="o">-</span><span class="n">client</span><span class="w">         </span><span class="o">#</span><span class="w"> </span><span class="err">客户端脚本</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">├──</span><span class="w"> </span><span class="n">templates</span><span class="o">/</span><span class="w">                      </span><span class="o">#</span><span class="w"> </span><span class="n">Web</span><span class="w"> </span><span class="n">UI</span><span class="w"> </span><span class="err">模板</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">├──</span><span class="w"> </span><span class="k">public</span><span class="o">/</span><span class="w">                         </span><span class="o">#</span><span class="w"> </span><span class="err">前端</span><span class="w"> </span><span class="n">js</span><span class="o">/</span><span class="n">css</span><span class="o">/</span><span class="err">图片</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">├──</span><span class="w"> </span><span class="n">metrics</span><span class="o">/</span><span class="n">orchestrator</span><span class="o">-</span><span class="n">grafana</span><span class="p">.</span><span class="n">json</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="err">└──</span><span class="w"> </span><span class="n">pseudo</span><span class="o">-</span><span class="n">gtid</span><span class="o">/</span><span class="w">
+</span></span></span></code></pre></div><p>配置<code>/etc/orchestrator.conf.json</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;Debug&#34;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;ListenAddress&#34;</span><span class="p">:</span> <span class="s2">&#34;:3000&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLOrchestratorHost&#34;</span><span class="p">:</span> <span class="s2">&#34;127.0.0.1&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLOrchestratorPort&#34;</span><span class="p">:</span> <span class="mi">3306</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLOrchestratorDatabase&#34;</span><span class="p">:</span> <span class="s2">&#34;orchestrator&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLOrchestratorUser&#34;</span><span class="p">:</span> <span class="s2">&#34;orch_backend&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLOrchestratorPassword&#34;</span><span class="p">:</span> <span class="s2">&#34;orch_backend_pass&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLTopologyUser&#34;</span><span class="p">:</span> <span class="s2">&#34;orch_topo&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;MySQLTopologyPassword&#34;</span><span class="p">:</span> <span class="s2">&#34;orch_topo_pass&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;InstancePollSeconds&#34;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;DiscoverByShowSlaveHosts&#34;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;UnseenInstanceForgetHours&#34;</span><span class="p">:</span> <span class="mi">240</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;RecoveryPeriodBlockSeconds&#34;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;RecoverMasterClusterFilters&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;PromotionIgnoreHostnameFilters&#34;</span><span class="p">:</span> <span class="p">[],</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>创建orch元数据库</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">sudo</span> <span class="err">python</span><span class="mi">3</span> <span class="err">mysql_binary_install.py</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--archive</span> <span class="err">~/mysql/Notes-Mysql/Mysql-Installer/mysql</span><span class="mf">-8.0</span><span class="err">.</span><span class="mi">37</span><span class="err">-linux-glibc</span><span class="mf">2.28</span><span class="err">-x</span><span class="mi">86</span><span class="err">_</span><span class="mi">64</span><span class="err">.tar.xz</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--md</span><span class="mi">5</span><span class="err">sum</span> <span class="mi">4</span><span class="err">ef</span><span class="mi">87</span><span class="err">d</span><span class="mi">5</span><span class="err">f</span><span class="mi">5160</span><span class="err">a</span><span class="mf">6565e767</span><span class="err">ec</span><span class="mi">10002</span><span class="err">ce</span><span class="mi">74</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--root-password</span> <span class="err">&#39;Your@password</span><span class="mi">123</span><span class="err">&#39;</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--port</span> <span class="mi">3309</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--bind-address</span> <span class="mf">0.0</span><span class="err">.</span><span class="mf">0.0</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--server-id</span> <span class="mi">104</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--report-host</span> <span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--report-port</span> <span class="mi">3309</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--basedir</span> <span class="err">/usr/local/mysql</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--datadir</span> <span class="err">/var/lib/mysql</span><span class="mi">-3309</span> <span class="err">\</span>
+</span></span><span class="line"><span class="cl">  <span class="err">--config</span> <span class="err">/etc/my</span><span class="mi">-3309</span><span class="err">.cnf</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">alias</span> <span class="err">mysql</span><span class="mi">3309</span><span class="err">=&#39;/usr/local/mysql/bin/mysql</span> <span class="err">-uroot</span> <span class="err">-h</span><span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span> <span class="err">-P</span><span class="mi">3309</span> <span class="err">-pYour@password</span><span class="mi">123</span><span class="err">&#39;</span>
+</span></span></code></pre></div><p>在主库上创建mysql用户，通过replication复制到从库上：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">CREATE</span> <span class="err">USER</span> <span class="err">&#39;orch_topo&#39;@&#39;</span><span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span><span class="err">&#39;</span> <span class="err">IDENTIFIED</span> <span class="err">BY</span> <span class="err">&#39;orch_topo_pass&#39;;</span>
+</span></span><span class="line"><span class="cl"><span class="err">GRANT</span> <span class="err">PROCESS,</span> <span class="err">REPLICATION</span> <span class="err">SLAVE,</span> <span class="err">REPLICATION</span> <span class="err">CLIENT,</span> <span class="err">RELOAD</span> <span class="err">ON</span> <span class="err">*.*</span> <span class="err">TO</span> <span class="err">&#39;orch_topo&#39;@&#39;</span><span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span><span class="err">&#39;;</span>
+</span></span><span class="line"><span class="cl"><span class="err">GRANT</span> <span class="err">REPLICATION_SLAVE_ADMIN,</span> <span class="err">GROUP_REPLICATION_ADMIN</span> <span class="err">ON</span> <span class="err">*.*</span> <span class="err">TO</span> <span class="err">&#39;orch_topo&#39;@&#39;</span><span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span><span class="err">&#39;;</span>
+</span></span></code></pre></div><p>在从库上<code>select user, host, plugin from mysql.user;</code>做验证。</p>
+<p>在orch元数据库上创建用户</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">CREATE</span> <span class="err">USER</span> <span class="err">&#39;orch_backend&#39;@&#39;</span><span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span><span class="err">&#39;</span> <span class="err">IDENTIFIED</span> <span class="err">BY</span> <span class="err">&#39;orch_backend_pass&#39;;</span>
+</span></span><span class="line"><span class="cl"><span class="err">CREATE</span> <span class="err">DATABASE</span> <span class="err">IF</span> <span class="err">NOT</span> <span class="err">EXISTS</span> <span class="err">orchestrator;</span>
+</span></span><span class="line"><span class="cl"><span class="err">GRANT</span> <span class="err">ALL</span> <span class="err">ON</span> <span class="err">orchestrator.*</span> <span class="err">TO</span> <span class="err">&#39;orch_backend&#39;@&#39;</span><span class="mf">127.0</span><span class="err">.</span><span class="mf">0.1</span><span class="err">&#39;;</span>
+</span></span></code></pre></div><p>进行orch发现</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">curl</span> <span class="err">-s</span> <span class="s2">&#34;http://127.0.0.1:3000/api/discover/127.0.0.1/3306&#34;</span>
+</span></span></code></pre></div><p>有：</p>
+<p><img alt="alt text" class="gallery-image" data-flex-basis="630px" data-flex-grow="262" height="632" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/blog/mysql-s1mple-ha/assets/image.png" srcset="/blog/mysql-s1mple-ha/assets/image_hu_fcd9e2c289d627fd.png 800w, /blog/mysql-s1mple-ha/assets/image_hu_cfd20a24d5cd46e5.png 1600w, /blog/mysql-s1mple-ha/assets/image.png 1659w" width="1659"></p>
+<p>可以手动测试下故障切换</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">systemctl</span> <span class="err">stop</span> <span class="err">mysqld</span>
+</span></span></code></pre></div><p>停止3306后 3308自动提升为主库，自动切主的时候将新主库的两个read_only修改为false。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="err">mysql&gt;</span> <span class="err">SELECT</span> <span class="err">VARIABLE_NAME,</span> <span class="err">VARIABLE_VALUE</span>
+</span></span><span class="line"><span class="cl">    <span class="err">-&gt;</span> <span class="err">FROM</span> <span class="err">performance_schema.global_variables</span>
+</span></span><span class="line"><span class="cl">    <span class="err">-&gt;</span> <span class="err">WHERE</span> <span class="err">VARIABLE_NAME</span> <span class="err">IN</span> <span class="err">(&#39;read_only&#39;,</span> <span class="err">&#39;super_read_only&#39;);</span>
+</span></span><span class="line"><span class="cl"><span class="err">+-----------------+----------------+</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">VARIABLE_NAME</span>   <span class="err">|</span> <span class="err">VARIABLE_VALUE</span> <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">+-----------------+----------------+</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">read_only</span>       <span class="err">|</span> <span class="err">OFF</span>            <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">super_read_only</span> <span class="err">|</span> <span class="err">OFF</span>            <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">+-----------------+----------------+</span>
+</span></span><span class="line"><span class="cl"><span class="mi">2</span> <span class="err">rows</span> <span class="err">in</span> <span class="err">set</span> <span class="err">(</span><span class="mf">0.00</span> <span class="err">sec)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="err">mysql&gt;</span> <span class="err">SHOW</span> <span class="err">global</span> <span class="err">VARIABLES</span> <span class="err">LIKE</span> <span class="err">&#39;%read_only&#39;;</span>
+</span></span><span class="line"><span class="cl"><span class="err">+-----------------------+-------+</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">Variable_name</span>         <span class="err">|</span> <span class="err">Value</span> <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">+-----------------------+-------+</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">innodb_read_only</span>      <span class="err">|</span> <span class="err">OFF</span>   <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">read_only</span>             <span class="err">|</span> <span class="err">OFF</span>   <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">super_read_only</span>       <span class="err">|</span> <span class="err">OFF</span>   <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">|</span> <span class="err">transaction_read_only</span> <span class="err">|</span> <span class="err">OFF</span>   <span class="err">|</span>
+</span></span><span class="line"><span class="cl"><span class="err">+-----------------------+-------+</span>
+</span></span><span class="line"><span class="cl"><span class="mi">4</span> <span class="err">rows</span> <span class="err">in</span> <span class="err">set</span> <span class="err">(</span><span class="mf">0.01</span> <span class="err">sec)</span>
+</span></span></code></pre></div><h3 id="proxysql">proxySQL
+</h3><p>用于分流的工具，提供固定的读写、只读入口，并根据 Orchestrator API 和 MySQL <code>read_only</code> 状态更新路由。</p>
+<p>在故障切换的时候，自动切换可写主库，在应用层我们只需要填写两个东西：读写url+用户名密码、只读url+用户名密码。</p>
+<p>需要在orchestrator 配置的json中添加钩子：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;PostMasterFailoverProcesses&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;curl -fsS -X POST http://proxy-sync:8080/sync &gt;/dev/null 2&gt;&amp;1 || true&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;echo &#39;Master failover complete: {failedHost}:{failedPort} -&gt; {successorHost}:{successorPort}&#39; &gt;&gt; /tmp/recovery.log&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;PostIntermediateMasterFailoverProcesses&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;curl -fsS -X POST http://proxy-sync:8080/sync &gt;/dev/null 2&gt;&amp;1 || true&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;echo &#39;Intermediate master failover complete: {failedHost}:{failedPort} -&gt; {successorHost}:{successorPort}&#39; &gt;&gt; /tmp/recovery.log&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;PostGracefulTakeoverProcesses&#34;</span><span class="p">:</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;curl -fsS -X POST http://proxy-sync:8080/sync &gt;/dev/null 2&gt;&amp;1 || true&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;echo &#39;Graceful takeover complete: {failedHost}:{failedPort} -&gt; {successorHost}:{successorPort}&#39; &gt;&gt; /tmp/recovery.log&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>这块要记录的内容比较多，有时间以后再写。</p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/mysql/">Mysql</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/blog/mysql-s1mple-ha/" class="leancloud_visitors" data-flag-title="Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>

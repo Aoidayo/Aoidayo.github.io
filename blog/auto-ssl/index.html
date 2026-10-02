@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="前言 为什么需要使用SSL证书自动部署？\nSSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。 现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。 现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。 证书自动化的机制：\nACME协议把证书申请变成了可编程的API：通过DNS验证某个域名是你自己的，CA就会给你发证书。（Let's Encrypt真是能和cloudflare类比的大好人啊，我以前还以为证书都需要自己花钱买的。） 我的情况：\n我只需要更新SSL的cert和key，将cert和key替换原来的证书和密钥文件，然后重启nginx，现在需要做的就是实现这个流程的自动化。 之前我在ohttps上申请证书并部署到服务器上，使用fullchain.pem（证书和中间证书）和certkey.pem（私钥）两个文件。 现在使用certbot和python3-certbot-dns-cloudflare自动化该流程，向let's encrypt申请通配符证书到本地。 关于我为什么需要SSL证书：\nDamn的密码管理器VaultWarden强制需要SSL证书，不然不给连接。 CertBot使用 基本流程：\n1、安装 2、DNS 验证插件安装 3、使用CertBot申请证书 1、安装 两种方式： 1）使用snap安装\nsudo apt update sudo apt install snapd -y sudo snap install core sudo snap refresh core sudo snap install --classic certbot sudo ln -s /snap/bin/certbot /usr/bin/certbot 2）使用apt安装\napt install certbot 验证\ncertbot --version 2、DNS 验证插件安装 (1) 申请cloudflare的api token\n申请cloudflare的api token（注意不是global token）\n登录 Cloudflare：\n进入 → My Profile 选择 → API Tokens 点击 → Create Token 使用模板：Edit zone DNS，其中权限必须包含：Zone：DNS+Zobe Zone Resources 选择：Include → Specific zone → aoidayo.site 保存并复制完整 token。\n">
+<title>CertBot自动化SSL证书部署</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/blog/auto-ssl/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="CertBot自动化SSL证书部署">
+<meta property='og:description' content="前言 为什么需要使用SSL证书自动部署？\nSSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。 现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。 现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。 证书自动化的机制：\nACME协议把证书申请变成了可编程的API：通过DNS验证某个域名是你自己的，CA就会给你发证书。（Let's Encrypt真是能和cloudflare类比的大好人啊，我以前还以为证书都需要自己花钱买的。） 我的情况：\n我只需要更新SSL的cert和key，将cert和key替换原来的证书和密钥文件，然后重启nginx，现在需要做的就是实现这个流程的自动化。 之前我在ohttps上申请证书并部署到服务器上，使用fullchain.pem（证书和中间证书）和certkey.pem（私钥）两个文件。 现在使用certbot和python3-certbot-dns-cloudflare自动化该流程，向let's encrypt申请通配符证书到本地。 关于我为什么需要SSL证书：\nDamn的密码管理器VaultWarden强制需要SSL证书，不然不给连接。 CertBot使用 基本流程：\n1、安装 2、DNS 验证插件安装 3、使用CertBot申请证书 1、安装 两种方式： 1）使用snap安装\nsudo apt update sudo apt install snapd -y sudo snap install core sudo snap refresh core sudo snap install --classic certbot sudo ln -s /snap/bin/certbot /usr/bin/certbot 2）使用apt安装\napt install certbot 验证\ncertbot --version 2、DNS 验证插件安装 (1) 申请cloudflare的api token\n申请cloudflare的api token（注意不是global token）\n登录 Cloudflare：\n进入 → My Profile 选择 → API Tokens 点击 → Create Token 使用模板：Edit zone DNS，其中权限必须包含：Zone：DNS+Zobe Zone Resources 选择：Include → Specific zone → aoidayo.site 保存并复制完整 token。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/blog/auto-ssl/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='运维' /><meta property='article:published_time' content='2026-03-02T19:58:04&#43;08:00'/><meta property='article:modified_time' content='2026-03-02T19:58:04&#43;08:00'/>
+<meta name="twitter:title" content="CertBot自动化SSL证书部署">
+<meta name="twitter:description" content="前言 为什么需要使用SSL证书自动部署？\nSSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。 现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。 现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。 证书自动化的机制：\nACME协议把证书申请变成了可编程的API：通过DNS验证某个域名是你自己的，CA就会给你发证书。（Let's Encrypt真是能和cloudflare类比的大好人啊，我以前还以为证书都需要自己花钱买的。） 我的情况：\n我只需要更新SSL的cert和key，将cert和key替换原来的证书和密钥文件，然后重启nginx，现在需要做的就是实现这个流程的自动化。 之前我在ohttps上申请证书并部署到服务器上，使用fullchain.pem（证书和中间证书）和certkey.pem（私钥）两个文件。 现在使用certbot和python3-certbot-dns-cloudflare自动化该流程，向let's encrypt申请通配符证书到本地。 关于我为什么需要SSL证书：\nDamn的密码管理器VaultWarden强制需要SSL证书，不然不给连接。 CertBot使用 基本流程：\n1、安装 2、DNS 验证插件安装 3、使用CertBot申请证书 1、安装 两种方式： 1）使用snap安装\nsudo apt update sudo apt install snapd -y sudo snap install core sudo snap refresh core sudo snap install --classic certbot sudo ln -s /snap/bin/certbot /usr/bin/certbot 2）使用apt安装\napt install certbot 验证\ncertbot --version 2、DNS 验证插件安装 (1) 申请cloudflare的api token\n申请cloudflare的api token（注意不是global token）\n登录 Cloudflare：\n进入 → My Profile 选择 → API Tokens 点击 → Create Token 使用模板：Edit zone DNS，其中权限必须包含：Zone：DNS+Zobe Zone Resources 选择：Include → Specific zone → aoidayo.site 保存并复制完整 token。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li  class='current'>
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#certbot使用">CertBot使用</a>
+      <ul>
+        <li><a href="#1安装">1、安装</a></li>
+        <li><a href="#2dns-验证插件安装">2、DNS 验证插件安装</a></li>
+        <li><a href="#3certbot使用">3、certbot使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/auto-ssl/">CertBot自动化SSL证书部署</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-03-02T19:58:04&#43;08:00'>Monday, March 2, 2026</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#certbot使用">CertBot使用</a>
+      <ul>
+        <li><a href="#1安装">1、安装</a></li>
+        <li><a href="#2dns-验证插件安装">2、DNS 验证插件安装</a></li>
+        <li><a href="#3certbot使用">3、certbot使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="前言">前言
+</h2><p>为什么需要使用SSL证书自动部署？</p>
+<ul>
+<li>SSL证书的时间比较短，之前可以使用1年证书的时候手动部署无所谓，但是最近两年（指从24年开始）免费证书的有效期都普遍变成了3个月。每三个月都得手动续期一下，我自己每三个月拉一次证书和私钥、然后传到服务器上的这个流程已经做了十几遍了，流汗了🤣😅。</li>
+<li>现在的短有效期证书以后可能会更短，据说CA/Browser Forum通过的决议会在2029年让证书最长有效期会缩到47天。这种短周期会让倒闭证书的自动化部署流程，同时减少网站内容传输没有被SSL证书加密、而被劫持的风险。</li>
+<li>现在的SSL证书本质上就是可以给你的网站内容传输做一次加密，实际上也是WebPKI信任模型的边界：证书不能帮你证明这是家合法合规公司，他只负责加密通道。</li>
+</ul>
+<p>证书自动化的机制：</p>
+<ul>
+<li>ACME协议把证书申请变成了可编程的API：通过DNS验证某个域名是你自己的，CA就会给你发证书。（<code>Let's Encrypt</code>真是能和cloudflare类比的大好人啊，我以前还以为证书都需要自己花钱买的。）</li>
+</ul>
+<p>我的情况：</p>
+<ul>
+<li>我只需要更新SSL的cert和key，将cert和key替换原来的证书和密钥文件，然后重启nginx，现在需要做的就是实现这个流程的自动化。</li>
+<li>之前我在ohttps上申请证书并部署到服务器上，使用fullchain.pem（证书和中间证书）和certkey.pem（私钥）两个文件。</li>
+<li>现在使用certbot和python3-certbot-dns-cloudflare自动化该流程，向<code>let's encrypt</code>申请通配符证书到本地。</li>
+</ul>
+<p>关于我为什么需要SSL证书：</p>
+<ul>
+<li>Damn的密码管理器VaultWarden强制需要SSL证书，不然不给连接。</li>
+</ul>
+<h2 id="certbot使用">CertBot使用
+</h2><p>基本流程：</p>
+<ul>
+<li>1、安装</li>
+<li>2、DNS 验证插件安装</li>
+<li>3、使用CertBot申请证书</li>
+</ul>
+<h3 id="1安装">1、安装
+</h3><p>两种方式：
+1）使用snap安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo apt update
+</span></span><span class="line"><span class="cl">sudo apt install snapd -y
+</span></span><span class="line"><span class="cl">sudo snap install core
+</span></span><span class="line"><span class="cl">sudo snap refresh core
+</span></span><span class="line"><span class="cl">sudo snap install --classic certbot
+</span></span><span class="line"><span class="cl">sudo ln -s /snap/bin/certbot /usr/bin/certbot
+</span></span></code></pre></div><p>2）使用apt安装</p>
+<pre tabindex="0"><code>apt install certbot
+</code></pre><p>验证</p>
+<pre tabindex="0"><code>certbot --version
+</code></pre><hr>
+<h3 id="2dns-验证插件安装">2、DNS 验证插件安装
+</h3><p><strong>(1) 申请cloudflare的api token</strong></p>
+<p>申请cloudflare的api token（注意不是global token）</p>
+<p>登录 Cloudflare：</p>
+<ol>
+<li>进入 → My Profile</li>
+<li>选择 → API Tokens</li>
+<li>点击 → Create Token</li>
+<li>使用模板：Edit zone DNS，其中权限必须包含：Zone：DNS+Zobe</li>
+<li>Zone Resources 选择：Include → Specific zone → aoidayo.site</li>
+</ol>
+<p>保存并复制完整 token。</p>
+<p>⚠️ 注意：不要多复制空格或换行。</p>
+<p><strong>(2) DNS API自动验证</strong></p>
+<p>DNS API自动验证：以Cloudflare为例：</p>
+<p>1、安装插件</p>
+<pre tabindex="0"><code>sudo apt install python3-certbot-dns-cloudflare
+</code></pre><p>2、创建 API Token 文件</p>
+<pre tabindex="0"><code>sudo nano /root/.cloudflare.ini
+</code></pre><p>写入：</p>
+<pre tabindex="0"><code>dns_cloudflare_api_token = NEywfvoLF012e5bvEQyqqntGL4V4L971YnTInGqd
+</code></pre><p>设置权限：</p>
+<pre tabindex="0"><code>sudo chmod 600 /root/.cloudflare.ini
+</code></pre><hr>
+<h3 id="3certbot使用">3、certbot使用
+</h3><p>1、申请通配符证书</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">sudo</span><span class="w"> </span><span class="n">certbot</span><span class="w"> </span><span class="n">certonly</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">--</span><span class="n">dns</span><span class="o">-</span><span class="n">cloudflare</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">--</span><span class="n">dns</span><span class="o">-</span><span class="n">cloudflare</span><span class="o">-</span><span class="n">credentials</span><span class="w"> </span><span class="o">/</span><span class="n">root</span><span class="o">/</span><span class="p">.</span><span class="na">cloudflare</span><span class="p">.</span><span class="na">ini</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">aoidayo</span><span class="p">.</span><span class="na">site</span><span class="w"> </span><span class="err">\</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="s">&#34;*.aoidayo.site&#34;</span><span class="w">
+</span></span></span></code></pre></div><p>这一步需要你添加通知邮箱和一些协议，我都默认yes了。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ sudo certbot certonly <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --dns-cloudflare <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --dns-cloudflare-credentials /root/.cloudflare.ini <span class="se">\
+</span></span></span><span class="line"><span class="cl">  -d aoidayo.site <span class="se">\
+</span></span></span><span class="line"><span class="cl">  -d <span class="s2">&#34;*.aoidayo.site&#34;</span>
+</span></span><span class="line"><span class="cl">Saving debug log to /var/log/letsencrypt/letsencrypt.log
+</span></span><span class="line"><span class="cl">Requesting a certificate <span class="k">for</span> aoidayo.site and *.aoidayo.site
+</span></span><span class="line"><span class="cl">Waiting <span class="m">10</span> seconds <span class="k">for</span> DNS changes to propagate
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Successfully received certificate.
+</span></span><span class="line"><span class="cl">Certificate is saved at: /etc/letsencrypt/live/aoidayo.site/fullchain.pem
+</span></span><span class="line"><span class="cl">Key is saved at:         /etc/letsencrypt/live/aoidayo.site/privkey.pem
+</span></span><span class="line"><span class="cl">This certificate expires on 2026-05-31.
+</span></span><span class="line"><span class="cl">These files will be updated when the certificate renews.
+</span></span><span class="line"><span class="cl">Certbot has <span class="nb">set</span> up a scheduled task to automatically renew this certificate in the background.
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span><span class="line"><span class="cl">If you like Certbot, please consider supporting our work by:
+</span></span><span class="line"><span class="cl"> * Donating to ISRG / Let<span class="err">&#39;</span>s Encrypt:   https://letsencrypt.org/donate
+</span></span><span class="line"><span class="cl"> * Donating to EFF:                    https://eff.org/donate-le
+</span></span><span class="line"><span class="cl">- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+</span></span></code></pre></div><p>成功后证书在：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/etc/letsencrypt/live/example.com/
+</span></span></code></pre></div><p>2、同时certbot会自动创建定时任务：</p>
+<p>查看：</p>
+<pre tabindex="0"><code>systemctl list-timers | grep certbot
+# 
+Tue 2026-03-03 09:46:37 CST 17h left           n/a                         n/a           certbot.timer                  certbot.service
+</code></pre><p>3、测试续期：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo certbot renew --dry-run <span class="c1"># 测试续期</span>
+</span></span><span class="line"><span class="cl">sudo certbot renew --force-renewal <span class="c1"># 强制续期</span>
+</span></span></code></pre></div><p>4、添加续期后hook</p>
+<p>🤔 添加续期后hook，在复制证书后，自动reload nginx，最后写入nginx/ssl的op.log中。</p>
+<pre tabindex="0"><code>sudo nano /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh # 
+sudo chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh # 赋权
+</code></pre><p>我的bash脚本如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">set</span> -e
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 基本变量</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">DOMAIN</span><span class="o">=</span><span class="s2">&#34;aoidayo.site&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">SRC_DIR</span><span class="o">=</span><span class="s2">&#34;/etc/letsencrypt/live/</span><span class="nv">$DOMAIN</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">DST_DIR</span><span class="o">=</span><span class="s2">&#34;/home/dockers/nginx/ssl/aoidayo&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">/op.log&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">SRC_CERT</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$SRC_DIR</span><span class="s2">/fullchain.pem&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">SRC_KEY</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$SRC_DIR</span><span class="s2">/privkey.pem&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">DST_CERT</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">/fullchain.pem&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nv">DST_KEY</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">/certkey.pem&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nv">TIMESTAMP</span><span class="o">=</span><span class="k">$(</span>date <span class="s2">&#34;+%Y-%m-%d %H:%M:%S&#34;</span><span class="k">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 检查源文件是否存在</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="o">[[</span> ! -f <span class="s2">&#34;</span><span class="nv">$SRC_CERT</span><span class="s2">&#34;</span> <span class="o">||</span> ! -f <span class="s2">&#34;</span><span class="nv">$SRC_KEY</span><span class="s2">&#34;</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="nv">$TIMESTAMP</span><span class="s2">] ERROR: Source certificate files not found.&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$LOG_FILE</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 创建目标目录</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">mkdir -p <span class="s2">&#34;</span><span class="nv">$DST_DIR</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 复制并覆盖</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cp -f <span class="s2">&#34;</span><span class="nv">$SRC_CERT</span><span class="s2">&#34;</span> <span class="s2">&#34;</span><span class="nv">$DST_CERT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">cp -f <span class="s2">&#34;</span><span class="nv">$SRC_KEY</span><span class="s2">&#34;</span>  <span class="s2">&#34;</span><span class="nv">$DST_KEY</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置合理权限</span>
+</span></span><span class="line"><span class="cl">chmod <span class="m">644</span> <span class="s2">&#34;</span><span class="nv">$DST_CERT</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">chmod <span class="m">600</span> <span class="s2">&#34;</span><span class="nv">$DST_KEY</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 重启 docker nginx</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># ==============================</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> docker restart nginx-server &gt; /dev/null 2&gt;<span class="p">&amp;</span>1<span class="p">;</span> <span class="k">then</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="nv">$TIMESTAMP</span><span class="s2">] SUCCESS: Certificate updated and nginx-server restarted.&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$LOG_FILE</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">echo</span> <span class="s2">&#34;[</span><span class="nv">$TIMESTAMP</span><span class="s2">] ERROR: Docker restart failed!&#34;</span> &gt;&gt; <span class="s2">&#34;</span><span class="nv">$LOG_FILE</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">exit</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl"><span class="k">fi</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">exit</span> <span class="m">0</span>
+</span></span></code></pre></div><h2 id="参考">参考
+</h2><p>最后给出本文参考。</p>
+<p>参考：</p>
+<ul>
+<li><a class="link" href="https://www.zhihu.com/question/1985782987418259611/answer/1985818988610086500"  target="_blank" rel="noopener"
+    >HTTPS证书自动化部署方案求推荐，Let&rsquo;s Encrypt靠谱吗？ - 杞鋂的回答 - 知乎</a></li>
+<li><a class="link" href="https://www.cnblogs.com/ljbguanli/p/18925988"  target="_blank" rel="noopener"
+    >使用 Let‘s Encrypt 和 Certbot 为 Cloudflare 托管的域名申请 SSL 证书 - 指南 - ljbguanli - 博客园</a></li>
+</ul>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/blog/auto-ssl/" class="leancloud_visitors" data-flag-title="CertBot自动化SSL证书部署">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>

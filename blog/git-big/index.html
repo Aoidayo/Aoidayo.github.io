@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="前言 最近使用 Git 管理 Unity 项目，误将 Unity 的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有12MB+, 对于一个 Git 仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。\n工具 推荐使用git filter-repo，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比 git 自带的git filter-branch更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如 Unity 的 3d-fbx 文件，模型 pt 文件等等）。\ngit filter-repo：newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement) 验证清理效果：git 自带命令 查看 git 仓库占用空间：git count-objects -vH 常用方法 A. filter-repo # 1. 文件夹 # 保留my_folder下面的所有文件, 删除其他所有文件 git filter-repo --path my_folder # --invert-paths 反转. 删除my_folder下面的所有文件 git filter-repo --path my_folder --invert-paths --force # 2. 文件 # --path-glob &lt;file.name&gt; 删除指定文件 git filter-repo --path-glob xxx.mp4 --invert-paths --force # 3. 占用空间 git filter-repo --strip-blobs-bigger-than 100K git filter-repo --strip-blobs-bigger-than 1M git filter-repo --strip-blobs-bigger-than 1G # 清理引用和缓存 git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive # 可能清理完成之后，把remote也给清除了，这里重置 git remote add origin git@github.com:Aoidayo/xxx.git # push git push origin --force --all git push origin --force --tags B. 验证 git rev-list 查看高占用文件， 剩余文件大小分布 git count-objects -vH git log &lt;file/dir&gt; # 1. git rev-list # 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象） git rev-list --objects --all | grep -f &lt;(git verify-pack -v .git/objects/pack/*.idx | grep blob | sort -k 3 -n | cut -f 1 -d &#34; &#34;|tail -10) # 剩余文件大小分布 (B) git rev-list --objects --all | awk &#39;{print $1}&#39; | git cat-file --batch-check=&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39; | awk &#39;/^blob/ {print $3, $4}&#39; | sort -n # 2. git count-objects -vH &#39;&#39;&#39; git count-objects -vH count: 19 size: 25.71 KiB in-pack: 283 packs: 1 size-pack: 9.30 MiB prune-packable: 0 garbage: 0 size-garbage: 0 bytes &#39;&#39;&#39; # 3. git log &lt;file/dir&gt; $ git log RopeUpDown\\ # 没有输出表示已经清理干净了 # 输出 和当前文件或者目录有关的commit history &#39;&#39;&#39; &gt; commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main) Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 21:17:38 2025 +0800 fix(remove filo): add ignore commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13 Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 20:57:55 2025 +0800 Rope Up Down &#39;&#39;&#39; 附录 参考：\n">
+<title>Git 清除.git仓库历史记录中的高存储占用文件</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/blog/git-big/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Git 清除.git仓库历史记录中的高存储占用文件">
+<meta property='og:description' content="前言 最近使用 Git 管理 Unity 项目，误将 Unity 的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有12MB+, 对于一个 Git 仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。\n工具 推荐使用git filter-repo，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比 git 自带的git filter-branch更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如 Unity 的 3d-fbx 文件，模型 pt 文件等等）。\ngit filter-repo：newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement) 验证清理效果：git 自带命令 查看 git 仓库占用空间：git count-objects -vH 常用方法 A. filter-repo # 1. 文件夹 # 保留my_folder下面的所有文件, 删除其他所有文件 git filter-repo --path my_folder # --invert-paths 反转. 删除my_folder下面的所有文件 git filter-repo --path my_folder --invert-paths --force # 2. 文件 # --path-glob &lt;file.name&gt; 删除指定文件 git filter-repo --path-glob xxx.mp4 --invert-paths --force # 3. 占用空间 git filter-repo --strip-blobs-bigger-than 100K git filter-repo --strip-blobs-bigger-than 1M git filter-repo --strip-blobs-bigger-than 1G # 清理引用和缓存 git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive # 可能清理完成之后，把remote也给清除了，这里重置 git remote add origin git@github.com:Aoidayo/xxx.git # push git push origin --force --all git push origin --force --tags B. 验证 git rev-list 查看高占用文件， 剩余文件大小分布 git count-objects -vH git log &lt;file/dir&gt; # 1. git rev-list # 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象） git rev-list --objects --all | grep -f &lt;(git verify-pack -v .git/objects/pack/*.idx | grep blob | sort -k 3 -n | cut -f 1 -d &#34; &#34;|tail -10) # 剩余文件大小分布 (B) git rev-list --objects --all | awk &#39;{print $1}&#39; | git cat-file --batch-check=&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39; | awk &#39;/^blob/ {print $3, $4}&#39; | sort -n # 2. git count-objects -vH &#39;&#39;&#39; git count-objects -vH count: 19 size: 25.71 KiB in-pack: 283 packs: 1 size-pack: 9.30 MiB prune-packable: 0 garbage: 0 size-garbage: 0 bytes &#39;&#39;&#39; # 3. git log &lt;file/dir&gt; $ git log RopeUpDown\\ # 没有输出表示已经清理干净了 # 输出 和当前文件或者目录有关的commit history &#39;&#39;&#39; &gt; commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main) Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 21:17:38 2025 +0800 fix(remove filo): add ignore commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13 Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 20:57:55 2025 +0800 Rope Up Down &#39;&#39;&#39; 附录 参考：\n">
+<meta property='og:url' content='https://blog.aoidayo.site/blog/git-big/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Git' /><meta property='article:published_time' content='2025-02-28T22:15:00&#43;08:00'/><meta property='article:modified_time' content='2025-02-28T22:15:00&#43;08:00'/><meta property='og:image' content='https://blog.aoidayo.site/blog/git-big/feature.png' />
+<meta name="twitter:title" content="Git 清除.git仓库历史记录中的高存储占用文件">
+<meta name="twitter:description" content="前言 最近使用 Git 管理 Unity 项目，误将 Unity 的Filo Cables包commit&amp;push到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有12MB+, 对于一个 Git 仓库来说还是太大了，所以需要即时从.git中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。\n工具 推荐使用git filter-repo，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比 git 自带的git filter-branch更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如 Unity 的 3d-fbx 文件，模型 pt 文件等等）。\ngit filter-repo：newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement) 验证清理效果：git 自带命令 查看 git 仓库占用空间：git count-objects -vH 常用方法 A. filter-repo # 1. 文件夹 # 保留my_folder下面的所有文件, 删除其他所有文件 git filter-repo --path my_folder # --invert-paths 反转. 删除my_folder下面的所有文件 git filter-repo --path my_folder --invert-paths --force # 2. 文件 # --path-glob &lt;file.name&gt; 删除指定文件 git filter-repo --path-glob xxx.mp4 --invert-paths --force # 3. 占用空间 git filter-repo --strip-blobs-bigger-than 100K git filter-repo --strip-blobs-bigger-than 1M git filter-repo --strip-blobs-bigger-than 1G # 清理引用和缓存 git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive # 可能清理完成之后，把remote也给清除了，这里重置 git remote add origin git@github.com:Aoidayo/xxx.git # push git push origin --force --all git push origin --force --tags B. 验证 git rev-list 查看高占用文件， 剩余文件大小分布 git count-objects -vH git log &lt;file/dir&gt; # 1. git rev-list # 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象） git rev-list --objects --all | grep -f &lt;(git verify-pack -v .git/objects/pack/*.idx | grep blob | sort -k 3 -n | cut -f 1 -d &#34; &#34;|tail -10) # 剩余文件大小分布 (B) git rev-list --objects --all | awk &#39;{print $1}&#39; | git cat-file --batch-check=&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39; | awk &#39;/^blob/ {print $3, $4}&#39; | sort -n # 2. git count-objects -vH &#39;&#39;&#39; git count-objects -vH count: 19 size: 25.71 KiB in-pack: 283 packs: 1 size-pack: 9.30 MiB prune-packable: 0 garbage: 0 size-garbage: 0 bytes &#39;&#39;&#39; # 3. git log &lt;file/dir&gt; $ git log RopeUpDown\\ # 没有输出表示已经清理干净了 # 输出 和当前文件或者目录有关的commit history &#39;&#39;&#39; &gt; commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main) Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 21:17:38 2025 +0800 fix(remove filo): add ignore commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13 Author: aoi &lt;2908496836@qq.com&gt; Date: Fri Feb 28 20:57:55 2025 +0800 Rope Up Down &#39;&#39;&#39; 附录 参考：\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://blog.aoidayo.site/blog/git-big/feature.png' />
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li  class='current'>
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#工具">工具</a>
+      <ul>
+        <li><a href="#常用方法">常用方法</a>
+          <ul>
+            <li><a href="#a-filter-repo">A. filter-repo</a></li>
+            <li><a href="#b-验证">B. 验证</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#附录">附录</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="has-image main-article">
+    <header class="article-header">
+    <div class="article-image">
+        <a href="/blog/git-big/">
+            <img alt="Featured image of post Git 清除.git仓库历史记录中的高存储占用文件" height="922" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/blog/git-big/feature.png" srcset="/blog/git-big/feature_hu_1e09fb5ad2b2b170.png 800w, /blog/git-big/feature_hu_507ab6e64c1e7873.png 1600w, /blog/git-big/feature.png 1825w" width="1825">
+        </a>
+    </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/blog/git-big/">Git 清除.git仓库历史记录中的高存储占用文件</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2025-02-28T22:15:00&#43;08:00'>Friday, February 28, 2025</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#工具">工具</a>
+      <ul>
+        <li><a href="#常用方法">常用方法</a>
+          <ul>
+            <li><a href="#a-filter-repo">A. filter-repo</a></li>
+            <li><a href="#b-验证">B. 验证</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#附录">附录</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="前言">前言
+</h2><p>最近使用 Git 管理 Unity 项目，误将 Unity 的<code>Filo Cables</code>包<code>commit&amp;push</code>到仓库中了，折腾半天发现无法撤回，这个包没有导入到 Unity 之前就有<code>12MB+</code>, 对于一个 Git 仓库来说还是太大了，所以需要即时从<code>.git</code>中删除所有相关文件的历史提交记录，避免仓库越来越大，防止占用 Github 公共资源。</p>
+<h2 id="工具">工具
+</h2><p>推荐使用<code>git filter-repo</code>，一个可以清理并重写仓库中历史记录的工具；自动清理本地仓库的引用与缓存；比 git 自带的<code>git filter-branch</code>更加高效，后者容易导致历史记录的混乱与重写；适合处理有高占用空间文件的仓库（比如 Unity 的 3d-fbx 文件，模型 pt 文件等等）。</p>
+<ul>
+<li><code>git filter-repo</code>：<a class="link" href="https://github.com/newren/git-filter-repo/tree/main"  target="_blank" rel="noopener"
+    >newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement)</a></li>
+<li>验证清理效果：<code>git 自带命令</code></li>
+<li>查看 git 仓库占用空间：<code>git count-objects -vH</code></li>
+</ul>
+<p><img alt="image-20250228223219471" class="gallery-image" data-flex-basis="1014px" data-flex-grow="422" height="367" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/blog/git-big/assets/image-20250228223219471.png" srcset="/blog/git-big/assets/image-20250228223219471_hu_365cca5945f088c9.png 800w, /blog/git-big/assets/image-20250228223219471.png 1551w" width="1551"></p>
+<h3 id="常用方法">常用方法
+</h3><h4 id="a-filter-repo">A. filter-repo
+</h4><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. 文件夹</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 保留my_folder下面的所有文件, 删除其他所有文件</span>
+</span></span><span class="line"><span class="cl">git filter-repo --path my_folder
+</span></span><span class="line"><span class="cl"><span class="c1"># --invert-paths 反转. 删除my_folder下面的所有文件</span>
+</span></span><span class="line"><span class="cl">git filter-repo --path my_folder --invert-paths --force
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. 文件</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># --path-glob &lt;file.name&gt; 删除指定文件</span>
+</span></span><span class="line"><span class="cl">git filter-repo --path-glob xxx.mp4 --invert-paths --force
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. 占用空间</span>
+</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 100K
+</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1M
+</span></span><span class="line"><span class="cl">git filter-repo --strip-blobs-bigger-than 1G
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 清理引用和缓存</span>
+</span></span><span class="line"><span class="cl">git reflog expire --expire<span class="o">=</span>now --all <span class="o">&amp;&amp;</span> git gc --prune<span class="o">=</span>now --aggressive
+</span></span><span class="line"><span class="cl"><span class="c1"># 可能清理完成之后，把remote也给清除了，这里重置</span>
+</span></span><span class="line"><span class="cl">git remote add origin git@github.com:Aoidayo/xxx.git
+</span></span><span class="line"><span class="cl"><span class="c1"># push</span>
+</span></span><span class="line"><span class="cl">git push origin --force --all
+</span></span><span class="line"><span class="cl">git push origin --force --tags
+</span></span></code></pre></div><h4 id="b-验证">B. 验证
+</h4><ul>
+<li><code>git rev-list</code> 查看高占用文件， 剩余文件大小分布</li>
+<li><code>git count-objects -vH</code></li>
+<li><code>git log &lt;file/dir&gt;</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 1. git rev-list</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看高空间占用的文件 : 列出 Git 仓库中占用空间最大的 10 个文件（blob 对象）</span>
+</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> grep -f &lt;<span class="o">(</span>git verify-pack -v .git/objects/pack/*.idx <span class="p">|</span> grep blob <span class="p">|</span> sort -k <span class="m">3</span> -n <span class="p">|</span> cut -f <span class="m">1</span> -d <span class="s2">&#34; &#34;</span><span class="p">|</span>tail -10<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 剩余文件大小分布 (B)</span>
+</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span> awk <span class="s1">&#39;{print $1}&#39;</span> <span class="p">|</span> git cat-file --batch-check<span class="o">=</span><span class="s1">&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39;</span> <span class="p">|</span> awk <span class="s1">&#39;/^blob/ {print $3, $4}&#39;</span> <span class="p">|</span> sort -n
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 2. git count-objects -vH</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">git count-objects -vH
+</span></span></span><span class="line"><span class="cl"><span class="s1">count: 19
+</span></span></span><span class="line"><span class="cl"><span class="s1">size: 25.71 KiB
+</span></span></span><span class="line"><span class="cl"><span class="s1">in-pack: 283
+</span></span></span><span class="line"><span class="cl"><span class="s1">packs: 1
+</span></span></span><span class="line"><span class="cl"><span class="s1">size-pack: 9.30 MiB
+</span></span></span><span class="line"><span class="cl"><span class="s1">prune-packable: 0
+</span></span></span><span class="line"><span class="cl"><span class="s1">garbage: 0
+</span></span></span><span class="line"><span class="cl"><span class="s1">size-garbage: 0 bytes
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 3. git log &lt;file/dir&gt;</span>
+</span></span><span class="line"><span class="cl">$ git log RopeUpDown<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="c1"># 没有输出表示已经清理干净了</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 输出 和当前文件或者目录有关的commit history</span>
+</span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">commit c656025c6c761d5f3fc0be2989c34232cdaf5dfb (HEAD -&gt; main)
+</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 21:17:38 2025 +0800
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">    fix(remove filo): add ignore
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">commit 6f0a3ffb2731698ec5ce981f9fa281ee8332ba13
+</span></span></span><span class="line"><span class="cl"><span class="s1">Author: aoi &lt;2908496836@qq.com&gt;
+</span></span></span><span class="line"><span class="cl"><span class="s1">Date:   Fri Feb 28 20:57:55 2025 +0800
+</span></span></span><span class="line"><span class="cl"><span class="s1">
+</span></span></span><span class="line"><span class="cl"><span class="s1">    Rope Up Down
+</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;&#39;&#39;</span>
+</span></span></code></pre></div><h2 id="附录">附录
+</h2><p>参考：</p>
+<ul>
+<li><a class="link" href="https://www.bilibili.com/video/BV1C841117TD/?vd_source=a3b7a95f2cd97322455e13ec98e4c6d4"  target="_blank" rel="noopener"
+    >GitFAQ-如何删除提交记录中的大文件_哔哩哔哩_bilibili</a></li>
+<li><a class="link" href="https://zhuanlan.zhihu.com/p/377661967"  target="_blank" rel="noopener"
+    >Git 清理.git 文件夹中的大文件及.gitignore 简单使用 - 知乎</a></li>
+<li>DS</li>
+</ul>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/git/">Git</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/blog/git-big/" class="leancloud_visitors" data-flag-title="Git 清除.git仓库历史记录中的高存储占用文件">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>

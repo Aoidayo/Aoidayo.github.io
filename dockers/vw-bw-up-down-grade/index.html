@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Pre 为什么要升级 新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。\n我的vaultwarden版本是\n❯ docker logs vaultwarden | head -n 50 /--------------------------------------------------------------------\\ | Starting Vaultwarden | | Version 1.34.1 | |--------------------------------------------------------------------| ❯ docker exec vaultwarden /vaultwarden --version Vaultwarden 1.34.1 Web-Vault 2025.5.0 换用别的电脑/手机 安装bitwarden ios/android/windows/macos客户端 或者 浏览器插件 ，发现都在登录时出现意外错误。\n很难绷的一个问题，刚开始以为是本地服务器上的证书自动化工具certbot向let&rsquo;s encrypt申请的的ssl证书缺少中间证书的问题，经过验证后发现fullchain中的确是两层证书。\n后续发现是vaultwarden服务端不适配最新bitwarden客户端的问题，解决方法有两种：一种是降级bitwarden官方客户端，另外一种是升级vaultwarden的服务端。\nA 客户端降级 可以在bitwarden的历史页面下载旧版本的客户端/插件\nhttps://github.com/bitwarden/clients/releases\ntags:browser 下载浏览器插件，解压后拖入浏览器的插件安装页面。 tags:desktop 桌面客户端 vaultwarden 1.34.1 可以适配\nbrowser v2025.10.1 desktop v2025.10.0 这些服务端上破坏性的变更导致之前的老版本客户端无法使用，这还是挺蛋疼的，可以选择留一份过去版本的客户端。\nbitwarden经常对「安卓客户端/macos客户端/windows客户端/浏览器插件」和「server服务端」作修改，导致新版本的bitwarden客户端完全连接不上旧版本的vaultwarden。对于旧版本的浏览器扩展，可以在~~~~crx4chrome~~~~中下载旧版。 对于旧版本的浏览器客户端或者扩展，可在bitwarden的历史页面下载。另外一种方式是 重新修改并部署新版本的vaultwarden。\nB 服务端升级 B.1 升级之前 升级之前确认\n原版本 vw的数据保存位置 上一版的docker-compose VaultWarden版本\n❯ docker exec vaultwarden /vaultwarden --version Vaultwarden 1.34.1 Web-Vault 2025.5.0 确认数据保存位置\n">
+<title>VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法">
+<meta property='og:description' content="Pre 为什么要升级 新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。\n我的vaultwarden版本是\n❯ docker logs vaultwarden | head -n 50 /--------------------------------------------------------------------\\ | Starting Vaultwarden | | Version 1.34.1 | |--------------------------------------------------------------------| ❯ docker exec vaultwarden /vaultwarden --version Vaultwarden 1.34.1 Web-Vault 2025.5.0 换用别的电脑/手机 安装bitwarden ios/android/windows/macos客户端 或者 浏览器插件 ，发现都在登录时出现意外错误。\n很难绷的一个问题，刚开始以为是本地服务器上的证书自动化工具certbot向let&rsquo;s encrypt申请的的ssl证书缺少中间证书的问题，经过验证后发现fullchain中的确是两层证书。\n后续发现是vaultwarden服务端不适配最新bitwarden客户端的问题，解决方法有两种：一种是降级bitwarden官方客户端，另外一种是升级vaultwarden的服务端。\nA 客户端降级 可以在bitwarden的历史页面下载旧版本的客户端/插件\nhttps://github.com/bitwarden/clients/releases\ntags:browser 下载浏览器插件，解压后拖入浏览器的插件安装页面。 tags:desktop 桌面客户端 vaultwarden 1.34.1 可以适配\nbrowser v2025.10.1 desktop v2025.10.0 这些服务端上破坏性的变更导致之前的老版本客户端无法使用，这还是挺蛋疼的，可以选择留一份过去版本的客户端。\nbitwarden经常对「安卓客户端/macos客户端/windows客户端/浏览器插件」和「server服务端」作修改，导致新版本的bitwarden客户端完全连接不上旧版本的vaultwarden。对于旧版本的浏览器扩展，可以在~~~~crx4chrome~~~~中下载旧版。 对于旧版本的浏览器客户端或者扩展，可在bitwarden的历史页面下载。另外一种方式是 重新修改并部署新版本的vaultwarden。\nB 服务端升级 B.1 升级之前 升级之前确认\n原版本 vw的数据保存位置 上一版的docker-compose VaultWarden版本\n❯ docker exec vaultwarden /vaultwarden --version Vaultwarden 1.34.1 Web-Vault 2025.5.0 确认数据保存位置\n">
+<meta property='og:url' content='https://blog.aoidayo.site/dockers/vw-bw-up-down-grade/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Dockers' /><meta property='article:tag' content='docker' /><meta property='article:tag' content='vaultwarden' /><meta property='article:tag' content='bitwarden' /><meta property='article:published_time' content='2026-07-21T16:44:34&#43;08:00'/><meta property='article:modified_time' content='2026-07-21T16:44:34&#43;08:00'/>
+<meta name="twitter:title" content="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法">
+<meta name="twitter:description" content="Pre 为什么要升级 新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。\n我的vaultwarden版本是\n❯ docker logs vaultwarden | head -n 50 /--------------------------------------------------------------------\\ | Starting Vaultwarden | | Version 1.34.1 | |--------------------------------------------------------------------| ❯ docker exec vaultwarden /vaultwarden --version Vaultwarden 1.34.1 Web-Vault 2025.5.0 换用别的电脑/手机 安装bitwarden ios/android/windows/macos客户端 或者 浏览器插件 ，发现都在登录时出现意外错误。\n很难绷的一个问题，刚开始以为是本地服务器上的证书自动化工具certbot向let&rsquo;s encrypt申请的的ssl证书缺少中间证书的问题，经过验证后发现fullchain中的确是两层证书。\n后续发现是vaultwarden服务端不适配最新bitwarden客户端的问题，解决方法有两种：一种是降级bitwarden官方客户端，另外一种是升级vaultwarden的服务端。\nA 客户端降级 可以在bitwarden的历史页面下载旧版本的客户端/插件\nhttps://github.com/bitwarden/clients/releases\ntags:browser 下载浏览器插件，解压后拖入浏览器的插件安装页面。 tags:desktop 桌面客户端 vaultwarden 1.34.1 可以适配\nbrowser v2025.10.1 desktop v2025.10.0 这些服务端上破坏性的变更导致之前的老版本客户端无法使用，这还是挺蛋疼的，可以选择留一份过去版本的客户端。\nbitwarden经常对「安卓客户端/macos客户端/windows客户端/浏览器插件」和「server服务端」作修改，导致新版本的bitwarden客户端完全连接不上旧版本的vaultwarden。对于旧版本的浏览器扩展，可以在~~~~crx4chrome~~~~中下载旧版。 对于旧版本的浏览器客户端或者扩展，可在bitwarden的历史页面下载。另外一种方式是 重新修改并部署新版本的vaultwarden。\nB 服务端升级 B.1 升级之前 升级之前确认\n原版本 vw的数据保存位置 上一版的docker-compose VaultWarden版本\n❯ docker exec vaultwarden /vaultwarden --version Vaultwarden 1.34.1 Web-Vault 2025.5.0 确认数据保存位置\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#pre-为什么要升级">Pre 为什么要升级</a></li>
+    <li><a href="#a-客户端降级">A 客户端降级</a></li>
+    <li><a href="#b-服务端升级">B 服务端升级</a>
+      <ul>
+        <li><a href="#b1-升级之前">B.1 升级之前</a></li>
+        <li><a href="#b2-升级">B.2 升级</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/dockers/vw-bw-up-down-grade/">VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-07-21T16:44:34&#43;08:00'>Tuesday, July 21, 2026</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#pre-为什么要升级">Pre 为什么要升级</a></li>
+    <li><a href="#a-客户端降级">A 客户端降级</a></li>
+    <li><a href="#b-服务端升级">B 服务端升级</a>
+      <ul>
+        <li><a href="#b1-升级之前">B.1 升级之前</a></li>
+        <li><a href="#b2-升级">B.2 升级</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="pre-为什么要升级">Pre 为什么要升级
+</h2><p>新版本bitwarden client登录旧版本vaultwarden和web-vault的兼容性问题。</p>
+<p>我的vaultwarden版本是</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ docker logs vaultwarden <span class="p">|</span> head -n <span class="m">50</span>
+</span></span><span class="line"><span class="cl">/--------------------------------------------------------------------<span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="p">|</span>                        Starting Vaultwarden                        <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>                           Version 1.34.1                           <span class="p">|</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------<span class="p">|</span>
+</span></span><span class="line"><span class="cl">❯ docker <span class="nb">exec</span> vaultwarden /vaultwarden --version
+</span></span><span class="line"><span class="cl">Vaultwarden 1.34.1
+</span></span><span class="line"><span class="cl">Web-Vault 2025.5.0
+</span></span></code></pre></div><p>换用别的电脑/手机 安装bitwarden <code>ios/android/windows/macos客户端</code> 或者 <code>浏览器插件</code> ，发现都在登录时出现意外错误。</p>
+<p>很难绷的一个问题，刚开始以为是本地服务器上的证书自动化工具<code>certbot</code>向let&rsquo;s encrypt申请的的ssl证书缺少中间证书的问题，经过验证后发现fullchain中的确是两层证书。</p>
+<p>后续发现是vaultwarden服务端不适配最新bitwarden客户端的问题，解决方法有两种：一种是降级bitwarden官方客户端，另外一种是升级vaultwarden的服务端。</p>
+<h2 id="a-客户端降级">A 客户端降级
+</h2><p>可以在bitwarden的历史页面下载旧版本的客户端/插件</p>
+<ul>
+<li>
+<p><a class="link" href="https://github.com/bitwarden/clients/releases"  target="_blank" rel="noopener"
+    >https://github.com/bitwarden/clients/releases</a></p>
+<ul>
+<li><code>tags:browser</code> 下载浏览器插件，解压后拖入浏览器的插件安装页面。</li>
+<li><code>tags:desktop</code> 桌面客户端</li>
+</ul>
+</li>
+<li>
+<p>vaultwarden 1.34.1 可以适配</p>
+<ul>
+<li><a class="link" href="https://github.com/bitwarden/clients/releases/tag/browser-v2025.10.1"  target="_blank" rel="noopener"
+    >browser v2025.10.1</a></li>
+<li><a class="link" href="https://github.com/bitwarden/clients/releases/tag/desktop-v2025.10.0"  target="_blank" rel="noopener"
+    >desktop v2025.10.0</a></li>
+</ul>
+</li>
+</ul>
+<p>这些服务端上破坏性的变更导致之前的老版本客户端无法使用，这还是挺蛋疼的，可以选择留一份过去版本的客户端。</p>
+
+    <blockquote>
+        <p>bitwarden经常对「安卓客户端/macos客户端/windows客户端/浏览器插件」和「server服务端」作修改，导致新版本的bitwarden客户端完全连接不上旧版本的vaultwarden。<del>对于旧版本的浏览器扩展，可以在~~~~<a class="link" href="https://www.crx4chrome.com/crx/283645/"  target="_blank" rel="noopener"
+    >crx4chrome</a>~~~~中下载旧版。</del> 对于旧版本的浏览器客户端或者扩展，可在bitwarden的历史页面下载。另外一种方式是 重新修改并部署新版本的vaultwarden。</p>
+
+    </blockquote>
+<h2 id="b-服务端升级">B 服务端升级
+</h2><h3 id="b1-升级之前">B.1 升级之前
+</h3><p>升级之前确认</p>
+<ul>
+<li>原版本</li>
+<li>vw的数据保存位置</li>
+<li>上一版的docker-compose</li>
+</ul>
+<p>VaultWarden版本</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ docker <span class="nb">exec</span> vaultwarden /vaultwarden --version
+</span></span><span class="line"><span class="cl">Vaultwarden 1.34.1
+</span></span><span class="line"><span class="cl">Web-Vault 2025.5.0
+</span></span></code></pre></div><p>确认数据保存位置</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker inspect vaultwarden <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --format <span class="s1">&#39;{{range .Mounts}}{{println .Type .Source &#34;-&gt;&#34; .Destination}}{{end}}&#39;</span>
+</span></span></code></pre></div><p>部署目录的tree显示：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ <span class="nb">pwd</span> <span class="o">&amp;&amp;</span> tree -L <span class="m">2</span>
+</span></span><span class="line"><span class="cl">/home/dockers/vaultwarden
+</span></span><span class="line"><span class="cl">.
+</span></span><span class="line"><span class="cl">├── vw-compose.yml
+</span></span><span class="line"><span class="cl">├── vw-data
+</span></span><span class="line"><span class="cl">│   ├── attachments
+</span></span><span class="line"><span class="cl">│   ├── db.sqlite3
+</span></span><span class="line"><span class="cl">│   ├── db.sqlite3-shm
+</span></span><span class="line"><span class="cl">│   ├── db.sqlite3-wal
+</span></span><span class="line"><span class="cl">│   ├── icon_cache
+</span></span><span class="line"><span class="cl">│   ├── rsa_key.pem
+</span></span><span class="line"><span class="cl">│   ├── sends
+</span></span><span class="line"><span class="cl">│   └── tmp
+</span></span></code></pre></div><p>docker-compose：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ cat vw-compose.yml
+</span></span><span class="line"><span class="cl">services:
+</span></span><span class="line"><span class="cl">  vaultwarden:
+</span></span><span class="line"><span class="cl">    image: vaultwarden/server:latest
+</span></span><span class="line"><span class="cl">    container_name: vaultwarden
+</span></span><span class="line"><span class="cl">    restart: always
+</span></span><span class="line"><span class="cl">    environment:
+</span></span><span class="line"><span class="cl">      DOMAIN: <span class="s2">&#34;https://yoursite&#34;</span> <span class="c1"># 使用反向代理时必填；您的域名；Vaultwarden 需要知道它是 https 才能正确处理附件</span>
+</span></span><span class="line"><span class="cl">      SIGNUPS_ALLOWED: <span class="s2">&#34;false&#34;</span> <span class="c1"># 创建账户后，使用 &#34;false&#34; 停用此选项，这样就不会有陌生人注册了</span>
+</span></span><span class="line"><span class="cl">    volumes:
+</span></span><span class="line"><span class="cl">      - ./vw-data:/data <span class="c1"># : 前面的路径可以修改</span>
+</span></span><span class="line"><span class="cl">    ports:
+</span></span><span class="line"><span class="cl">      - 11001:80 <span class="c1"># 您可以将 11001 替换为您喜欢的端口</span>
+</span></span></code></pre></div><h3 id="b2-升级">B.2 升级
+</h3><ul>
+<li>1、确认compose识别正常</li>
+<li>2、停止vaultwarden</li>
+<li>3、备份数据和配置</li>
+<li>4、修改compose，固定版本，方便下次升级</li>
+<li>5、拉取镜像、启动</li>
+</ul>
+<p>1、确认compose识别正常</p>
+<pre tabindex="0"><code>cd /home/dockers/vaultwarden
+</code></pre><p>确认 Compose 识别正常：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml config
+</code></pre><p>2、停止容器</p>
+<p>sqlite文件一览：</p>
+<pre tabindex="0"><code>db.sqlite3
+db.sqlite3-shm
+db.sqlite3-wal
+</code></pre><p>说明 SQLite 正在使用 WAL 模式。为了获得一致的数据库备份，建议先停止容器：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml stop vaultwarden
+</code></pre><p>确认已停止：</p>
+<pre tabindex="0"><code>docker ps -a --filter name=vaultwarden
+</code></pre><p>状态应该是 <code>Exited</code>。</p>
+<p>3、备份数据和配置</p>
+<p>执行：</p>
+<pre tabindex="0"><code>mkdir -p backups
+
+sudo tar -czpf \
+  &#34;backups/vaultwarden-$(date +%Y%m%d-%H%M%S).tar.gz&#34; \
+  vw-compose.yml vw-data
+</code></pre><p>检查备份：</p>
+<pre tabindex="0"><code>ls -lh backups
+</code></pre><p>再简单验证压缩包：</p>
+<pre tabindex="0"><code>tar -tzf &#34;$(ls -t backups/vaultwarden-*.tar.gz | head -n 1)&#34; | head -n 30
+</code></pre><p>应该能够看到：</p>
+<pre tabindex="0"><code>vw-compose.yml
+vw-data/
+vw-data/db.sqlite3
+vw-data/attachments/
+vw-data/sends/
+vw-data/rsa_key.pem
+</code></pre><p>为了保险，也可以生成校验值：</p>
+<pre tabindex="0"><code>sha256sum &#34;$(ls -t backups/vaultwarden-*.tar.gz | head -n 1)&#34;
+</code></pre><p>4、修改Compose并固定版本</p>
+<p>不建议继续使用：</p>
+<pre tabindex="0"><code>image: vaultwarden/server:latest
+</code></pre><p>因为以后很难确认每次具体升级到了什么版本，也不方便回滚。</p>
+<p>修改为：</p>
+<pre tabindex="0"><code>services:
+  vaultwarden:
+    image: vaultwarden/server:1.36.0
+    container_name: vaultwarden
+    restart: always
+    environment:
+      DOMAIN: &#34;https://yoursite&#34;
+      SIGNUPS_ALLOWED: &#34;false&#34;
+    volumes:
+      - ./vw-data:/data
+    ports:
+      - &#34;11001:80&#34;
+</code></pre><p>可以直接执行：</p>
+<pre tabindex="0"><code>sed -i \
+  &#39;s#image: vaultwarden/server:latest#image: vaultwarden/server:1.36.0#&#39; \
+  vw-compose.yml
+</code></pre><p>检查修改结果：</p>
+<pre tabindex="0"><code>cat vw-compose.yml
+</code></pre><p>验证语法：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml config
+</code></pre><p>5、拉取并启动</p>
+<p>拉取镜像：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml pull vaultwarden
+</code></pre><p>重新创建容器：</p>
+<pre tabindex="0"><code>docker compose -f vw-compose.yml up -d vaultwarden
+</code></pre><p>注意，<code>up -d</code> 会替换旧容器，但继续挂载原来的：</p>
+<pre tabindex="0"><code>/home/dockers/vaultwarden/vw-data
+</code></pre><p>因此数据不会被清空。</p>
+<p>6、验证安装</p>
+<p>查看日志</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">docker compose -f vw-compose.yml logs --tail<span class="o">=</span><span class="m">200</span> vaultwarden
+</span></span><span class="line"><span class="cl">docker compose -f vw-compose.yml logs -f vaultwarden
+</span></span><span class="line"><span class="cl">docker <span class="nb">exec</span> vaultwarden /vaultwarden --version
+</span></span></code></pre></div><p>重新安装新版本后，就可以正常使用bitwarden的各种最新客户端了。</p>
+
+    <blockquote>
+        <p>一般vaultwarden都是追bitwarden更新的，如果新版官方客户端不能适配最新vaultwarden的话，可以降级客户端使用。</p>
+
+    </blockquote>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/docker/">Docker</a>
+        
+            <a href="/tags/vaultwarden/">Vaultwarden</a>
+        
+            <a href="/tags/bitwarden/">Bitwarden</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/blog/python-container/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Python算法项目 容器化</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/dockers/vw-bw-up-down-grade/" class="leancloud_visitors" data-flag-title="VaultWarden升级/BW客户端降级: Bitwarden客户端/插件不能登录VaultWarden的几种解决方法">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>

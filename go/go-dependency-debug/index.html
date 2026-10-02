@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="A 在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。\nJava：得益于类加载机制，只需在自己项目的 source path 下新建一个与目标依赖完全相同的包名（package）和类名，编译时该类会覆盖 classpath 中依赖包里的同名类，从而实现无需修改依赖本身即可调试的效果。Java的这点确实很方便，以前用这个方法定位过 easypoi 的问题。 Python：常见方式是用 pip install -e . 做可编辑安装，或者直接找到 site-packages（pip show &lt;package&gt; 可查看路径）里的源码进行修改；也可以把依赖源码整体拷贝到项目内，通过调整 sys.path 优先级或使用 PYTHONPATH 让本地版本优先加载。 C++ ：由于普遍采用源码 vendor 或静态/动态链接的方式管理依赖，通常做法是把第三方库源码拷贝到项目的 third_party 或 vendor 目录，通过 CMake 的 add_subdirectory（或 FetchContent 指向本地路径）引入本地修改版本，替代原本从包管理器或远程仓库拉取的版本。 B 接着说说Go：可以利用 go.mod 的 replace，将依赖指向本地拷贝的源码目录，下面详细说明具体步骤：\n先定位依赖源码的缓存位置，可通过 GOPATH 找到：\ngo env GOPATH echo $(go env GOPATH)/pkg/mod/github.com/example/awesome-pkg@v1.2.3/ 在当前项目下新建 third_party 目录，并将其加入 .gitignore（避免把第三方源码提交进仓库），然后把依赖源码拷贝进去：\ncp -r $(go env GOPATH)/pkg/mod/github.com/example/awesome-pkg@v1.2.3 ./third_party/awesome-pkg 修改 go.mod，通过 replace 指令让依赖指向本地目录：\n// 原来 // require github.com/example/awesome-pkg v1.2.3 replace github.com/example/awesome-pkg =&gt; ./third_party/awesome-pkg // 最终类似如下 module my-project go 1.25 require ( github.com/example/awesome-pkg v1.2.3 ) replace github.com/example/awesome-pkg =&gt; ./third_party/awesome-pkg 接着对本地源码目录赋予相应权限，方便编辑调试：\n">
+<title>go mod依赖源码本地修改与调试</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/go/go-dependency-debug/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="go mod依赖源码本地修改与调试">
+<meta property='og:description' content="A 在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。\nJava：得益于类加载机制，只需在自己项目的 source path 下新建一个与目标依赖完全相同的包名（package）和类名，编译时该类会覆盖 classpath 中依赖包里的同名类，从而实现无需修改依赖本身即可调试的效果。Java的这点确实很方便，以前用这个方法定位过 easypoi 的问题。 Python：常见方式是用 pip install -e . 做可编辑安装，或者直接找到 site-packages（pip show &lt;package&gt; 可查看路径）里的源码进行修改；也可以把依赖源码整体拷贝到项目内，通过调整 sys.path 优先级或使用 PYTHONPATH 让本地版本优先加载。 C++ ：由于普遍采用源码 vendor 或静态/动态链接的方式管理依赖，通常做法是把第三方库源码拷贝到项目的 third_party 或 vendor 目录，通过 CMake 的 add_subdirectory（或 FetchContent 指向本地路径）引入本地修改版本，替代原本从包管理器或远程仓库拉取的版本。 B 接着说说Go：可以利用 go.mod 的 replace，将依赖指向本地拷贝的源码目录，下面详细说明具体步骤：\n先定位依赖源码的缓存位置，可通过 GOPATH 找到：\ngo env GOPATH echo $(go env GOPATH)/pkg/mod/github.com/example/awesome-pkg@v1.2.3/ 在当前项目下新建 third_party 目录，并将其加入 .gitignore（避免把第三方源码提交进仓库），然后把依赖源码拷贝进去：\ncp -r $(go env GOPATH)/pkg/mod/github.com/example/awesome-pkg@v1.2.3 ./third_party/awesome-pkg 修改 go.mod，通过 replace 指令让依赖指向本地目录：\n// 原来 // require github.com/example/awesome-pkg v1.2.3 replace github.com/example/awesome-pkg =&gt; ./third_party/awesome-pkg // 最终类似如下 module my-project go 1.25 require ( github.com/example/awesome-pkg v1.2.3 ) replace github.com/example/awesome-pkg =&gt; ./third_party/awesome-pkg 接着对本地源码目录赋予相应权限，方便编辑调试：\n">
+<meta property='og:url' content='https://blog.aoidayo.site/go/go-dependency-debug/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Go' /><meta property='article:tag' content='go' /><meta property='article:published_time' content='2026-08-04T16:21:45&#43;08:00'/><meta property='article:modified_time' content='2026-08-04T16:21:45&#43;08:00'/><meta property='og:image' content='https://blog.aoidayo.site/go/go-dependency-debug/feature_rc.png' />
+<meta name="twitter:title" content="go mod依赖源码本地修改与调试">
+<meta name="twitter:description" content="A 在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。\nJava：得益于类加载机制，只需在自己项目的 source path 下新建一个与目标依赖完全相同的包名（package）和类名，编译时该类会覆盖 classpath 中依赖包里的同名类，从而实现无需修改依赖本身即可调试的效果。Java的这点确实很方便，以前用这个方法定位过 easypoi 的问题。 Python：常见方式是用 pip install -e . 做可编辑安装，或者直接找到 site-packages（pip show &lt;package&gt; 可查看路径）里的源码进行修改；也可以把依赖源码整体拷贝到项目内，通过调整 sys.path 优先级或使用 PYTHONPATH 让本地版本优先加载。 C++ ：由于普遍采用源码 vendor 或静态/动态链接的方式管理依赖，通常做法是把第三方库源码拷贝到项目的 third_party 或 vendor 目录，通过 CMake 的 add_subdirectory（或 FetchContent 指向本地路径）引入本地修改版本，替代原本从包管理器或远程仓库拉取的版本。 B 接着说说Go：可以利用 go.mod 的 replace，将依赖指向本地拷贝的源码目录，下面详细说明具体步骤：\n先定位依赖源码的缓存位置，可通过 GOPATH 找到：\ngo env GOPATH echo $(go env GOPATH)/pkg/mod/github.com/example/awesome-pkg@v1.2.3/ 在当前项目下新建 third_party 目录，并将其加入 .gitignore（避免把第三方源码提交进仓库），然后把依赖源码拷贝进去：\ncp -r $(go env GOPATH)/pkg/mod/github.com/example/awesome-pkg@v1.2.3 ./third_party/awesome-pkg 修改 go.mod，通过 replace 指令让依赖指向本地目录：\n// 原来 // require github.com/example/awesome-pkg v1.2.3 replace github.com/example/awesome-pkg =&gt; ./third_party/awesome-pkg // 最终类似如下 module my-project go 1.25 require ( github.com/example/awesome-pkg v1.2.3 ) replace github.com/example/awesome-pkg =&gt; ./third_party/awesome-pkg 接着对本地源码目录赋予相应权限，方便编辑调试：\n"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://blog.aoidayo.site/go/go-dependency-debug/feature_rc.png' />
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg t="1738895102529" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13993" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><path d="M306.005333 117.632L444.330667 256h135.296l138.368-138.325333a42.666667 42.666667 0 1 1 60.373333 60.373333l-78.037333 77.952L789.333333 256A149.333333 149.333333 0 0 1 938.666667 405.333333v341.333334a149.333333 149.333333 0 0 1-149.333334 149.333333h-554.666666A149.333333 149.333333 0 0 1 85.333333 746.666667v-341.333334A149.333333 149.333333 0 0 1 234.666667 256h88.96L245.632 177.962667a42.666667 42.666667 0 0 1 60.373333-60.373334zM789.333333 341.333333h-554.666666a64 64 0 0 0-63.701334 57.856L170.666667 405.333333v341.333334a64 64 0 0 0 57.856 63.701333L234.666667 810.666667h554.666666a64 64 0 0 0 63.701334-57.813334L853.333333 746.666667v-341.333334A64 64 0 0 0 789.333333 341.333333zM341.333333 469.333333a42.666667 42.666667 0 0 1 42.666667 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666666-42.666667z m341.333334 0a42.666667 42.666667 0 0 1 42.666666 42.666667v85.333333a42.666667 42.666667 0 1 1-85.333333 0v-85.333333a42.666667 42.666667 0 0 1 42.666667-42.666667z" p-id="13994" fill="currentColor"></path></svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/moments/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                
+                <span>瞬间</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#a">A</a></li>
+    <li><a href="#b">B</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="has-image main-article">
+    <header class="article-header">
+    <div class="article-image">
+        <a href="/go/go-dependency-debug/">
+            <img alt="Featured image of post go mod依赖源码本地修改与调试" height="297" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/go/go-dependency-debug/feature_rc.png" srcset="/go/go-dependency-debug/feature_rc_hu_ba8ff33e50ef468b.png 800w, /go/go-dependency-debug/feature_rc.png 819w" width="819">
+        </a>
+    </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            
+            
+            
+            <a href="/categories/blog/" style="background-color: hsl(289, 60%, 84%); color: hsl(289, 60%, 15%);">
+                Blog
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/go/go-dependency-debug/">go mod依赖源码本地修改与调试</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    
+    
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-08-04T16:21:45&#43;08:00'>Tuesday, August 4, 2026</time>
+                
+
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#a">A</a></li>
+    <li><a href="#b">B</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h2 id="a">A
+</h2><p>在实际开发中，有时需要临时修改第三方依赖的源码来定位问题或验证修复方案，不同语言生态的做法略有不同，总体上来说，java是最简单的，c++和go差不多，python是相对比较复杂的。</p>
+<ul>
+<li><strong>Java</strong>：得益于类加载机制，只需在自己项目的 source path 下新建一个与目标依赖完全相同的包名（package）和类名，编译时该类会覆盖 classpath 中依赖包里的同名类，从而实现无需修改依赖本身即可调试的效果。Java的这点确实很方便，以前用这个方法定位过 <code>easypoi</code> 的问题。</li>
+<li><strong>Python</strong>：常见方式是用 <code>pip install -e .</code> 做可编辑安装，或者直接找到 <code>site-packages</code>（<code>pip show &lt;package&gt;</code> 可查看路径）里的源码进行修改；也可以把依赖源码整体拷贝到项目内，通过调整 <code>sys.path</code> 优先级或使用 <code>PYTHONPATH</code> 让本地版本优先加载。</li>
+<li><strong>C++</strong> ：由于普遍采用源码 vendor 或静态/动态链接的方式管理依赖，通常做法是把第三方库源码拷贝到项目的 <code>third_party</code> 或 <code>vendor</code> 目录，通过 CMake 的 <code>add_subdirectory</code>（或 <code>FetchContent</code> 指向本地路径）引入本地修改版本，替代原本从包管理器或远程仓库拉取的版本。</li>
+</ul>
+<h2 id="b">B
+</h2><p>接着说说<strong>Go</strong>：可以利用 <code>go.mod</code> 的 <code>replace</code>，将依赖指向本地拷贝的源码目录，下面详细说明具体步骤：</p>
+<p>先定位依赖源码的缓存位置，可通过 <code>GOPATH</code> 找到：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">go env GOPATH
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="k">$(</span>go env GOPATH<span class="k">)</span>/pkg/mod/github.com/example/awesome-pkg@v1.2.3/
+</span></span></code></pre></div><p>在当前项目下新建 <code>third_party</code> 目录，并将其加入 <code>.gitignore</code>（避免把第三方源码提交进仓库），然后把依赖源码拷贝进去：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">cp -r <span class="k">$(</span>go env GOPATH<span class="k">)</span>/pkg/mod/github.com/example/awesome-pkg@v1.2.3 ./third_party/awesome-pkg
+</span></span></code></pre></div><p>修改 <code>go.mod</code>，通过 <code>replace</code> 指令让依赖指向本地目录：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 原来</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">// require github.com/example/awesome-pkg v1.2.3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nx">replace</span><span class="w"> </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">example</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="nx">third_party</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 最终类似如下</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nx">module</span><span class="w"> </span><span class="nx">my</span><span class="o">-</span><span class="nx">project</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">go</span><span class="w"> </span><span class="mf">1.25</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nf">require</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">example</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span><span class="w"> </span><span class="nx">v1</span><span class="mf">.2.3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nx">replace</span><span class="w"> </span><span class="nx">github</span><span class="p">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">example</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="nx">third_party</span><span class="o">/</span><span class="nx">awesome</span><span class="o">-</span><span class="nx">pkg</span><span class="w">
+</span></span></span></code></pre></div><p>接着对本地源码目录赋予相应权限，方便编辑调试：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">chmod -R u+x ./third_party/awesome-pkg 
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> ./third_party/awesome-pkg
+</span></span><span class="line"><span class="cl">nano xxx.go
+</span></span></code></pre></div><p>修改完成后即可正常编译调试，<code>go build</code>/<code>go run</code> 会自动使用本地修改后的版本。</p>
+<p>调试结束后记得移除 <code>replace</code> 指令并删除 <code>third_party</code> 目录，避免影响正式构建。</p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/go/">Go</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+
+        
+<section class="comments">
+    <span id="/go/go-dependency-debug/" class="leancloud_visitors" data-flag-title="go mod依赖源码本地修改与调试">
+        文章阅读量 <span class="leancloud-visitors-count">0</span>
+    </span>
+    <div id="valine"></div>
+</section>
+<script src="https://code.bdstatic.com/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+<script src="https://unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: "#valine",
+        appId: "VfgzEDBRRzAgRUnQjN7Yl2YS-gzGzoHsz",
+        appKey: "HL7O7Yyug8NwhhOexaxeVIto",
+        placeholder: "欢迎留言~",
+        avatar: "hide",
+        visitor: true
+    });
+</script>
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+
+
+    </body>
+</html>
