@@ -5,7 +5,19 @@
         <description>Recent content in Tags on Aoidayo</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-CN</language>
-        <lastBuildDate>Fri, 02 Oct 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 03 Oct 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>Java</title>
+            <link>https://blog.aoidayo.site/tags/java/</link>
+            <pubDate>Sat, 03 Oct 2026 00:00:00 +0000</pubDate>
+            <guid>https://blog.aoidayo.site/tags/java/</guid>
+            <description></description>
+        </item><item>
+            <title>Spring</title>
+            <link>https://blog.aoidayo.site/tags/spring/</link>
+            <pubDate>Sat, 03 Oct 2026 00:00:00 +0000</pubDate>
+            <guid>https://blog.aoidayo.site/tags/spring/</guid>
+            <description></description>
+        </item><item>
             <title>Hugo</title>
             <link>https://blog.aoidayo.site/tags/hugo/</link>
             <pubDate>Fri, 02 Oct 2026 00:00:00 +0000</pubDate>

@@ -3,21 +3,33 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://blog.aoidayo.site/</loc>
-    <lastmod>2026-10-02T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://blog.aoidayo.site/categories/blog/</loc>
-    <lastmod>2026-10-02T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://blog.aoidayo.site/categories/</loc>
-    <lastmod>2026-10-02T00:00:00+00:00</lastmod>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://blog.aoidayo.site/tags/java/</loc>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://blog.aoidayo.site/java/</loc>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://blog.aoidayo.site/tags/spring/</loc>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://blog.aoidayo.site/java/spring/spring-l3cache-qa/</loc>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://blog.aoidayo.site/tags/</loc>
+    <lastmod>2026-10-03T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://blog.aoidayo.site/tags/hugo/</loc>
     <lastmod>2026-10-02T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://blog.aoidayo.site/blog/multi-theme-hugo-content-guide/</loc>
-    <lastmod>2026-10-02T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://blog.aoidayo.site/tags/</loc>
     <lastmod>2026-10-02T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://blog.aoidayo.site/blog/</loc>
