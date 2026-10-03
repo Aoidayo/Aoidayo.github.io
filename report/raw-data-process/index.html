@@ -39,6 +39,9 @@
 
     <script>
         try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
             if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
                 document.documentElement.classList.add('zen-mode');
                 const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
@@ -49,7 +52,7 @@
         } catch (_) {}
     </script>
     
-    <link rel="stylesheet" href="/css/zen-mode.b60a41107b9a4550374aaa4e1aa2f7a6717080f8aa0203592c250dd2ba684609.css">
+    <link rel="stylesheet" href="/css/zen-mode.ac1150503541e25bc9812e83a77c6fac91bb58d0d6da7cb663a62c68e48e130e.css">
 
 
     </head>
@@ -668,7 +671,7 @@ osm数据有uv字段，但是从GeoFabrik上下载的shapefile丢失这部分数
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.94639f2415663a84530b265518e905adefb3146258d382f0a84eaa5c02665adc.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.31cbeb0babcd3583a57cb7140b3a2f17a20b5df96eba2f71be8a54c7e8a3ea22.js" defer></script>
 
 
     </body>

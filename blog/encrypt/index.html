@@ -38,6 +38,9 @@
 
     <script>
         try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
             if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
                 document.documentElement.classList.add('zen-mode');
                 const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
@@ -48,7 +51,7 @@
         } catch (_) {}
     </script>
     
-    <link rel="stylesheet" href="/css/zen-mode.b60a41107b9a4550374aaa4e1aa2f7a6717080f8aa0203592c250dd2ba684609.css">
+    <link rel="stylesheet" href="/css/zen-mode.ac1150503541e25bc9812e83a77c6fac91bb58d0d6da7cb663a62c68e48e130e.css">
 
 
     </head>
@@ -290,7 +293,7 @@
     <section class="article-content">
     
     
-        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"r4eHnJsmLUIaqqA61jqG0A==","iv":"npTSS/SZI4CqkqIj","ciphertext":"ahKpQ2rXM2R8P6sA5qOyn53KfoRq0aw07EUFmOPb9D8eqFf0WweDxUcQnRyUCIjEjnH2MRt95JsSuK5OCgkpf0q8aEammFqLtFWHKZhyoTQFRcCZNN/6NNRiyxsGESzsNfEyPnB/p48thhSkx00u5Q4a5WQ2Gy1shErpXjynGDkmloWE9eOceAsDp5FcayBetrbGVG6gFcRC0sBCtfs0CTiFPCeXebEOnB4bPpvAzbYICgd0rcMFsOyafJ1//EF3IZpAAQ8HbyGTPcZgyNBszY5oKzYf0+dFezpKDr3Iez0/Y3UoV9dQdXAExw2yGUbzlYOmhA3NzPykZjv8qfNH5e+yY+Ejf1/2PFxKhBMZFk2ZLus2rTc/W9RYRvN2yoenulqO5rTUceSD/2Nxc7Ine+ePbIJzwtSfEa7U/2FPo2Xbn0yhny+B29SYb+HTTrGy7Ta3NQpYJhlwqwIRX9bH7afL1A6LSn2rSfKuclH6Jacfxt7htfBPPq2ehghFhzYk/BMRRX4MciF63SlzKrC0tE1g+tCBlmk4ClqGvmnr+4pGxua1EbTQzB4DXVUYcvgwnhIVBOn5LqOdjkL0ST4g4yvD8l5NWcDCQHJjfmfv4k6sXESK+utM2pqsHQZiE0hCQPxe8nP5UtMzS0cETEdQkwJAzAo2Gel2zOQycpdfpiRvE/05+qPbjraeRPIkTNiL8/QJr1fGRfOswyYwA5ySWFoYalUwfFRvnJ9UiKljpDcmNWOB2ZQWkrMbX3WX0rUOdbg3Pxa+9cC7ScZjCCgjuq+6dcS0WD3x27Jsh1qY8JNPeBmYKLjnn64rvbSYSYUheBfRzIBm86yL19p24tp5f7SLCYYTk78wWugGCZN3ONgXQWFHqR2/XLSKpXnNIEguTnYQ3ZxeipE+79r3S3cQhibylUMVTiHz/n1nVtuzIdCaZsLXTp6ZLEEuCgUUvsqcQ/TeCj7fwQhbA8pG+l5sWlfHktu1WfBA4Fcn","id":"Sjv9hbFUK8dgStBn4pecq-","kind":"article","prompt":"请输入密码"}</script></div>
+        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"vVfcNC0/LRcRNaiIJJRMKA==","iv":"2XPCt7zTOyg//Cv8","ciphertext":"LdggcX7RJes6ZwI3B4aa7iqTzyK9eLIU8JQMa/tl2eZTvpj9jZRsJU3qW16TB7O9ca7e/WPrvLr3Cd4PSm0Fh909IYWlHyoHUeBHhS1pfJG8F7ftzhrciag6r6lH1rP9axBMVpfyMrKrDywa2EgkJvTOVwP7D07btbw4bvNY8M8Zi89BA+a1+yDQViDoyoput7Mn7R0rMBorNfO+cfOmrXDuswi+5bfuHWMPcdNIgBxj1UEo+un+WfAHUg8PnbSUs92Mtz8xEdc7+B/qvTjtiz7RSzLrUrLvfSbopNMamyd3LB/4hUfjJssZvt5niOFjwUrU+mo5mPzbOqRIH217YQAqViMOvE8UR3g/4oMPXEXDKCp3AGBxmD19OJGrFQbU4kHATyUrZa6FxK6aAFP31ulnO6R8TPjJTTSGwsZXCfYEPEeJIHai0RHaaS2Br8kDHjhKdYLm5CoBjlghsP+i9kGchO4Kj9BoPL7kH75mhISiLyyM6XdtN09QSfvNg1upz510zYrC3MnE6CZPJ4kP2lxtL8Xcj0hKP4y/3tGyeCT2NovGnKFR83GkzAnLZW0fhoxg5WXaQaxA69UEGx1hHijxA/FDXTNFSTFWdN+SBZ+OGjzeHbq3P0n4+JlmCtyt0xaP8jLWkigCEgA+NicBNPJWSW654k5lgy12KKnIOXic495MVQSV+o+FdAxTW5HavuYaiFAXfp5xar9pw8iVBMRHJ9RoN4ng0rrZX6ZyFZPsB5kIpPj8g1gvhT2aGxIAwUXeosP4bSnQhQCFaPC8cEeDjYax8pNOJvDQU3yag4g+tmlo5VSbNL3VVkwV57zbVAekYn/FKFz275O5qOhR32+sGjO+W8Nehy4OOETihZzN8IKCJRy1jIBaLkh5cz7Eb8DUJksziekASc7w/3GO+J8GDnYI3Zs5QsVY1bDTUSyEZujNGRpFO+NpyWl09iSyykou9OfCKhgQTbSFD8w6eTb0heejIhcsW+hU","id":"Sjv9hbFUK8dgStBn4pecq-","kind":"article","prompt":"请输入密码"}</script></div>
 </section>
 
 
@@ -437,7 +440,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.94639f2415663a84530b265518e905adefb3146258d382f0a84eaa5c02665adc.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.31cbeb0babcd3583a57cb7140b3a2f17a20b5df96eba2f71be8a54c7e8a3ea22.js" defer></script>
 
 
     </body>

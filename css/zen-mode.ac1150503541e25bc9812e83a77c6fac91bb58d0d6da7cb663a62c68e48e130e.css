@@ -43,6 +43,10 @@ html.zen-mode body.article-page .zen-mode-toggle {
     color: var(--reading-control-on-color);
 }
 
+html.toc-hidden body.article-page .toc-mode-toggle {
+    color: var(--reading-control-off-color);
+}
+
 html.zen-mode body.article-page .main-container {
     max-width: calc(var(--zen-article-width) + 2 * var(--container-padding));
 }
@@ -60,7 +64,7 @@ html.zen-mode body.article-page.has-toc .main-container {
     max-width: calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation) + 2 * var(--container-padding));
 }
 
-html.zen-mode body.article-page.has-toc.toc-hidden .main-container > main.main {
+html.zen-mode.toc-hidden body.article-page.has-toc .main-container > main.main {
     max-width: calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation));
 }
 
@@ -70,7 +74,7 @@ html.zen-mode body.article-page.has-toc .main-container > .right-sidebar {
     max-width: var(--zen-toc-width, 360px);
 }
 
-body.article-page.toc-hidden .main-container > .right-sidebar,
-body.article-page.toc-hidden .article-toc {
+html.toc-hidden body.article-page .main-container > .right-sidebar,
+html.toc-hidden body.article-page .article-toc {
     display: none;
 }
