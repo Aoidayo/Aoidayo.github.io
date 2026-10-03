@@ -1,5 +1,12 @@
 body.article-page {
     --zen-article-width: 900px;
+    --reading-control-off-color: #767676;
+    --reading-control-on-color: #1d4ed8;
+}
+
+html[data-scheme="dark"] body.article-page {
+    --reading-control-off-color: #aab1bb;
+    --reading-control-on-color: #7dd3fc;
 }
 
 body.article-page .reading-control {
@@ -11,30 +18,29 @@ body.article-page .reading-control {
     padding: 0;
     border: 0;
     background: transparent;
-    color: var(--card-text-color-tertiary);
+    color: var(--reading-control-off-color);
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 body.article-page .reading-control svg {
     width: 20px;
     height: 20px;
+    stroke-width: 1.33;
 }
 
 body.article-page .reading-control:hover {
-    color: var(--accent-color);
+    color: var(--reading-control-on-color);
 }
 
 body.article-page .reading-control:focus-visible {
-    outline: 2px solid var(--accent-color);
+    outline: 2px solid var(--reading-control-on-color);
     outline-offset: 2px;
 }
 
+body.article-page .reading-control[aria-pressed="true"],
 html.zen-mode body.article-page .zen-mode-toggle {
-    color: var(--accent-color);
-}
-
-body.article-page.toc-hidden .toc-mode-toggle {
-    opacity: 0.55;
+    color: var(--reading-control-on-color);
 }
 
 html.zen-mode body.article-page .main-container {
