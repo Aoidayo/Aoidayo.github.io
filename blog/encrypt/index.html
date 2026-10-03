@@ -36,8 +36,19 @@
       </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
 <script defer src="/js/hugo-encrypt.js"></script>
 
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
     
-    <link rel="stylesheet" href="/css/zen-mode.480b211e40a45a71fee6116f2f9a304527850dcdd38ef8218836599444493c92.css">
+    <link rel="stylesheet" href="/css/zen-mode.b7b3d033f34b7967c7806c4a4524a1fa68307337f106d40f38603a95ee0480ed.css">
 
 
     </head>
@@ -260,11 +271,6 @@
                         </svg>
                     </button>
                     
-                    <span class="reading-width-control">
-                        <label for="reading-width">宽度</label>
-                        <input id="reading-width" type="range" min="640" max="1120" step="40" value="900" aria-label="文章阅读宽度">
-                        <output id="reading-width-value" for="reading-width">900px</output>
-                    </span>
                 
                 
             </div>
@@ -284,7 +290,7 @@
     <section class="article-content">
     
     
-        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"cM0GL8PeCv6QN5HZHwJbzQ==","iv":"yksQ0feTAi6YnBBo","ciphertext":"1I9BA/+l4jkQoTfh5+mrpBd261UcfaljNFyhK2Y5OYE99JTpTKS9yGn4bxbQH2UjAYbf10S+qYpp2Gh+ENsK+dpAi7bccr484qrvj9ktYWhR4b0MNQUcq5IrS9HIvWj9ZRJ0sHohtsjIOxlZDodniQx1+T3gzYOenQI4Al/xGKandWGh9nY9QVaceiU15vIdJ9tgdmxGbVlsTV9ZQLBxZ/hC1FEZsE3W3kYc5HPg8ULyUsXSn2+tqutxUjPtmGgSgYak2ViGNDL8SXUxS1cHKpozNrEyUY2LkuiDxIBTeI/gA2QQy2v4Fc1KBQNxODe6Sa9qCxHsdX80t+6O5bo059qCU81Pbu6kpbqq1jkYgQkUWb4JuUm4CqJEzUhYfhx3FkjSrtx7ynQZJR+w/W34j0bFkdTES3KA7xNk7uVjL83DEC6jY/wsSv4oM7WuKAwY3H+U9KJP6TU4r0Z9gX2yUgrN941qXhg063y1tGFWrA/PQyVcEk6bCBgjjZM7XSzVns1tjrsxyBhKh0QVBxFc6UNuFpvzTCvNv1ENl1M4S+OtQtxqwAE0zW0QXQcQSW/NiHqFZEdlQ7EZBkaMM/PMDvcZxBiIlGT8yhRIHEDcHJu0b2cfy0plCpnhwClDvXkDlDbgXvjXQffIJMJME+zMnNhJZhvUV5omlG6Gs68S4T6QpldGgfmDqpoZNliewAF2wtO1bqCnlEOvU7ge0hNQ7asUTGHX1lc0e+SdKTtlab8QslvWHb3hA3CF5keFW2BEw/C7KaNA6+CIIi8zt/XJlCEP6d1W0bzLWvialuXB0grfE4FjvPnybtxrFHd67hbZsUeNNLURFaitZdHsjYCVzaL8JFKCixrqQw2oDPpZljpTowR5b1zrwh+vdJrKMUZKcalQP2mBemFIZsTCNPksOwqNObFt6s3D7NSlMH+SDlSvLPV9YndhBzY+w3FDT2durkpQwccio9mqiX5dcKNqFqlArgNnKKB5A1BO","id":"Sjv9hbFUK8dgStBn4pecq-","kind":"article","prompt":"请输入密码"}</script></div>
+        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"kET4ggPV11yFMgF8FEhhiw==","iv":"gAT8oksCHlZMFgZW","ciphertext":"MMSHHIqZ9Q8aQtVTNTdCKv4yHklZMcu0RWaeF0pv7FnWs5OH34vJ9PFCyPeSKBpGH+VX6YPjea74zi4EAGEIQ9D370AJFZbWnfpEQR4x8xj1c9xEQmmib+/d+Z++hTaDQekz1/Zn0VeWfx1CBxAVvVBsnwQXD9P26jXHY3+wU1nZgVnEm0VY1AYPFo4M/n4UIZVIeeUocPvBoBfTAHnyYHGX8lf4gKVnABBTI32t7U4tWJZfJ98MSQdWhbep8jDkd075ROAv+Fy7B45plrjcTCLQ9IdrGegIzk+gzHVDG3rKvD0ECGFH7V3qXJJQWN9cZ0YKPHUkqiwlU6opBHci2xwk/29/BEkc9M0LOfMKKdPfaJFmRCyqrEDRx2MKeb9O6Si8PAX0amL2/mEKe50dr5ULROngIpdqalg/Q4rKbuU32+xBvodvA7q9hiFWDm3fLDYjHXevu9p4W0ZhhBUH8N1mz+uhwwmirFRfxEGuAkpeT0gs72o2/O6pUNrGlGnIhrKlOSVqd8Wxa4y46Yr5hrtxWxA/d6OW4LHiAfYjbUhzKWRz0fDi4Z1bPlOUHvd35ykLEbYWNFPnSJGsj2JIti+XnUVRvhujXe4NDvQuueOeY84EpPNXq0HcxxEmkwiGJXlZl0r4292XhxsqIW+NRAwChnObTJIidrNhSurn3m45V0boeO8NA2+0Zk78UVQmgvUcaEOazQ2OYTxSM3kCs1t5lMH3XHfOAsvwxh9xQZ1Z+HyHf7QXU/aqUpLTaOmNHgxYwhjR79QmYepnA+hUc7DTxrhUe+EBzY51KnMiRbRc+NKffOKwHTE8wJfvbKoCoD9QpMdnVlguXK0X/gIet2XQShy2F45SoWVdndV86yuFHjKv08P3wcvI6OLrmtfsdYbnMbfEMsDAqs63Poc4upoPU2WW5GCNeayzKzNnDAIWYGbxBPcoEu8kXS/HDNWpzfh2zS+IqW16Bepq7KeVAD+3fpJw897KHOcm","id":"Sjv9hbFUK8dgStBn4pecq-","kind":"article","prompt":"请输入密码"}</script></div>
 </section>
 
 
@@ -431,7 +437,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.6c78004f5f35c52fb30ad97194881c59261ff72f1357ed81707118701cdc74a9.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.94639f2415663a84530b265518e905adefb3146258d382f0a84eaa5c02665adc.js" defer></script>
 
 
     </body>
