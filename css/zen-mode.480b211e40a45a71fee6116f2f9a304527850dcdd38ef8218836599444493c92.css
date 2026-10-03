@@ -1,0 +1,88 @@
+body.article-page {
+    --reading-width: 900px;
+}
+
+body.article-page .reading-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--card-text-color-tertiary);
+    cursor: pointer;
+}
+
+body.article-page .reading-control svg {
+    width: 20px;
+    height: 20px;
+}
+
+body.article-page .reading-control:hover {
+    color: var(--accent-color);
+}
+
+body.article-page .reading-control:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+body.article-page.zen-mode .zen-mode-toggle {
+    color: var(--accent-color);
+}
+
+body.article-page.toc-hidden .toc-mode-toggle {
+    opacity: 0.55;
+}
+
+body.article-page .reading-width-control {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    color: var(--card-text-color-tertiary);
+}
+
+body.article-page.zen-mode .reading-width-control {
+    display: inline-flex;
+}
+
+body.article-page .reading-width-control input {
+    width: 120px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+body.article-page .reading-width-control output {
+    min-width: 48px;
+    font-variant-numeric: tabular-nums;
+}
+
+body.article-page.zen-mode .main-container {
+    max-width: calc(var(--reading-width) + 2 * var(--container-padding));
+}
+
+body.article-page.zen-mode .main-container > .left-sidebar {
+    display: none;
+}
+
+body.article-page.zen-mode .main-container > main.main {
+    max-width: var(--reading-width);
+    margin-inline: auto;
+}
+
+body.article-page.zen-mode.has-toc:not(.toc-hidden) .main-container {
+    max-width: calc(var(--reading-width) + 280px + var(--section-separation) + 2 * var(--container-padding));
+}
+
+body.article-page.zen-mode.has-toc .main-container > .right-sidebar {
+    flex: 0 0 280px;
+    width: 280px;
+    max-width: 280px;
+}
+
+body.article-page.toc-hidden .main-container > .right-sidebar,
+body.article-page.toc-hidden .article-toc {
+    display: none;
+}
