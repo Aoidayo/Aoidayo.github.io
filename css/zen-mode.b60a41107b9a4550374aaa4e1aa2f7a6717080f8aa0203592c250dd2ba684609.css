@@ -56,8 +56,12 @@ html.zen-mode body.article-page .main-container > main.main {
     margin-inline: auto;
 }
 
-html.zen-mode body.article-page.has-toc:not(.toc-hidden) .main-container {
+html.zen-mode body.article-page.has-toc .main-container {
     max-width: calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation) + 2 * var(--container-padding));
+}
+
+html.zen-mode body.article-page.has-toc.toc-hidden .main-container > main.main {
+    max-width: calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation));
 }
 
 html.zen-mode body.article-page.has-toc .main-container > .right-sidebar {
