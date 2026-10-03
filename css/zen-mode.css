@@ -1,34 +1,64 @@
-body.article-page .zen-mode-toggle {
-    position: fixed;
-    right: calc(16px + env(safe-area-inset-right));
-    bottom: calc(20px + env(safe-area-inset-bottom));
-    z-index: 50;
-    border: 0;
+body.article-page .reading-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 5px;
+    border: 1px solid var(--card-separator-color);
     border-radius: var(--tag-border-radius);
-    padding: 10px 16px;
-    background: var(--accent-color);
-    color: var(--accent-color-text);
-    box-shadow: var(--shadow-l2);
-    font: inherit;
-    font-size: 1.4rem;
+    background: var(--card-background);
+    color: var(--card-text-color-secondary);
     cursor: pointer;
 }
 
-body.article-page .zen-mode-toggle:hover {
-    background: var(--accent-color-darker);
+body.article-page .reading-control svg {
+    width: 20px;
+    height: 20px;
 }
 
-body.article-page .zen-mode-toggle:focus-visible {
-    outline: 2px solid var(--card-text-color-main);
-    outline-offset: 3px;
+body.article-page .reading-control:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+body.article-page .reading-control:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+body.article-page .toc-mode-toggle {
+    display: none;
+}
+
+body.article-page.zen-mode .toc-mode-toggle {
+    display: inline-flex;
+}
+
+body.article-page.zen-mode .zen-mode-toggle {
+    background: var(--accent-color);
+    color: var(--accent-color-text);
+    border-color: var(--accent-color);
+}
+
+body.article-page.zen-mode.toc-hidden .toc-mode-toggle {
+    opacity: 0.55;
 }
 
 body.article-page.zen-mode .main-container {
+    max-width: 1280px;
+    --right-sidebar-max-width: 280px;
+}
+
+body.article-page.zen-mode .main-container > .left-sidebar {
+    display: none;
+}
+
+body.article-page.zen-mode.toc-hidden .main-container {
     max-width: 1000px;
 }
 
-body.article-page.zen-mode .main-container > .left-sidebar,
-body.article-page.zen-mode .main-container > .right-sidebar,
-body.article-page.zen-mode .article-toc {
+body.article-page.zen-mode.toc-hidden .main-container > .right-sidebar,
+body.article-page.zen-mode.toc-hidden .article-toc {
     display: none;
 }
