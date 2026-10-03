@@ -35,6 +35,7 @@
         }
       </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
 <script defer src="/js/hugo-encrypt.js"></script>
+<link rel="stylesheet" href="/css/zen-mode.css">
 
     </head>
     <body class="
@@ -211,6 +212,10 @@
     
 
             <main class="main full-width">
+    <button id="zen-mode-toggle" class="zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读">
+        <span class="zen-mode-label">专注阅读</span>
+    </button>
+
     
 <article class="main-article">
     <header class="article-header">
@@ -278,7 +283,7 @@
     <section class="article-content">
     
     
-        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"RuPLKuJGMNKqvgWBXPRYFg==","iv":"sqZc0IEGgBrVfSUW","ciphertext":"n3OcDU8BT3w/+SEWXb8JWkgAZ5o7TEMZNFyw/QllH11Bk3BYlGiEju7LhBSt9Oxa0WecQenkVJlkUgEWkAZLswgYAS+lxT4XLcnNorMEf50rTCN/OEbREMXmIR523d7egB2DclNva7YpUlZgd18HT21fin9isLqKRdEKbjfXCOyobdvmV2nbUtEsLQnlP9LuQJIXR6BwcXEPi8rqo9cOmlKlLNeHSTJ9rLJ+TPb2qJacyrnZHp+wZShOYRdjnySAVZMH/XnLo0/aWGI/ryOgC+DWEpnD7438AsuI8pqjX7v7b3xD1nk0NebDh6Faqa8j2cdOhdxC1PlVUeeXlnbCF6ujWjkbdL4k7xNHMZgzfGaa3IEdqmAFvUQydbe/pfNOuK6Ba35s7Wofro6cE6ILxWfQ6/DAPPb7GwaX79ZkOoUp/KzTMWXc/JemiY+GHTZdSFs4ORpDvKABcMAttu4wCY35jky5bOV3j80ViXC14d3Ir438ZBN1aYeplYfVCcpWn0r6EGtnHyDtloFhDDlo5pspvQbZhnmNqL1rqVCqL3/vZUuVIq5KDuYHAz8mDHtp+Z7MWV7pT/az4zVSsnNN8JknWUTfx3lHnbSxE2xHpjumvWd5S9piHjKxM3HPqhXGKgXscdxQVkaMXD1cp8ksxAvDzfA33KD4Bjkhu2tpMagfO0PKl0b9Qp+HEnySAY3ydfK9Hh13gW7eN8iW29l+AdzeVkValoLm19BNPq6FNHhibkNkWDifbuX3WACovT9lRhOWnUe8Nx6vF7Ex1l+OIV+JwKj3HeQKkx2Kp7H9QkTNm0hkL/fwhgt1MwFQdwUrclu6qfeaU5hI49TXuEHT/1uGBss1bLkMme8KcsnOH1t9Sv16vjdPVIYq3U9BQFSJipZRs804JcM9fIVkOhI+CbwnrfhvfbbdaJaDjXVc/U4cvF64DXmref/j4aNVKcR9PPCPlljbvfwlIDjHogqkrUufDkMUJfNvBbHY","id":"Sjv9hbFUK8dgStBn4pecq-","kind":"article","prompt":"请输入密码"}</script></div>
+        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"q8v7f8xpKo5IaY42Tfwadg==","iv":"kIFZNpYnJuNC6Fe8","ciphertext":"+K8LDO/03isi3EBDEc939Mo83mHVebGhQ3ZoJnBr61RvlDqqS3akWMbQhFJoi03ZfMzMPI6oYJSIcoEXxa/e+ZNB56wqGYcU0THwl4IIDrlMN0dGg3ijkCp9SkY+zJiorPvpVsGOU0gx7HYAM0KPJKvGVLbwpCR2Fsex9GPPxQIPh8J1QnD6FMTzHEUAqPUvM5j1ZnFO3fnBHXkvc0WZEm5FeFVktFtiRZ7tLNNzuqQn03F+wMMzXOC9U6fxn5knu0sI1mDhkVYncD0dTpKHRCLu3vy/rrRz8+lyNDzzasWQ1/HRoDLmUdPTLlIaZitn9xGDEMKyU7CuZ6H/HIXBZwCXUO+lZu4pYi8Kc+KgPSlEB4kKOl1DN7fM68bL+PjwCQys6UGU7fyTI2p55u5w4B5AfwQeeHrvVcYdQYk9NT98ugyhN5S/kPFrjFv19sfy4dE2QBXD8WLnRmEb3uTNpSkZ+h0Yw/jIh6pou9zmvMxNpMqFmow+QWZ2VEZk5H4zOeWEj1uR56025t3Rg0WnCB8V4YayeDt11pX57WgQv7N5kASRSNRrbhTrmco37CxIju5UA9eb8kSKTD2LG6bX8Vu+nlE2wbgaOfD13dnGjXuzI5MYtommOS34ftCYfue6PvOy7hqLkyam+Ghc/hzvchWj+OfZtJDbdU6OghJajWKx2CPFlNY0qEOi9wMneb+K8zClDk5byp1CiCvBTrmswr7/Egw8A16q7Pa9dwy/GzkKEORdlEpRNrCkPb2zxETtoi6yK60nL2CrdKbQRBXZceRqSM++BQs1p6s8n707IbXW1b6lZ3+e/bkKXRuWk3CDW/nw/cFG0zdwDccR9n/jC9RaSxRBZSMQpc/690V7DjCxdeqhnjkJcgTjOhcz25yXr7AokBJ0HchG/j1y4+eQoL0Glg9C6WsRBOqaL3+fzVoJ4MmU0WB8AAf88Gbf7MWrQmmzJmN7wN2xCnaixTRzwHYJPwohxaOVDnRc","id":"Sjv9hbFUK8dgStBn4pecq-","kind":"article","prompt":"请输入密码"}</script></div>
 </section>
 
 
@@ -425,7 +430,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.3c5ccd6e0ac955616921266c23146f480e4332f26e84288ba18b8ab9af05b066.js" defer></script>
 
 
     </body>
