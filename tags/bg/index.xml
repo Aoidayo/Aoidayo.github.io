@@ -4,5 +4,12 @@
         <link>https://blog.aoidayo.site/tags/bg/</link>
         <description>Recent content in Bg on Aoidayo</description>
         <generator>Hugo -- gohugo.io</generator>
-        <language>zh-CN</language><atom:link href="https://blog.aoidayo.site/tags/bg/index.xml" rel="self" type="application/rss+xml" /></channel>
+        <language>zh-CN</language>
+        <lastBuildDate>Tue, 06 Oct 2026 12:00:00 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/bg/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>我的QA索引</title>
+            <link>https://blog.aoidayo.site/work/my-qa-index/</link>
+            <pubDate>Tue, 06 Oct 2026 12:00:00 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/work/my-qa-index/</guid>
+            <description>此文章包含加密内容。</description>
+        </item></channel>
 </rss>

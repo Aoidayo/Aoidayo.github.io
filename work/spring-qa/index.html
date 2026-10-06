@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下Spring的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nSpring Q：Spring是什么？主要有哪些常用的工具和核心infra？ A：Spring集ioc、di、aop对象管理、依赖注入、代理织入于一体统一框架。在这之上社区涌现出无数基于Spring的框架。\n具体的：\nData：JDBC、ORM、Transcations Web：Websocker，MVC、Servlet，WebFlux AOP、Spring AMQP Core：Context、Beans、SpEL Junit Test Q：Spring的核心特性以及实现方式？ A：Spring的三大核心特性：IOC、DI、AOP。\n每一个都能延伸无数的问题，这里可以建个git仓库维护一下可能的问题。\nIOC：Inversion of control，控制翻转。一种创建、获取、管理、销毁bean的实现方式，代码负责在Configuration/类上/字段上/final字段构造器声明Bean和依赖关系，然后Bean的创建和管理由BeanFactory/ApplicationContext负责实现。\nDI：Bean，依赖的获取方式，\nAOP：Aspect Oriented Programming，切面编程。将非业务代码但是业务代码都共同使用的逻辑抽取出来，通过切面实现代理，将代理对象注入IOC容器，在我们手动调用这个bean的指定方法时就是在调用代理对象的方法。\n常见的例子：数据层事务管理@Transcation，@hasPermission鉴权。 实现方式：SpringAOP默认使用JDK动态代理，在运行时创建 target（实现接口对象）的接口来实现代理。如果没有实现接口，那么通过CGLIB字节码动态代理 创建target的子类来实现代理。SpringBoot2.0 中默认使用CGLIB来实现代理。 Q：DI是什么？如何实现的？如何使用的？ A：DI就是依赖注入，实现和使用方式其实都差不多，使用方式就是：1、@Autowired注入 2、构造器注入 3、setter注入，4、通过ioc容器获取。实现方式就是通过ioc容器获取，注解构造器stter注入在扫描后从ioc容器中取。\n参考代码：jc-here/spring/spring_basic at main · Aoidayo/jc-here\nAOP的若干问题\nQ：AOP想解决什么问题？ A：抽取共性代码，通过动态代理实现共性代码的抽取，比如权限认证、日志记录、事务处理等代码，解耦模块化代码。 Q：谈谈你对AOP的了解程度？代理机制、代理的方法调用，代理的边界。 A：代理机制、代理的方法调用，代理的边界。\n1、AOP基于代理机制来实现，具体来说默认SPring使用JDK动态代理，如果是实现了类的接口，通过创建接口的实现类来实现代理。如果target是没有实现接口，使用CGLIB动态代理，通过继承target创建子类来进行代理。运行时代理，在Spring启动后解析需要AOP的对象，将代理生成的对象会加入IOC容器，方法执行前后有代理逻辑的code，比如记录日志、执行时间；鉴权；事务等等。\n2、AOP代理的方法调用，通过连接点jointPoint.proceed()来执行。\n3、AOP代理的边界：只能作用在SpringIOC容器管理的bean的方法上，不能作用于「1、bean的字段、构造器上」「2、非ioc容器管理的方法上」，「3、不能拦截通过new对象和类内部调用的方法」。限制较大。\nQ：AOP的切面、连接点、切点、通知、目标对象、代理对象、织入是什么？怎么有这么多的概念？ A：AOP的切面就是实现AOP代理逻辑的@Aspect类；连接点就是ProceedingJointPoint，在SpringAOP中只代指需要代理对象的方法，如果是AspectJ的话还会有字段和构造器；切点pointCut，通过@PointCut的spel表达式或者注解类指定需要介入代理的类；通知分几种：@Before、@After、@AfterReturning、@AfterThrowing、@Around通知，注解的方法实现横切逻辑，在jointPoint的指定位置执行；织入waving表示将目标对象target通过JDK或者CGLIB动态代理为proxy对象并加入Spring IOC的过程。\n代码可以参考：spring_basic\nQ：为什么JDKProxy和CGLIB是动态代理？什么是静态代理？AspectJ是什么代理？作用时期不同的区别？ A：静态代理就是通过代码创建代理，其中注入target，封装一层方法在调用的时候添加连接点以及各个不同位置的织入逻辑，问题在于每一个类都需要手动维护，非常麻烦。\nJDKProxy和CGLIB（Code Generation）都是动态代理，运行期通过生成target实现接口的子类和生成target的子类来实现代理（运行时生成代理的字节码），然后将proxy代理对象加入IOC容器。\n问题是增强的是代理实现类，而不是原类对象。这会导致不能在类内部方法中进行调用，调用的方法就是原类的方法，无法走代理。\n解决这个问题的是编译器和类加载期向target类字节码需要代理方法的位置前后直接织入代码的AspectJ，通过直接织入代码，在原target上进行增强，已经不能叫代理了，可以叫类增强，解决了动态代理的一些问题（类内无法调用，只能对方法做代理）。\nQ：为什么AspectJ可以直接对字段做代理呢？ A：不是代理而是直接字节码增强，AspectJ通过get/putField等字节码拦截对字段的修改和读取。同理构造方法等也是如此，连接点jointPoint比Spring AOP多很多。 Q：反射是什么？在Spring中有什么用？ A：反射通过获取class类对象来动态获取/修改字段，调用方法，构造对象。Spring中IOC的DI就是通过反射来动态注入依赖，创建对象；AOP的动态代理也是在运行时通过代理创建target接口的实现或者无接口target的子类来进行动态代理。 Q：什么是循环依赖？Spring解决了哪种循环依赖问题？有哪些循环依赖问题？Spring的L3Cache都是什么？几个概念：循环依赖，原始对象，未完成的代理对象。Spring的L3Cache如何解决单例模式下的字段循环依赖问题？几个概念：实例化，DI，初始化。 A：参考 ((20261003103748-a23qrhp &lsquo;SpringL3Cache处理单例模式的字段循环依赖&rsquo;))\n三缓的测试代码可以参考：spring_basic\nQ：为什么AOP代理的类会在自调用的时候失效？ A：分两种情况讨论。\n1、默认的AOP代理，其实是创建了两个类（target子类或者target接口的实现类，target），假设我们要代理的是innerMethod，那么outerMehtod就封装了切面代码，外面的获取bean的时候得到的是代理类，那么调用不会出问题。但是如果在innerMethod中调用另外一个innerMethod2, 在类内部直接调用，不会经过代理，这就是经典的代理绕过问题。\n2、我们常用@Configuration，@Configuration默认的proxyBeanMethods为true，也就是Configuration会被CGLIB动态增强，不是AOP的那种代理，而是直接替换一个增强类为这个Configuration。此时如果两个bean方法a和b，b调用a，就会走代理逻辑。如果proxybeanMethods=false，那么b调用a可能就会破坏singleton 单例。\nQ：@Transcational事务什么时候会失效？ A：分为几种情况，主要分为掉代理、绕过代理 和 事务传播行为配置不当。\n掉代理的几种情况：\n同类方法通过this调用@transcational事务方法，事务失效。 在@Transcational方法中try catch异常但是没有抛出，代理感知不到异常，无法进行回滚。 在@Transcational方法中抛出了checked exception，但是@Transcational只rollbackFor runtimeException和error。需要手动配置@Transcational(rollbackFor=Exception.class)。 标注在非public方法上。@Transcational本身就是基于AOP实现的，Spring AOP对于非public的protected、default理论上支持，对于private、final就不支持了，一个是JDK动态代理的时候接口中的方法默认就是public，另外一个是CGLIB实现target子类的时候不能继承到private和final方法，也无法代理。 事务传播行为配置不当：比如两个事务方法parentMethod调用childMethod，childMethod配置事务传播为propagation=Propagation.REQUIRE_NEW，挂起外层事务开启新事务，外层事务回滚不影响本事务提交。导致外层事务的一起回滚失效。\n">
+<title>Spring</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/spring-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Spring">
+<meta property='og:description' content="按照学习顺序来组织一下Spring的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nSpring Q：Spring是什么？主要有哪些常用的工具和核心infra？ A：Spring集ioc、di、aop对象管理、依赖注入、代理织入于一体统一框架。在这之上社区涌现出无数基于Spring的框架。\n具体的：\nData：JDBC、ORM、Transcations Web：Websocker，MVC、Servlet，WebFlux AOP、Spring AMQP Core：Context、Beans、SpEL Junit Test Q：Spring的核心特性以及实现方式？ A：Spring的三大核心特性：IOC、DI、AOP。\n每一个都能延伸无数的问题，这里可以建个git仓库维护一下可能的问题。\nIOC：Inversion of control，控制翻转。一种创建、获取、管理、销毁bean的实现方式，代码负责在Configuration/类上/字段上/final字段构造器声明Bean和依赖关系，然后Bean的创建和管理由BeanFactory/ApplicationContext负责实现。\nDI：Bean，依赖的获取方式，\nAOP：Aspect Oriented Programming，切面编程。将非业务代码但是业务代码都共同使用的逻辑抽取出来，通过切面实现代理，将代理对象注入IOC容器，在我们手动调用这个bean的指定方法时就是在调用代理对象的方法。\n常见的例子：数据层事务管理@Transcation，@hasPermission鉴权。 实现方式：SpringAOP默认使用JDK动态代理，在运行时创建 target（实现接口对象）的接口来实现代理。如果没有实现接口，那么通过CGLIB字节码动态代理 创建target的子类来实现代理。SpringBoot2.0 中默认使用CGLIB来实现代理。 Q：DI是什么？如何实现的？如何使用的？ A：DI就是依赖注入，实现和使用方式其实都差不多，使用方式就是：1、@Autowired注入 2、构造器注入 3、setter注入，4、通过ioc容器获取。实现方式就是通过ioc容器获取，注解构造器stter注入在扫描后从ioc容器中取。\n参考代码：jc-here/spring/spring_basic at main · Aoidayo/jc-here\nAOP的若干问题\nQ：AOP想解决什么问题？ A：抽取共性代码，通过动态代理实现共性代码的抽取，比如权限认证、日志记录、事务处理等代码，解耦模块化代码。 Q：谈谈你对AOP的了解程度？代理机制、代理的方法调用，代理的边界。 A：代理机制、代理的方法调用，代理的边界。\n1、AOP基于代理机制来实现，具体来说默认SPring使用JDK动态代理，如果是实现了类的接口，通过创建接口的实现类来实现代理。如果target是没有实现接口，使用CGLIB动态代理，通过继承target创建子类来进行代理。运行时代理，在Spring启动后解析需要AOP的对象，将代理生成的对象会加入IOC容器，方法执行前后有代理逻辑的code，比如记录日志、执行时间；鉴权；事务等等。\n2、AOP代理的方法调用，通过连接点jointPoint.proceed()来执行。\n3、AOP代理的边界：只能作用在SpringIOC容器管理的bean的方法上，不能作用于「1、bean的字段、构造器上」「2、非ioc容器管理的方法上」，「3、不能拦截通过new对象和类内部调用的方法」。限制较大。\nQ：AOP的切面、连接点、切点、通知、目标对象、代理对象、织入是什么？怎么有这么多的概念？ A：AOP的切面就是实现AOP代理逻辑的@Aspect类；连接点就是ProceedingJointPoint，在SpringAOP中只代指需要代理对象的方法，如果是AspectJ的话还会有字段和构造器；切点pointCut，通过@PointCut的spel表达式或者注解类指定需要介入代理的类；通知分几种：@Before、@After、@AfterReturning、@AfterThrowing、@Around通知，注解的方法实现横切逻辑，在jointPoint的指定位置执行；织入waving表示将目标对象target通过JDK或者CGLIB动态代理为proxy对象并加入Spring IOC的过程。\n代码可以参考：spring_basic\nQ：为什么JDKProxy和CGLIB是动态代理？什么是静态代理？AspectJ是什么代理？作用时期不同的区别？ A：静态代理就是通过代码创建代理，其中注入target，封装一层方法在调用的时候添加连接点以及各个不同位置的织入逻辑，问题在于每一个类都需要手动维护，非常麻烦。\nJDKProxy和CGLIB（Code Generation）都是动态代理，运行期通过生成target实现接口的子类和生成target的子类来实现代理（运行时生成代理的字节码），然后将proxy代理对象加入IOC容器。\n问题是增强的是代理实现类，而不是原类对象。这会导致不能在类内部方法中进行调用，调用的方法就是原类的方法，无法走代理。\n解决这个问题的是编译器和类加载期向target类字节码需要代理方法的位置前后直接织入代码的AspectJ，通过直接织入代码，在原target上进行增强，已经不能叫代理了，可以叫类增强，解决了动态代理的一些问题（类内无法调用，只能对方法做代理）。\nQ：为什么AspectJ可以直接对字段做代理呢？ A：不是代理而是直接字节码增强，AspectJ通过get/putField等字节码拦截对字段的修改和读取。同理构造方法等也是如此，连接点jointPoint比Spring AOP多很多。 Q：反射是什么？在Spring中有什么用？ A：反射通过获取class类对象来动态获取/修改字段，调用方法，构造对象。Spring中IOC的DI就是通过反射来动态注入依赖，创建对象；AOP的动态代理也是在运行时通过代理创建target接口的实现或者无接口target的子类来进行动态代理。 Q：什么是循环依赖？Spring解决了哪种循环依赖问题？有哪些循环依赖问题？Spring的L3Cache都是什么？几个概念：循环依赖，原始对象，未完成的代理对象。Spring的L3Cache如何解决单例模式下的字段循环依赖问题？几个概念：实例化，DI，初始化。 A：参考 ((20261003103748-a23qrhp &lsquo;SpringL3Cache处理单例模式的字段循环依赖&rsquo;))\n三缓的测试代码可以参考：spring_basic\nQ：为什么AOP代理的类会在自调用的时候失效？ A：分两种情况讨论。\n1、默认的AOP代理，其实是创建了两个类（target子类或者target接口的实现类，target），假设我们要代理的是innerMethod，那么outerMehtod就封装了切面代码，外面的获取bean的时候得到的是代理类，那么调用不会出问题。但是如果在innerMethod中调用另外一个innerMethod2, 在类内部直接调用，不会经过代理，这就是经典的代理绕过问题。\n2、我们常用@Configuration，@Configuration默认的proxyBeanMethods为true，也就是Configuration会被CGLIB动态增强，不是AOP的那种代理，而是直接替换一个增强类为这个Configuration。此时如果两个bean方法a和b，b调用a，就会走代理逻辑。如果proxybeanMethods=false，那么b调用a可能就会破坏singleton 单例。\nQ：@Transcational事务什么时候会失效？ A：分为几种情况，主要分为掉代理、绕过代理 和 事务传播行为配置不当。\n掉代理的几种情况：\n同类方法通过this调用@transcational事务方法，事务失效。 在@Transcational方法中try catch异常但是没有抛出，代理感知不到异常，无法进行回滚。 在@Transcational方法中抛出了checked exception，但是@Transcational只rollbackFor runtimeException和error。需要手动配置@Transcational(rollbackFor=Exception.class)。 标注在非public方法上。@Transcational本身就是基于AOP实现的，Spring AOP对于非public的protected、default理论上支持，对于private、final就不支持了，一个是JDK动态代理的时候接口中的方法默认就是public，另外一个是CGLIB实现target子类的时候不能继承到private和final方法，也无法代理。 事务传播行为配置不当：比如两个事务方法parentMethod调用childMethod，childMethod配置事务传播为propagation=Propagation.REQUIRE_NEW，挂起外层事务开启新事务，外层事务回滚不影响本事务提交。导致外层事务的一起回滚失效。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/spring-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-06T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-06T12:00:00&#43;08:00'/>
+<meta name="twitter:title" content="Spring">
+<meta name="twitter:description" content="按照学习顺序来组织一下Spring的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nSpring Q：Spring是什么？主要有哪些常用的工具和核心infra？ A：Spring集ioc、di、aop对象管理、依赖注入、代理织入于一体统一框架。在这之上社区涌现出无数基于Spring的框架。\n具体的：\nData：JDBC、ORM、Transcations Web：Websocker，MVC、Servlet，WebFlux AOP、Spring AMQP Core：Context、Beans、SpEL Junit Test Q：Spring的核心特性以及实现方式？ A：Spring的三大核心特性：IOC、DI、AOP。\n每一个都能延伸无数的问题，这里可以建个git仓库维护一下可能的问题。\nIOC：Inversion of control，控制翻转。一种创建、获取、管理、销毁bean的实现方式，代码负责在Configuration/类上/字段上/final字段构造器声明Bean和依赖关系，然后Bean的创建和管理由BeanFactory/ApplicationContext负责实现。\nDI：Bean，依赖的获取方式，\nAOP：Aspect Oriented Programming，切面编程。将非业务代码但是业务代码都共同使用的逻辑抽取出来，通过切面实现代理，将代理对象注入IOC容器，在我们手动调用这个bean的指定方法时就是在调用代理对象的方法。\n常见的例子：数据层事务管理@Transcation，@hasPermission鉴权。 实现方式：SpringAOP默认使用JDK动态代理，在运行时创建 target（实现接口对象）的接口来实现代理。如果没有实现接口，那么通过CGLIB字节码动态代理 创建target的子类来实现代理。SpringBoot2.0 中默认使用CGLIB来实现代理。 Q：DI是什么？如何实现的？如何使用的？ A：DI就是依赖注入，实现和使用方式其实都差不多，使用方式就是：1、@Autowired注入 2、构造器注入 3、setter注入，4、通过ioc容器获取。实现方式就是通过ioc容器获取，注解构造器stter注入在扫描后从ioc容器中取。\n参考代码：jc-here/spring/spring_basic at main · Aoidayo/jc-here\nAOP的若干问题\nQ：AOP想解决什么问题？ A：抽取共性代码，通过动态代理实现共性代码的抽取，比如权限认证、日志记录、事务处理等代码，解耦模块化代码。 Q：谈谈你对AOP的了解程度？代理机制、代理的方法调用，代理的边界。 A：代理机制、代理的方法调用，代理的边界。\n1、AOP基于代理机制来实现，具体来说默认SPring使用JDK动态代理，如果是实现了类的接口，通过创建接口的实现类来实现代理。如果target是没有实现接口，使用CGLIB动态代理，通过继承target创建子类来进行代理。运行时代理，在Spring启动后解析需要AOP的对象，将代理生成的对象会加入IOC容器，方法执行前后有代理逻辑的code，比如记录日志、执行时间；鉴权；事务等等。\n2、AOP代理的方法调用，通过连接点jointPoint.proceed()来执行。\n3、AOP代理的边界：只能作用在SpringIOC容器管理的bean的方法上，不能作用于「1、bean的字段、构造器上」「2、非ioc容器管理的方法上」，「3、不能拦截通过new对象和类内部调用的方法」。限制较大。\nQ：AOP的切面、连接点、切点、通知、目标对象、代理对象、织入是什么？怎么有这么多的概念？ A：AOP的切面就是实现AOP代理逻辑的@Aspect类；连接点就是ProceedingJointPoint，在SpringAOP中只代指需要代理对象的方法，如果是AspectJ的话还会有字段和构造器；切点pointCut，通过@PointCut的spel表达式或者注解类指定需要介入代理的类；通知分几种：@Before、@After、@AfterReturning、@AfterThrowing、@Around通知，注解的方法实现横切逻辑，在jointPoint的指定位置执行；织入waving表示将目标对象target通过JDK或者CGLIB动态代理为proxy对象并加入Spring IOC的过程。\n代码可以参考：spring_basic\nQ：为什么JDKProxy和CGLIB是动态代理？什么是静态代理？AspectJ是什么代理？作用时期不同的区别？ A：静态代理就是通过代码创建代理，其中注入target，封装一层方法在调用的时候添加连接点以及各个不同位置的织入逻辑，问题在于每一个类都需要手动维护，非常麻烦。\nJDKProxy和CGLIB（Code Generation）都是动态代理，运行期通过生成target实现接口的子类和生成target的子类来实现代理（运行时生成代理的字节码），然后将proxy代理对象加入IOC容器。\n问题是增强的是代理实现类，而不是原类对象。这会导致不能在类内部方法中进行调用，调用的方法就是原类的方法，无法走代理。\n解决这个问题的是编译器和类加载期向target类字节码需要代理方法的位置前后直接织入代码的AspectJ，通过直接织入代码，在原target上进行增强，已经不能叫代理了，可以叫类增强，解决了动态代理的一些问题（类内无法调用，只能对方法做代理）。\nQ：为什么AspectJ可以直接对字段做代理呢？ A：不是代理而是直接字节码增强，AspectJ通过get/putField等字节码拦截对字段的修改和读取。同理构造方法等也是如此，连接点jointPoint比Spring AOP多很多。 Q：反射是什么？在Spring中有什么用？ A：反射通过获取class类对象来动态获取/修改字段，调用方法，构造对象。Spring中IOC的DI就是通过反射来动态注入依赖，创建对象；AOP的动态代理也是在运行时通过代理创建target接口的实现或者无接口target的子类来进行动态代理。 Q：什么是循环依赖？Spring解决了哪种循环依赖问题？有哪些循环依赖问题？Spring的L3Cache都是什么？几个概念：循环依赖，原始对象，未完成的代理对象。Spring的L3Cache如何解决单例模式下的字段循环依赖问题？几个概念：实例化，DI，初始化。 A：参考 ((20261003103748-a23qrhp &lsquo;SpringL3Cache处理单例模式的字段循环依赖&rsquo;))\n三缓的测试代码可以参考：spring_basic\nQ：为什么AOP代理的类会在自调用的时候失效？ A：分两种情况讨论。\n1、默认的AOP代理，其实是创建了两个类（target子类或者target接口的实现类，target），假设我们要代理的是innerMethod，那么outerMehtod就封装了切面代码，外面的获取bean的时候得到的是代理类，那么调用不会出问题。但是如果在innerMethod中调用另外一个innerMethod2, 在类内部直接调用，不会经过代理，这就是经典的代理绕过问题。\n2、我们常用@Configuration，@Configuration默认的proxyBeanMethods为true，也就是Configuration会被CGLIB动态增强，不是AOP的那种代理，而是直接替换一个增强类为这个Configuration。此时如果两个bean方法a和b，b调用a，就会走代理逻辑。如果proxybeanMethods=false，那么b调用a可能就会破坏singleton 单例。\nQ：@Transcational事务什么时候会失效？ A：分为几种情况，主要分为掉代理、绕过代理 和 事务传播行为配置不当。\n掉代理的几种情况：\n同类方法通过this调用@transcational事务方法，事务失效。 在@Transcational方法中try catch异常但是没有抛出，代理感知不到异常，无法进行回滚。 在@Transcational方法中抛出了checked exception，但是@Transcational只rollbackFor runtimeException和error。需要手动配置@Transcational(rollbackFor=Exception.class)。 标注在非public方法上。@Transcational本身就是基于AOP实现的，Spring AOP对于非public的protected、default理论上支持，对于private、final就不支持了，一个是JDK动态代理的时候接口中的方法默认就是public，另外一个是CGLIB实现target子类的时候不能继承到private和final方法，也无法代理。 事务传播行为配置不当：比如两个事务方法parentMethod调用childMethod，childMethod配置事务传播为propagation=Propagation.REQUIRE_NEW，挂起外层事务开启新事务，外层事务回滚不影响本事务提交。导致外层事务的一起回滚失效。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/spring-qa/">Spring</a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-06T12:00:00&#43;08:00'>Tuesday, October 6, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+
+    <section class="article-content">
+    
+    
+    <p>按照学习顺序来组织一下Spring的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
+<h2 id="spring">Spring
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Spring是什么？主要有哪些常用的工具和核心infra？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Spring集ioc、di、aop对象管理、依赖注入、代理织入于一体统一框架。在这之上社区涌现出无数基于Spring的框架。</p>
+<p>具体的：</p>
+<ul>
+<li>Data：JDBC、ORM、Transcations</li>
+<li>Web：Websocker，MVC、Servlet，WebFlux</li>
+<li>AOP、Spring AMQP</li>
+<li>Core：Context、Beans、SpEL</li>
+<li>Junit Test</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Spring的核心特性以及实现方式？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Spring的三大核心特性：IOC、DI、AOP。</p>
+<p>每一个都能延伸无数的问题，这里可以建个git仓库维护一下可能的问题。</p>
+<ul>
+<li>
+<p>IOC：Inversion of control，控制翻转。一种创建、获取、管理、销毁bean的实现方式，代码负责在Configuration/类上/字段上/final字段构造器声明Bean和依赖关系，然后Bean的创建和管理由BeanFactory/ApplicationContext负责实现。</p>
+</li>
+<li>
+<p>DI：Bean，依赖的获取方式，</p>
+</li>
+<li>
+<p>AOP：Aspect Oriented Programming，切面编程。将非业务代码但是业务代码都共同使用的逻辑抽取出来，通过切面实现代理，将代理对象注入IOC容器，在我们手动调用这个bean的指定方法时就是在调用代理对象的方法。</p>
+<ul>
+<li>常见的例子：数据层事务管理@Transcation，@hasPermission鉴权。</li>
+<li>实现方式：SpringAOP默认使用JDK动态代理，在运行时创建 target（实现接口对象）的接口来实现代理。如果没有实现接口，那么通过CGLIB字节码动态代理 创建target的子类来实现代理。SpringBoot2.0 中默认使用CGLIB来实现代理。</li>
+</ul>
+</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>DI是什么？如何实现的？如何使用的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>DI就是依赖注入，实现和使用方式其实都差不多，使用方式就是：1、@Autowired注入 2、构造器注入 3、setter注入，4、通过ioc容器获取。实现方式就是通过ioc容器获取，注解构造器stter注入在扫描后从ioc容器中取。</p>
+<p>参考代码：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/spring/spring_basic"  target="_blank" rel="noopener"
+    >jc-here/spring/spring_basic at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+<p>AOP的若干问题</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>AOP想解决什么问题？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">抽取共性代码，通过动态代理实现共性代码的抽取，比如权限认证、日志记录、事务处理等代码，解耦模块化代码。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>谈谈你对AOP的了解程度？代理机制、代理的方法调用，代理的边界。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>代理机制、代理的方法调用，代理的边界。</p>
+<p>1、AOP基于代理机制来实现，具体来说默认SPring使用JDK动态代理，如果是实现了类的接口，通过创建接口的实现类来实现代理。如果target是没有实现接口，使用CGLIB动态代理，通过继承target创建子类来进行代理。运行时代理，在Spring启动后解析需要AOP的对象，将代理生成的对象会加入IOC容器，方法执行前后有代理逻辑的code，比如记录日志、执行时间；鉴权；事务等等。</p>
+<p>2、AOP代理的方法调用，通过连接点jointPoint.proceed()来执行。</p>
+<p>3、AOP代理的边界：只能作用在SpringIOC容器管理的bean的方法上，不能作用于「1、bean的字段、构造器上」「2、非ioc容器管理的方法上」，「3、不能拦截通过new对象和类内部调用的方法」。限制较大。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>AOP的切面、连接点、切点、通知、目标对象、代理对象、织入是什么？怎么有这么多的概念？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>AOP的切面就是实现AOP代理逻辑的@Aspect类；连接点就是ProceedingJointPoint，在SpringAOP中只代指需要代理对象的方法，如果是AspectJ的话还会有字段和构造器；切点pointCut，通过@PointCut的spel表达式或者注解类指定需要介入代理的类；通知分几种：@Before、@After、@AfterReturning、@AfterThrowing、@Around通知，注解的方法实现横切逻辑，在jointPoint的指定位置执行；织入waving表示将目标对象target通过JDK或者CGLIB动态代理为proxy对象并加入Spring IOC的过程。</p>
+<p>代码可以参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/spring/spring_basic"  target="_blank" rel="noopener"
+    >spring_basic</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么JDKProxy和CGLIB是动态代理？什么是静态代理？AspectJ是什么代理？作用时期不同的区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>静态代理就是通过代码创建代理，其中注入target，封装一层方法在调用的时候添加连接点以及各个不同位置的织入逻辑，问题在于每一个类都需要手动维护，非常麻烦。</p>
+<p>JDKProxy和CGLIB（Code Generation）都是动态代理，运行期通过生成target实现接口的子类和生成target的子类来实现代理（运行时生成代理的字节码），然后将proxy代理对象加入IOC容器。</p>
+<p>问题是增强的是代理实现类，而不是原类对象。这会导致不能在类内部方法中进行调用，调用的方法就是原类的方法，无法走代理。</p>
+<p>解决这个问题的是编译器和类加载期向target类字节码需要代理方法的位置前后直接织入代码的AspectJ，通过直接织入代码，在原target上进行增强，已经不能叫代理了，可以叫类增强，解决了动态代理的一些问题（类内无法调用，只能对方法做代理）。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么AspectJ可以直接对字段做代理呢？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">不是代理而是直接字节码增强，AspectJ通过get/putField等字节码拦截对字段的修改和读取。同理构造方法等也是如此，连接点jointPoint比Spring AOP多很多。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>反射是什么？在Spring中有什么用？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">反射通过获取class类对象来动态获取/修改字段，调用方法，构造对象。Spring中IOC的DI就是通过反射来动态注入依赖，创建对象；AOP的动态代理也是在运行时通过代理创建target接口的实现或者无接口target的子类来进行动态代理。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是循环依赖？Spring解决了哪种循环依赖问题？有哪些循环依赖问题？Spring的L3Cache都是什么？几个概念：循环依赖，原始对象，未完成的代理对象。Spring的L3Cache如何解决单例模式下的字段循环依赖问题？几个概念：实例化，DI，初始化。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>参考 ((20261003103748-a23qrhp &lsquo;SpringL3Cache处理单例模式的字段循环依赖&rsquo;))</p>
+<p>三缓的测试代码可以参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/spring/spring_basic"  target="_blank" rel="noopener"
+    >spring_basic</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么AOP代理的类会在自调用的时候失效？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>分两种情况讨论。</p>
+<p>1、默认的AOP代理，其实是创建了两个类（target子类或者target接口的实现类，target），假设我们要代理的是innerMethod，那么outerMehtod就封装了切面代码，外面的获取bean的时候得到的是代理类，那么调用不会出问题。但是如果在innerMethod中调用另外一个innerMethod2, 在类内部直接调用，不会经过代理，这就是经典的代理绕过问题。</p>
+<p>2、我们常用@Configuration，@Configuration默认的<code>proxyBeanMethods</code>为true，也就是Configuration会被CGLIB动态增强，不是AOP的那种代理，而是直接替换一个增强类为这个Configuration。此时如果两个bean方法a和b，b调用a，就会走代理逻辑。如果proxybeanMethods=false，那么b调用a可能就会破坏singleton 单例。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>@Transcational事务什么时候会失效？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>分为几种情况，主要分为掉代理、绕过代理 和 事务传播行为配置不当。</p>
+<p>掉代理的几种情况：</p>
+<ul>
+<li>同类方法通过this调用@transcational事务方法，事务失效。</li>
+<li>在@Transcational方法中try catch异常但是没有抛出，代理感知不到异常，无法进行回滚。</li>
+<li>在@Transcational方法中抛出了checked exception，但是@Transcational只rollbackFor runtimeException和error。需要手动配置<code>@Transcational(rollbackFor=Exception.class)</code>。</li>
+<li>标注在非public方法上。@Transcational本身就是基于AOP实现的，Spring AOP对于非public的protected、default理论上支持，对于private、final就不支持了，一个是JDK动态代理的时候接口中的方法默认就是public，另外一个是CGLIB实现target子类的时候不能继承到private和final方法，也无法代理。</li>
+</ul>
+<p>事务传播行为配置不当：比如两个事务方法parentMethod调用childMethod，childMethod配置事务传播为<code>propagation=Propagation.REQUIRE_NEW</code>，挂起外层事务开启新事务，外层事务回滚不影响本事务提交。导致外层事务的一起回滚失效。</p>
+<p>#TODO#</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Spring Bean的生命周期</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>参考 ((20261004092345-rdkyr4k &lsquo;SpringBean的生命周期&rsquo;))</p>
+<p>aff：想了解更多，可以看<a class="link" href="https://github.com/fuzhengwei/small-spring/tree/main"  target="_blank" rel="noopener"
+    >Spring 手撸专栏</a></p>
+<p>主要回答如下几个问题：</p>
+<ul>
+<li>什么是Bean的生命周期，什么是普通Java对象的生命周期。</li>
+<li>Bean实例化的时间？</li>
+<li>Spring在Bean的生命周期开始之前做了什么？</li>
+<li>Bean的生命周期中有很多钩子，具体来说有哪些呢？</li>
+</ul>
+<p>代码参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/spring/spring_basic#bean-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"  target="_blank" rel="noopener"
+    >spring_basic#Bean 生命周期</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Bean的单例多例有什么区别？Bean的scope有哪些？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Bean默认创建是单例，如果是多例需要在<code>@Bean</code>附近指定<code>@Scope(&quot;prototype&quot;)</code>，区别是单例beanSpring会管理从实例化-属性注入-初始化-使用-销毁的全生命周期，但是对于多例bean，Spring只追踪到初始化完成，后面的使用和销毁全部交给程序员自己完成。Bean的Scope有<code>singleton, prototype, SpringWeb相关的request、session、application，SpringWebScoket的websocket，也支持自定义scope</code>，不同的scope影响Spring容器对它们生命周期的管理，以及是否可以共享（针对Spring Web/WebSocket的）。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>SpringIOC容器中存的是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">bean，SpringIOC会在启动时调用refresh，先扫描所有注解、配置类、xml配置的BeanDefinition，然后根据BeanDefinition进行Bean对象的实例化、属性注入、初始化。最后将创建好的signleton bean加入IOC容器管理，多例bean直接返回给用户使用。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Spring在Bean的初始化和销毁前后的扩展点？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">通过xml或者@Bean配置的initMethod和detroyMethod，实现的initializingBean和disposableBean中的方法，以及自定义BeanPostProcesor实现postPorcessInitialization/Destroy（前者有before和after，后者只有before），最后就是也就是基于BeanPostProcessor实现的基于注解的，标注在Bean类中的@PostConstruct和@PreDestroy方法。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Spring中的单例bean是线程安全的吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">不一定，线程安全需要自己保证。比如<code>UserService的handle(userId)</code>方法设置userId到属性中，如果多线程并发就会导致后者覆盖前者，想处理这种问题一般需要引入TheadLocal。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>单例Bean中注入prototype bean，每次使用会创建新的多例bean吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">单例bean只创建一次，多例bean在那一次创建后就固定下来不会变动。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>BeanFactory和AplicationContext什么联系和区别？ApplicationContext启动时创建所有bean吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">BaenFactory是IOC容器的基础接口，提供Bean的创建、获取以及依赖管理等基础功能。ApplicationContext在此基础上进行更多上下文扩展：事件发布、refresh以及BeanPostProcessor等等。ApplicationContext启动时调用刷新，搜索并注册BeanDefinition然后创建非懒加载单例bean，懒加载单例bean和多例bean的创建实际不同（调用时创建，单例bean依赖多例bean时创建）。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>BeanFactory和FactoryBean。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">BeanFactory是负责管理容器的，FactoryBean是注册在IOC中的bean，负责生产对象，视情况这个生产的对象也可以加入IOC容器管理。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>BeanFactoryPostProcessor和BeanPostProcessor有什么区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>处理对象和处理时机不同。</p>
+<p>BeanFactoryPostProcessor处理时机：Bean实例化之前，处理的是BeanDefinition，修改其中的Scope可以将单例创建变成多例创建，修改的是如何创建对象。</p>
+<p>BeanPostProcessor，处理时机是实例化、属性注入之后，初始化方法前后，修改的是已经创建的对象。比如ApplicationContextAware通过BPP的ppBeforeInitialization注入ApplicationContext给bean，又比如AOP代理对象就是在BPP的ppAfterInitialization阶段生成的。</p>
+<p>BeanFactoryPostProcessor修改bean的scope 单例为多例的代码例子：<a class="link" href="https://github.com/Aoidayo/jc-here/blob/main/spring/spring_basic/README.md?plain=1#L64"  target="_blank" rel="noopener"
+    >jc-here/spring/spring_basic/README.md at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/work/my-qa-index/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">我的QA索引</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
