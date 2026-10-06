@@ -68,6 +68,15 @@ html.zen-mode.toc-hidden body.article-page.has-toc .main-container > main.main {
     max-width: calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation));
 }
 
+@media (min-width: 768px) {
+    html.zen-mode.toc-hidden body.article-page.has-toc .main-container {
+        max-width: min(
+            calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation) + 2 * var(--container-padding)),
+            86vw
+        );
+    }
+}
+
 html.zen-mode body.article-page.has-toc .main-container > .right-sidebar {
     flex: 0 0 var(--zen-toc-width, 360px);
     width: var(--zen-toc-width, 360px);
