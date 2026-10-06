@@ -1,5 +1,6 @@
 body.article-page {
     --zen-article-width: 900px;
+    --zen-wide-article-width: 1300px;
     --reading-control-off-color: #767676;
     --reading-control-on-color: #1d4ed8;
 }
@@ -60,6 +61,14 @@ html.zen-mode body.article-page .main-container > main.main {
     margin-inline: auto;
 }
 
+html.zen-mode body.article-page:not(.has-toc) .main-container {
+    max-width: calc(var(--zen-wide-article-width) + 2 * var(--container-padding));
+}
+
+html.zen-mode body.article-page:not(.has-toc) .main-container > main.main {
+    max-width: var(--zen-wide-article-width);
+}
+
 html.zen-mode body.article-page.has-toc .main-container {
     max-width: calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation) + 2 * var(--container-padding));
 }
@@ -69,6 +78,10 @@ html.zen-mode.toc-hidden body.article-page.has-toc .main-container > main.main {
 }
 
 @media (min-width: 768px) {
+    html.zen-mode body.article-page:not(.has-toc) .main-container {
+        max-width: min(calc(var(--zen-wide-article-width) + 2 * var(--container-padding)), 86vw);
+    }
+
     html.zen-mode.toc-hidden body.article-page.has-toc .main-container {
         max-width: min(
             calc(var(--zen-article-width) + var(--zen-toc-width, 360px) + var(--section-separation) + 2 * var(--container-padding)),
