@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下Java并发的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\n多线程 Q：什么是JMM？什么是原子性可见性有序性？哪些对象相对是共享变量？ A：JMM，Java Memory Model，Java内存模型。主要是为了解决多线程同步和通信的可见性、原子性、有序性问题产生的。\n具体来说什么是JMM呢：可以参考这张图 ((20260430104747-kl872fu &lsquo;image &lsquo;))，在内存中每个线程有自己的VM栈，同时也会有共享变量区域（这块区域叫主存），多线程需要访问共享变量时需要将主存中的共享变量复制一份到本地内存中，本地修改后过一段时间才会同步到主存中。\n什么是可见性、原子性和有序性？\n可见性：线程A修改完共享变量后不一定马上同步到主存中，需要过一段时间才能同步。线程B不能马上看到这个变量被修改了。\n原子性：一个经典例子「i++」，分三步操作 1、读i； 2、i加1； 3、赋值。多线程对i这个变量进行操作的时候，就会出现原子性问题。\n有序性：有时候编译器和CPU为了提高速度，会在不影响单线程结果的情况下进行指令重排，总体遵循happens-before规则。一个经典的例子就是「Obj a = new Obj()」\n下面的123操作有时候会改成132, 在多线程进行的情况下可能会导致错误：a指向地址没有赋值，没有实际对象。\n开辟对象的内存空间 内存空间赋初始值 修改a的引用到指定内存空间 哪些对象是共享变量？\nJVM堆/元空间（方法区）的非线程私有的对象是共享变量。\n可以被多线程共享的变量是共享变量。比如\npublic class A{ int i = 1; // 这里的i 就是堆A对象的属性，属于共享变量。 method1(); // 修改i method2(); // 修改i } Q：Java的线程实现？虚拟线程和平台线程？切换和调度是否由内核态实现？和go中的协程呢？虚拟线程和平台线程的作用是什么？ A：Java中的线程实现，JDK21之前使用传统的1:1封装内核线程，JDK21之后引入显式的虚拟线程，M:N封装少量平台线程。虚拟线程和go中的协程类似。虚拟线程和平台线程的作用不同，虚拟线程适合处理io密集型等待居多的任务，切换和调度都比平台线程块，但是在cpu密集型上面因为都是占用cpu资源，所以不如直接创建平台线程。\n两种实现：虚拟线程和平台线程\n平台线程：Java中的默认线程实现，1:1封装os内核线程；线程调度由os内核态完成，切换时开销较大；创建线程时默认VM栈1MB，自带Program Counter（PC），不能无限创建。 虚拟线程：JDK21之后的线程实现，M:N封装平台线程，M&raquo;N；线程调度由用户态JVM的ForkJoinPool完成，切换开销小，创建线程栈的资源开销小可以动态伸缩，单个JVM进程可以创建上百万个虚拟线程。在IO密集型需要等待任务上有优势，反之在cpu密集型上不如直接创建平台线程。 Q：如何实现线程安全、数据一致、原子操作？ A：保证原子性：AtomicInteger、Sychronized上锁；保证可见性：Synchronized，Volatile；保证有序性：禁止指令重排一类。\n具体来说实现线程安全，就是保证编写多线程代码同步和通信时的 原子性、可见性、有序性。\n实现方法也很常见：\n乐观锁：CAS、Version版本号先修改在比较不同则回滚。 悲观锁：Synchronized、ReenterantLock等等 Volatile保障使用乐观锁时的可见性，搭配乐观锁CAS使用。 Q：如何创建线程，执行线程？ A：参考((20260824102745-stkak49 &lsquo;基本使用流程&rsquo;))，大概是几种方法，核心就是接收了runnable（无返回值）和callable（有返回值）的线程通过thread.start()执行，如果是线程池executor就是submit执行，callable可以通过future接收返回值等。也可以通过((20260822150735-u3o37s4 &ldquo;CompletableFuture&rdquo;))接收callable+线程池的方式来编排组织线程同步和执行顺序。 Q：如何中断线程？interrupt是如何让线程抛出IterruptedException异常的？ A：首先需要说明interrupt仅仅只是给线程设置一个中断状态，是否响应需要依赖runnable内部的阻塞状态。是否响应中断需要依赖两种，一种是自动响应中断的Thread.sleep, Thread.join以及object.wait和future.get等io方法，如果是cpu循环执行的话，那么这种就需要手动在循环中判断interrupt状态并return或者抛出异常了。这个解释同时说明了上述两个问题。\n关于如何中断线程，其实不同的主体有不同的方法，核心还是使用interrupt：\nthread的interrupt方法\nThreadPoolExecutor提交后可以使用返回值future的cancel方法，cacel(true)表示可以给正在运行的方法发送iterrupt方法，反之cancel(false)就不会给正在运行的线程发送。\nThreadPoolExecutor还有两个方法，一个是shutdown一个是shutdownNow\nshutdownNow：拒绝所有任务提交，不处理任务队列中的所有任务，给当前所有正在运行的线程发送interrupt方法。 shutdown：拒绝所有任务提交，但是任务队列和正在运行中的线程不会做任何干扰。 代码参考：jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here\n">
+<title>Java并发编程 八股</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/java-concurrent-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Java并发编程 八股">
+<meta property='og:description' content="按照学习顺序来组织一下Java并发的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\n多线程 Q：什么是JMM？什么是原子性可见性有序性？哪些对象相对是共享变量？ A：JMM，Java Memory Model，Java内存模型。主要是为了解决多线程同步和通信的可见性、原子性、有序性问题产生的。\n具体来说什么是JMM呢：可以参考这张图 ((20260430104747-kl872fu &lsquo;image &lsquo;))，在内存中每个线程有自己的VM栈，同时也会有共享变量区域（这块区域叫主存），多线程需要访问共享变量时需要将主存中的共享变量复制一份到本地内存中，本地修改后过一段时间才会同步到主存中。\n什么是可见性、原子性和有序性？\n可见性：线程A修改完共享变量后不一定马上同步到主存中，需要过一段时间才能同步。线程B不能马上看到这个变量被修改了。\n原子性：一个经典例子「i++」，分三步操作 1、读i； 2、i加1； 3、赋值。多线程对i这个变量进行操作的时候，就会出现原子性问题。\n有序性：有时候编译器和CPU为了提高速度，会在不影响单线程结果的情况下进行指令重排，总体遵循happens-before规则。一个经典的例子就是「Obj a = new Obj()」\n下面的123操作有时候会改成132, 在多线程进行的情况下可能会导致错误：a指向地址没有赋值，没有实际对象。\n开辟对象的内存空间 内存空间赋初始值 修改a的引用到指定内存空间 哪些对象是共享变量？\nJVM堆/元空间（方法区）的非线程私有的对象是共享变量。\n可以被多线程共享的变量是共享变量。比如\npublic class A{ int i = 1; // 这里的i 就是堆A对象的属性，属于共享变量。 method1(); // 修改i method2(); // 修改i } Q：Java的线程实现？虚拟线程和平台线程？切换和调度是否由内核态实现？和go中的协程呢？虚拟线程和平台线程的作用是什么？ A：Java中的线程实现，JDK21之前使用传统的1:1封装内核线程，JDK21之后引入显式的虚拟线程，M:N封装少量平台线程。虚拟线程和go中的协程类似。虚拟线程和平台线程的作用不同，虚拟线程适合处理io密集型等待居多的任务，切换和调度都比平台线程块，但是在cpu密集型上面因为都是占用cpu资源，所以不如直接创建平台线程。\n两种实现：虚拟线程和平台线程\n平台线程：Java中的默认线程实现，1:1封装os内核线程；线程调度由os内核态完成，切换时开销较大；创建线程时默认VM栈1MB，自带Program Counter（PC），不能无限创建。 虚拟线程：JDK21之后的线程实现，M:N封装平台线程，M&raquo;N；线程调度由用户态JVM的ForkJoinPool完成，切换开销小，创建线程栈的资源开销小可以动态伸缩，单个JVM进程可以创建上百万个虚拟线程。在IO密集型需要等待任务上有优势，反之在cpu密集型上不如直接创建平台线程。 Q：如何实现线程安全、数据一致、原子操作？ A：保证原子性：AtomicInteger、Sychronized上锁；保证可见性：Synchronized，Volatile；保证有序性：禁止指令重排一类。\n具体来说实现线程安全，就是保证编写多线程代码同步和通信时的 原子性、可见性、有序性。\n实现方法也很常见：\n乐观锁：CAS、Version版本号先修改在比较不同则回滚。 悲观锁：Synchronized、ReenterantLock等等 Volatile保障使用乐观锁时的可见性，搭配乐观锁CAS使用。 Q：如何创建线程，执行线程？ A：参考((20260824102745-stkak49 &lsquo;基本使用流程&rsquo;))，大概是几种方法，核心就是接收了runnable（无返回值）和callable（有返回值）的线程通过thread.start()执行，如果是线程池executor就是submit执行，callable可以通过future接收返回值等。也可以通过((20260822150735-u3o37s4 &ldquo;CompletableFuture&rdquo;))接收callable+线程池的方式来编排组织线程同步和执行顺序。 Q：如何中断线程？interrupt是如何让线程抛出IterruptedException异常的？ A：首先需要说明interrupt仅仅只是给线程设置一个中断状态，是否响应需要依赖runnable内部的阻塞状态。是否响应中断需要依赖两种，一种是自动响应中断的Thread.sleep, Thread.join以及object.wait和future.get等io方法，如果是cpu循环执行的话，那么这种就需要手动在循环中判断interrupt状态并return或者抛出异常了。这个解释同时说明了上述两个问题。\n关于如何中断线程，其实不同的主体有不同的方法，核心还是使用interrupt：\nthread的interrupt方法\nThreadPoolExecutor提交后可以使用返回值future的cancel方法，cacel(true)表示可以给正在运行的方法发送iterrupt方法，反之cancel(false)就不会给正在运行的线程发送。\nThreadPoolExecutor还有两个方法，一个是shutdown一个是shutdownNow\nshutdownNow：拒绝所有任务提交，不处理任务队列中的所有任务，给当前所有正在运行的线程发送interrupt方法。 shutdown：拒绝所有任务提交，但是任务队列和正在运行中的线程不会做任何干扰。 代码参考：jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/java-concurrent-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-06T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-06T12:00:00&#43;08:00'/>
+<meta name="twitter:title" content="Java并发编程 八股">
+<meta name="twitter:description" content="按照学习顺序来组织一下Java并发的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\n多线程 Q：什么是JMM？什么是原子性可见性有序性？哪些对象相对是共享变量？ A：JMM，Java Memory Model，Java内存模型。主要是为了解决多线程同步和通信的可见性、原子性、有序性问题产生的。\n具体来说什么是JMM呢：可以参考这张图 ((20260430104747-kl872fu &lsquo;image &lsquo;))，在内存中每个线程有自己的VM栈，同时也会有共享变量区域（这块区域叫主存），多线程需要访问共享变量时需要将主存中的共享变量复制一份到本地内存中，本地修改后过一段时间才会同步到主存中。\n什么是可见性、原子性和有序性？\n可见性：线程A修改完共享变量后不一定马上同步到主存中，需要过一段时间才能同步。线程B不能马上看到这个变量被修改了。\n原子性：一个经典例子「i++」，分三步操作 1、读i； 2、i加1； 3、赋值。多线程对i这个变量进行操作的时候，就会出现原子性问题。\n有序性：有时候编译器和CPU为了提高速度，会在不影响单线程结果的情况下进行指令重排，总体遵循happens-before规则。一个经典的例子就是「Obj a = new Obj()」\n下面的123操作有时候会改成132, 在多线程进行的情况下可能会导致错误：a指向地址没有赋值，没有实际对象。\n开辟对象的内存空间 内存空间赋初始值 修改a的引用到指定内存空间 哪些对象是共享变量？\nJVM堆/元空间（方法区）的非线程私有的对象是共享变量。\n可以被多线程共享的变量是共享变量。比如\npublic class A{ int i = 1; // 这里的i 就是堆A对象的属性，属于共享变量。 method1(); // 修改i method2(); // 修改i } Q：Java的线程实现？虚拟线程和平台线程？切换和调度是否由内核态实现？和go中的协程呢？虚拟线程和平台线程的作用是什么？ A：Java中的线程实现，JDK21之前使用传统的1:1封装内核线程，JDK21之后引入显式的虚拟线程，M:N封装少量平台线程。虚拟线程和go中的协程类似。虚拟线程和平台线程的作用不同，虚拟线程适合处理io密集型等待居多的任务，切换和调度都比平台线程块，但是在cpu密集型上面因为都是占用cpu资源，所以不如直接创建平台线程。\n两种实现：虚拟线程和平台线程\n平台线程：Java中的默认线程实现，1:1封装os内核线程；线程调度由os内核态完成，切换时开销较大；创建线程时默认VM栈1MB，自带Program Counter（PC），不能无限创建。 虚拟线程：JDK21之后的线程实现，M:N封装平台线程，M&raquo;N；线程调度由用户态JVM的ForkJoinPool完成，切换开销小，创建线程栈的资源开销小可以动态伸缩，单个JVM进程可以创建上百万个虚拟线程。在IO密集型需要等待任务上有优势，反之在cpu密集型上不如直接创建平台线程。 Q：如何实现线程安全、数据一致、原子操作？ A：保证原子性：AtomicInteger、Sychronized上锁；保证可见性：Synchronized，Volatile；保证有序性：禁止指令重排一类。\n具体来说实现线程安全，就是保证编写多线程代码同步和通信时的 原子性、可见性、有序性。\n实现方法也很常见：\n乐观锁：CAS、Version版本号先修改在比较不同则回滚。 悲观锁：Synchronized、ReenterantLock等等 Volatile保障使用乐观锁时的可见性，搭配乐观锁CAS使用。 Q：如何创建线程，执行线程？ A：参考((20260824102745-stkak49 &lsquo;基本使用流程&rsquo;))，大概是几种方法，核心就是接收了runnable（无返回值）和callable（有返回值）的线程通过thread.start()执行，如果是线程池executor就是submit执行，callable可以通过future接收返回值等。也可以通过((20260822150735-u3o37s4 &ldquo;CompletableFuture&rdquo;))接收callable+线程池的方式来编排组织线程同步和执行顺序。 Q：如何中断线程？interrupt是如何让线程抛出IterruptedException异常的？ A：首先需要说明interrupt仅仅只是给线程设置一个中断状态，是否响应需要依赖runnable内部的阻塞状态。是否响应中断需要依赖两种，一种是自动响应中断的Thread.sleep, Thread.join以及object.wait和future.get等io方法，如果是cpu循环执行的话，那么这种就需要手动在循环中判断interrupt状态并return或者抛出异常了。这个解释同时说明了上述两个问题。\n关于如何中断线程，其实不同的主体有不同的方法，核心还是使用interrupt：\nthread的interrupt方法\nThreadPoolExecutor提交后可以使用返回值future的cancel方法，cacel(true)表示可以给正在运行的方法发送iterrupt方法，反之cancel(false)就不会给正在运行的线程发送。\nThreadPoolExecutor还有两个方法，一个是shutdown一个是shutdownNow\nshutdownNow：拒绝所有任务提交，不处理任务队列中的所有任务，给当前所有正在运行的线程发送interrupt方法。 shutdown：拒绝所有任务提交，但是任务队列和正在运行中的线程不会做任何干扰。 代码参考：jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#多线程">多线程</a></li>
+    <li><a href="#并发锁">并发锁</a></li>
+    <li><a href="#threadlocal">ThreadLocal</a></li>
+    <li><a href="#线程池">线程池</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/java-concurrent-qa/">Java并发编程 八股</a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-06T12:00:00&#43;08:00'>Tuesday, October 6, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#多线程">多线程</a></li>
+    <li><a href="#并发锁">并发锁</a></li>
+    <li><a href="#threadlocal">ThreadLocal</a></li>
+    <li><a href="#线程池">线程池</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>按照学习顺序来组织一下Java并发的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
+<h2 id="多线程">多线程
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是JMM？什么是原子性可见性有序性？哪些对象相对是共享变量？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>JMM，Java Memory Model，Java内存模型。主要是为了解决多线程同步和通信的可见性、原子性、有序性问题产生的。</p>
+<p>具体来说什么是JMM呢：可以参考这张图 ((20260430104747-kl872fu &lsquo;image &lsquo;))，在内存中每个线程有自己的VM栈，同时也会有共享变量区域（这块区域叫主存），多线程需要访问共享变量时需要将主存中的共享变量复制一份到本地内存中，本地修改后过一段时间才会同步到主存中。</p>
+<p>什么是可见性、原子性和有序性？</p>
+<ol>
+<li>
+<p>可见性：线程A修改完共享变量后不一定马上同步到主存中，需要过一段时间才能同步。线程B不能马上看到这个变量被修改了。</p>
+</li>
+<li>
+<p>原子性：一个经典例子「i++」，分三步操作 1、读i； 2、i加1； 3、赋值。多线程对i这个变量进行操作的时候，就会出现原子性问题。</p>
+</li>
+<li>
+<p>有序性：有时候编译器和CPU为了提高速度，会在不影响单线程结果的情况下进行指令重排，总体遵循happens-before规则。一个经典的例子就是「Obj a = new Obj()」</p>
+<p>下面的123操作有时候会改成132, 在多线程进行的情况下可能会导致错误：a指向地址没有赋值，没有实际对象。</p>
+<ol>
+<li>开辟对象的内存空间</li>
+<li>内存空间赋初始值</li>
+<li>修改a的引用到指定内存空间</li>
+</ol>
+</li>
+</ol>
+<p>哪些对象是共享变量？</p>
+<ul>
+<li>
+<p>JVM堆/元空间（方法区）的非线程私有的对象是共享变量。</p>
+</li>
+<li>
+<p>可以被多线程共享的变量是共享变量。比如</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">A</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">1</span><span class="p">;</span><span class="w"> </span><span class="c1">// 这里的i 就是堆A对象的属性，属于共享变量。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">method1</span><span class="p">();</span><span class="w"> </span><span class="c1">// 修改i</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">method2</span><span class="p">();</span><span class="w"> </span><span class="c1">// 修改i</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Java的线程实现？虚拟线程和平台线程？切换和调度是否由内核态实现？和go中的协程呢？虚拟线程和平台线程的作用是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Java中的线程实现，JDK21之前使用传统的1:1封装内核线程，JDK21之后引入显式的虚拟线程，M:N封装少量平台线程。虚拟线程和go中的协程类似。虚拟线程和平台线程的作用不同，虚拟线程适合处理io密集型等待居多的任务，切换和调度都比平台线程块，但是在cpu密集型上面因为都是占用cpu资源，所以不如直接创建平台线程。</p>
+<p>两种实现：虚拟线程和平台线程</p>
+<ul>
+<li>平台线程：Java中的默认线程实现，1:1封装os内核线程；线程调度由os内核态完成，切换时开销较大；创建线程时默认VM栈1MB，自带Program Counter（PC），不能无限创建。</li>
+<li>虚拟线程：JDK21之后的线程实现，M:N封装平台线程，M&raquo;N；线程调度由用户态JVM的ForkJoinPool完成，切换开销小，创建线程栈的资源开销小可以动态伸缩，单个JVM进程可以创建上百万个虚拟线程。在IO密集型需要等待任务上有优势，反之在cpu密集型上不如直接创建平台线程。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何实现线程安全、数据一致、原子操作？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>保证原子性：AtomicInteger、Sychronized上锁；保证可见性：Synchronized，Volatile；保证有序性：禁止指令重排一类。</p>
+<p>具体来说实现线程安全，就是保证编写多线程代码同步和通信时的 原子性、可见性、有序性。</p>
+<p>实现方法也很常见：</p>
+<ul>
+<li>乐观锁：CAS、Version版本号先修改在比较不同则回滚。</li>
+<li>悲观锁：Synchronized、ReenterantLock等等</li>
+<li>Volatile保障使用乐观锁时的可见性，搭配乐观锁CAS使用。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何创建线程，执行线程？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">参考((20260824102745-stkak49 &lsquo;基本使用流程&rsquo;))，大概是几种方法，核心就是接收了runnable（无返回值）和callable（有返回值）的线程通过thread.start()执行，如果是线程池executor就是submit执行，callable可以通过future接收返回值等。也可以通过((20260822150735-u3o37s4 &ldquo;CompletableFuture&rdquo;))接收callable+线程池的方式来编排组织线程同步和执行顺序。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何中断线程？interrupt是如何让线程抛出IterruptedException异常的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>首先需要说明interrupt仅仅只是给线程设置一个中断状态，是否响应需要依赖runnable内部的阻塞状态。是否响应中断需要依赖两种，一种是自动响应中断的Thread.sleep, Thread.join以及object.wait和future.get等io方法，如果是cpu循环执行的话，那么这种就需要手动在循环中判断interrupt状态并return或者抛出异常了。这个解释同时说明了上述两个问题。</p>
+<p>关于如何中断线程，其实不同的主体有不同的方法，核心还是使用interrupt：</p>
+<ul>
+<li>
+<p>thread的interrupt方法</p>
+</li>
+<li>
+<p>ThreadPoolExecutor提交后可以使用返回值future的cancel方法，cacel(true)表示可以给正在运行的方法发送iterrupt方法，反之cancel(false)就不会给正在运行的线程发送。</p>
+</li>
+<li>
+<p>ThreadPoolExecutor还有两个方法，一个是shutdown一个是shutdownNow</p>
+<ul>
+<li>shutdownNow：拒绝所有任务提交，不处理任务队列中的所有任务，给当前所有正在运行的线程发送interrupt方法。</li>
+<li>shutdown：拒绝所有任务提交，但是任务队列和正在运行中的线程不会做任何干扰。</li>
+</ul>
+</li>
+</ul>
+<p>代码参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>线程有哪些状态？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">参考((20260430163856-v6l2y2d &lsquo;线程有哪些状态&rsquo;))，线程的状态有NEW初始化状态，刚刚创建完没有被start；Runnabel状态，同时包括ready和running状态，在running状态的可以通过yield让渡cpu给别的线程执行，在ready状态的等待cpu调度；waiting状态是在线程运行时因为object.wait join lock.park等被切换过去的状态，通过notify unpark，notifyAll可以切回runnable状态；timewating就是wating切换的实现状态，同时加上可以自动响应中断的Thread.sleep(指定时间)；blocked一般都是运行线程为了获取锁（lock，synchronzied）等等进入的，需要等待锁释放获取到锁才能切会runnable状态；线程执行完成后进入terminated状态，回收vm栈和program counter等系统资源。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>sleep、wait、blocked有什么区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>触发，释放锁不同。</p>
+<p>sleep可以手动在线程的任何位置触发，不会释放任何锁，进入timedwaiting状态。时间到了后自动切入runablle的ready状态。</p>
+<p>wait需要在获得lock后的同步块中触发，主动让渡锁出去，进入waiting状态，等待别人notify自己，得到notify后切入runnable的ready状态，cpu分配后重新开始竞争锁。</p>
+<p>blocked是在竞争锁的过程中失败自动切入blocked状态，当有进程释放锁，会自动触发唤醒重新竞争。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>可以手写生产者消费者吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">可以参考以下思路实现。((20261001152043-5oklgra &lsquo;生产者消费者&rsquo;))</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>notify和notifyAll什么区别？notify选择哪个线程？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">notify在源码中说是随机选择，但其实HotspotJVM使用FIFO选择线程退出waiting，开始竞争锁。notifyAll是唤醒所有线程来竞争锁，竞争失败的切入Blocked状态。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>不同线程如何通信？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>拿生产者消费者举例，对于单生产者单消费者，生产者速率是消费者3倍的情况来说，可以选择以下几种方式：</p>
+<ul>
+<li>Object lock，notify，wait，queue</li>
+<li>使用线程安全的BlockingQueue做add和take</li>
+<li>ReentrantLock lock，以及lock.Condition来创建await释放锁和signal来唤醒一个线程来竞争锁。总体和第一个很像。</li>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>虚拟线程和Go线程在高并发io场景下的性能差距？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">细究肯定还是有差距的，但是现在已经没有以前差距那么大了。虚拟线程因为io阻塞时，JVM会将其从平台线程上摘下，然后跑其他虚拟线程，不会阻塞内核线程。在JDK21下，高并发io场景下的虚拟线程和go协程的差距已经在逐步缩小了。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>JUC下面你常用的有哪些？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>线程池ThreadPoolExecutor，Threads.newFixed等；并发集合ConcurrentHashmap，CopyOnWriteList读多写少；同步类 CountDownLatch（countDown和await）；原子操作类AtomicInteger和AtomicReference。</p>
+<p>其中AtomicReference通过对对象的“读取，比较，修改”封装为原子性的CAS操作，其实也就类似AtomicInteger，通过get/set来使用，cas操作通过compareAndSet。对比Volatile只能保证可见性，如果加悲观锁开销远大于AtomicReference的CAS操作。<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >参考：github代码</a></p>
+<p>CountDownLatch初始化后，在线程体中完成任务后做countDown，主线程阻塞在countDownLatch.await上面等待前面的线程完成执行。参考：((20260824103330-31806a1 &lsquo;CountDownLatch&rsquo;))</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>JUC的ConcurrentHashmap是如何实现的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">((20260919230416-3tuqjso &lsquo;ConcurrentHashMap如何实现的？&rsquo;))</div></div>
+</details>
+
+<h2 id="并发锁">并发锁
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>了解哪些锁的种类，具体有哪些常用的锁？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>1、** 锁的种类：公平非公平，乐观悲观，排他互斥锁。</p>
+<p><strong>2、</strong> 常用锁</p>
+<ul>
+<li>syncrhonized锁，内置对象锁，Object中实现，可以对任何非null对象使用synchronized上锁。</li>
+<li>ReentrantLock锁，可重入锁，显式锁，默认非公平锁。可以设置为公平锁，自定义程度非常高。</li>
+<li>ReadWriteLock锁，读写锁，适合读多写少的场景。读读共享，读写、写写互斥。</li>
+<li>自旋锁：等待锁的是不会阻塞，而是不断循环检查是否可以获取锁。优点是省的内核切换带来的开销，缺点是如果长时间自旋会一直占用空耗cpu资源。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Synchronized内置对象锁是什么？加锁释放的逻辑？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Synchronized锁借助JVM的Monitor对象自动维护，在存在竞争/竞争加剧的时候视情况进行锁升级。进入synchronized块/方法之前需要竞争指定对象的锁，退出时释放锁，竞争失败则阻塞进入blocked状态等待锁释放重新竞争。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Synchronized锁的原子性、可见性、有序性？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>原子性不用多说，同步块对应的原子性；可见性，monitorenter，进入同步块之前先将主存中需要访问的共享变量复制到本地线程方法栈（VM栈）中，monitorexit，退出同步块之前将本地VM栈中的变量同步到主存中；有序性：synchronized不能确保指令不重排。</p>
+<p>一个经典的例子就是DCL单例锁必须要给instance加volatile，不然多线程进行单例获取时，线程B可能会获取到先引用赋值后对象构造的非null instance对象。使用volatile，可以通过插入内存屏障来进行对象构造和引用赋值这两个指令重排导致单例获取的问题。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Synchronzied锁支持重入吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>支持重入，可以写个代码验证下。</p>
+<p>什么是可重入：同一个线程可以多次获取一把锁。</p>
+<p>代码参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Synchronized的锁升级流程？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>无锁，偏向锁，轻量锁，重量锁。</p>
+<p>无锁：默认状态就是((20260501094731-8n8d3go &ldquo;对象头监视器Monitor中的无锁状态&rdquo;))，没有线程进行获取。</p>
+<p>偏向锁：当有一个线程获取锁的时候，锁升级为偏向锁，记录当前线程和重入次数1。当这个线程再次获取时，因为是偏向锁，所以可以直接获取，同时重入次数+1。当有另外一个线程B获取的时候：加入当前线程A持有，那么锁升级为轻量锁，线程A重新持有轻量锁，线程B自旋CAS等待线程A释放锁。如果锁没有其他线程占有，修改偏向锁的偏向线程为线程B和重入次数为1。</p>
+<p>轻量锁：多个线程并发请求锁、线程B请求线程A占有的偏向锁的时候，触发偏向锁向轻量锁的升级。源线程A继续持有轻量锁，线程B通过CAS自旋等待线程A释放锁。一旦CAS次数过多，轻量锁升级为重量锁。</p>
+<p>重量锁：CAS次数过多，1、锁竞争激烈。2、单个线程持有锁时间较长，等待锁释放的线程CAS自旋次数过多占用过高CPU资源。此时替换轻量锁为由os内核的互斥变量mutex，减少cpu占用，避免无意义开销。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Synchronized实现DCL单例锁？为什么要这么写？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>无锁时，AB线程同时进入instance==null创建两个对象，不符合单例模式；加锁时，阻塞式获取，对于非空状态效率比较低；DCL null创建锁的时候，因为指令重排，B线程还是可能获取提前引用赋值的instance对象，导致判断为非null返回没有初始化完成的对象。所以需要DCL。</p>
+<p>DCL代码参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是volatile，如何保证可见性和有序性？有什么代价？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>volatile，可见性通过读是必须从主存读，写时必须同步写入主存实现；有序性，在读/写volatile变量的操作前后加内存屏障，禁止前后的指令重排。什么代价呢？比读写普通变量更慢，具体表现是在1亿次i++的状态下，耗时大概在40倍左右（volatile变量耗时192ms，普通变量耗时5ms，40倍左右的开销）。</p>
+<p>读写对比的代码参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是ReentrantLock？实现机制？和synchronized什么区别？三性怎么实现的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>ReentrantLock是一种显式锁。</p>
+<p>实现机制：CAS自旋+AQS队列同步器，同时维护volatile thread和volatile state变量。</p>
+<p>和synchronzied什么区别：</p>
+<ol>
+<li>一个是内置对象头监视器模式的锁，一个是显式锁。</li>
+<li>reentrantLock支持公平锁，多路condtion singla/await，显式加锁释放锁，可重入。</li>
+</ol>
+<p>三性怎么实现的：</p>
+<ul>
+<li>什么是三性：可见性，有序性，可重入性。</li>
+<li>可见性：通过volatile实现。</li>
+<li>有序性：volatile变量禁止指令对ReentrantLock中的指令重排，同步块中也不会重排，结合happens-before实现禁止指令重排。</li>
+<li>可重入性：CAS+AQS+Volatile thread，state；当发现当前持锁线程为请求线程的时候，直接放行同时state+1；不是的时候，加入AQS队列；释放锁的时候state必定为1, 然后被扣为0接着释放。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>ReentrantLock的多路condition是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>具体的，多路condition的每个condition维护一个线程等待队列，通知线程进行同步和通信（producer通知consumer消费，让渡reentrantLock；consumer通知producer生产，让渡reentrantLock）。</p>
+<p>如何用ReentrantLock的多路condition来优雅的实现生产者消费者：可以看这个<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >代码</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是CAS？CAS有哪些问题？什么是AQS？AQS是公平的吗？AQS有非独占模式吗？CAS和AQS是什么关系</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>CAS就是comapre and set，先获取想要修改的变量，然后原子性（CPU总线锁定）的comapreAndSet，如果comapre expected和当前最新值相同，那么可以修改，反之继续在while循环中自旋CAS等待获取成功。CAS的问题源自于获取值 到 原子性的compareAndSet 和 获取想要修改的变量之间，存在ABA问题、获取失败时的自旋开销问题以及一次只能comapreAndSet一个变量的问题，多个变量需要封装为一个对象再做cas。</p>
+<p>什么是AQS：抽象队列同步器 Abstract Queue Synchronizer，其实就是volatile state变量和CLH线程队列。CAS失败的线程如果都持续自旋带来许多不必要的CPU开销，通过组织AQS的CLH队列，让CAS失败的线程加入CLH队列，head就是当前持有锁的线程，head.next在head释放锁的时候unpark head.next，来cas获取锁。后面的线程进入队列后，如果前面不空，自己将自己park，等待前面的通知自己unpark。</p>
+<p>AQS是公平的吗？并非，默认的ReentrantLock就是非公平的，竞争的线程在进入队列前没有自park的时候，可以cas，如果成功了就占用锁移动到队头节点。这就不是公平的。当然也可以设置ReentrantLock为公平的，此时只有进入AQS队列的可以acquire。</p>
+<p>AQS有非独占模式吗？有的，tryAcquireShared和tryReleaseShared，可以在共享模式下释放和获取锁，一个unpark后面的链式unpark，大家一起共享一个锁。</p>
+<p>CAS和AQS是什么关系？为了不让高并发场景CAS自旋的不必要开销，使用AQS CLH队列来维护等待线程队列。默认的像Atomic类的CAS就是一个do while循环。</p>
+</div></div>
+</details>
+
+<h2 id="threadlocal">ThreadLocal
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是ThreadLocal？什么原理？有什么限制？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>ThreadLocal是每个线程私有的变量，在子线程中获取父线程中的变量时为空，可以设置子线程自己的ThreadLocal。存储在每个线程的ThreadLocalMap&lt; Key:WeakReference<ThreadLocal>, Value: value&gt;中，ThreadLocal是弱引用，存储的值是value。当ThreadLocal没有了外部的强引用的时候，一次<code>System.GC()</code>配合<code>Thread.sleep(500)</code>就可以清理掉这个ThreadLocal，但是此时value还存在ThreadLocalMap中，形成了内存泄露。</p>
+<p>限制：子线程中无法访问（两种创建方式<code>new Thread(()-&gt;{})</code>和<code>threadExecutorPool.submit(()-&gt;{})</code>的子线程）父线程的threadLocal。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>可以在子线程中访问父线程的ThreadLocal的工具？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>一个是自带的InheritableThreadLocal，可以在new Thread中使用，但是不能使用线程池；另外一个是阿里的TransmittableThreadLocal和TtlExecutor，支持new Thread捕获父线程的ThreadLocal值。</p>
+<p>具体来说：</p>
+<ol>
+<li>InheritableThreadLocal的问题是，只能在线程创建的时候捕获当前父线程的ThreadLocal/InheritableThreadLocal值，后续如果更新了itl的值，那么重新复用的线程输出的itl的值还是创建时的值，有延迟问题。</li>
+<li>TransmittableThreadLocal，阿里的父子线程传递Ttl，可以在new Thread中使用，也可以通过TtlExecutor创建线程池来捕获。每次线程start的时候都将父线程的Ttl复制到本地，子线程结束时自动清理避免ThreadLocal的内存泄露污染。</li>
+</ol>
+<p>TransmittableThreadLocal和InheritableThreadLocal的区别就是一个是在任务提交/执行时进行Ttl的捕获，一个是在线程创建时做itl的捕获，这样就延伸出了线程复用时的使用差别。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>InheritableThreadLocal和TransmittableThreadLocal是否解决了weakReference带来的value内存泄露问题吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>并没有，虽然会自动清理，但是如果是一个singleExecutor的话，那么上一次线程使用的时候设置的threadLocal下一次线程使用的时候还会继续访问到。正确的做法还是使用完remove。</p>
+<p>代码参考：<a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread03_safe"  target="_blank" rel="noopener"
+    >jc-here/concurrent_thread/thread03_safe at main · Aoidayo/jc-here</a></p>
+</div></div>
+</details>
+
+<h2 id="线程池">线程池
+</h2><p>通过new ThreadPoolExecutor创建的线程池。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>主要参数</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">主要参数有：核心线程数corePoolSize，最大线程数maxPoolSize，非核心线程存活时间keepAliveTime和TimeUnit，BlockingQueue WorkQueue，以及ThreadFactory线程工程和workQueue满的时候的拒绝策略handlerAbortPolicy。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>工作流程</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>工作流程是：假定一个ThreadPoolExecutor，corePoolSize=2, maxPoolSize=4, keepAliveTime=60s，使用ArrayBlockingQueue(2), AbortPolicy使用抛出异常并丢弃。</p>
+<ol>
+<li>第一个任务被submit或者execute，创建核心线程c1并执行</li>
+<li>第二个任务提交，创建核心线程c2并执行</li>
+<li>第三个任务提交，此时corePoolSize满，workQueue没有满，加入任务队列。</li>
+<li>第四个任务提交，此时corePoolSize满，workQueue没有满，加入任务队列。</li>
+<li>第五个任务提交，此时corePoolsize和workQueue都满了，此时创建非核心线程e1，优先执行第五个任务。</li>
+<li>第六个任务提交，此时corePoolsize和workQueue都满了，此时创建非核心线程e1，优先执行第六个任务。</li>
+<li>第七个任务提交，此时corePoolSize和workQueue都满了，同时maxpoolSize也满，根据拒绝策略handler进行处理。</li>
+</ol></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>一个线程池最多同时处理多少任务</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>对于并发同时处理多少任务：具体的，同时可以接收maxPoolSize + len(workQueue)个任务。如果其他线程处理的快的话，不止接收这么多。</p>
+<p>注：一般来说是这样，但是如果workQueue是无界队列，那么最大同时处理上限就是corePoolSize个。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>对于任务队列</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">分为有界队列和无界队列两种，有界队列就是ArrayBlockingQueue，无界队列有LinkedBlockingQueue，DelayedBlockingQueue等，SynchronousQueue是特殊的任务队列，类似于Go中的Chnnel(0)，必须要线程池中有空闲线程时才能接收提交，否则执行拒绝策略。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>对于拒绝策略：分为四种，</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ol>
+<li>AbortPolicy，抛出异常并丢弃，这个异常需要在提交者所在线程中显示处理。</li>
+<li>DiscardPolicy，静默丢弃，不抛出异常。</li>
+<li>CallerRunPolicy，提交者所在线程执行提交的任务。</li>
+<li>DiscardOldestPolicy，丢弃workQueue中的第一个，然后重新提交。</li>
+</ol>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>关于submit和execute的区别：</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>execute执行的异常需要在runnable内部显式处理，如果没有处理直接抛出那么当前的worker线程会死亡，等待线程池新建下一个。execute抛到上面的异常可以有ThreadFactory通过thread.setUncaughtExceptionHandler 和 ThreadPoolExecutor的匿名内部类中实现的afterExecute方法拿到，但是无法处理只能记录。</p>
+<p>submit提交后，runnable执行过程中产生的异常被封装在Future中，在get的时候外面包上try catch进行处理。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>对于execute抛到上面的异常，两种记录方法：</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>对于线程工厂，可以在创建线程时给thread设置UncaughtExceptionHandler来记录execute执行过程中抛出的异常。</p>
+<p>对于线程池，可以使用匿名内部类实现afterExecute方法，记录execute抛出的异常，处理submit抛出的异常。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>线程池的关闭方式shutdown和shutdownnow区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">shutdown是等待线程池处理完所有任务后再关闭，shutdownnow是拒绝所有任务提交，不处理workQueue中的所有任务，给所有正在执行任务的线程发送interrupt信号，等待中断。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>线程池创建需要注意什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>无界队列和corePoolSize搭配的时候，不会创建非核心线程。</p>
+<p>核心线程数量，队列类型，拒绝策略。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>预定义的四种线程池是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>newFixed，newCached，newSingle和newScheduled</p>
+<p>具体的，基本上都是使用无界队列。</p>
+<p>newFixed的corePoolSize = maxPoolSize，使用LinkedBlockingQueue，使用固定数量的核心线程来处理任务。</p>
+<p>newCached的corePoolSize = 0, maxPoolSize= Integer.MAX，使用SynchronousQueue来不断创建新核心线程处理任务。</p>
+<p>newSingle就是corePoolSize = maxPoolSize =1, 使用LinkedBlockingQueue，保证串行执行任务。</p>
+<p>newScheduled就是使用无界队列DelayedWrokQueue来延时执行任务，并发定时任务上限就是corePoolSize。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>相关代码实施</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><a class="link" href="https://github.com/Aoidayo/jc-here/tree/main/concurrent_thread/thread02_xcc"  target="_blank" rel="noopener"
+    >jc-here/concurrent_thread/thread02_xcc at main · Aoidayo/jc-here</a></div></div>
+</details>
+
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
