@@ -23,23 +23,6 @@
     border-radius: 3px;
 }
 
-.article-content .qa-action {
-    color: var(--accent-color);
-    font-size: 0.8em;
-    font-weight: 400;
-    margin-left: 0.75em;
-    white-space: nowrap;
-}
-
-.article-content .qa-action--open,
-.article-content .qa-item[open] .qa-action--closed {
-    display: none;
-}
-
-.article-content .qa-item[open] .qa-action--open {
-    display: inline;
-}
-
 .article-content .qa-answer {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -50,41 +33,6 @@
 .article-content .qa-answer-content {
     min-width: 0;
     overflow-wrap: anywhere;
-}
-
-.article-content .qa-item[data-answer-style="lines"] .qa-answer-content {
-    position: relative;
-}
-
-.article-content .qa-line-masks {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-}
-
-.article-content .qa-line-mask {
-    position: absolute;
-    display: block;
-    box-sizing: border-box;
-    border-radius: 999px 8px 999px 10px;
-    background: #d94b33;
-    pointer-events: none;
-}
-
-.article-content .qa-line-masks:hover .qa-line-mask {
-    filter: brightness(1.08);
-}
-
-.article-content .qa-line-masks:focus-visible {
-    outline: 2px solid #d94b33;
-    outline-offset: 2px;
 }
 
 .article-content .qa-answer-content > :first-child {
