@@ -15,6 +15,12 @@
 
   function readStoredPassword(key) {
     try {
+      var saved = localStorage.getItem("hugo-encrypt:" + key);
+      if (saved) return saved;
+    } catch (error) {
+      // The browser may block persistent storage.
+    }
+    try {
       return sessionStorage.getItem("hugo-encrypt:" + key) || "";
     } catch (error) {
       return "";
@@ -23,9 +29,29 @@
 
   function storePassword(key, password) {
     try {
+      localStorage.setItem("hugo-encrypt:" + key, password);
+      sessionStorage.removeItem("hugo-encrypt:" + key);
+      return;
+    } catch (error) {
+      // Keep the existing tab-only behavior if persistent storage is unavailable.
+    }
+    try {
       sessionStorage.setItem("hugo-encrypt:" + key, password);
     } catch (error) {
-      // Ignore private browsing and disabled storage.
+      // Decryption still works when browser storage is unavailable.
+    }
+  }
+
+  function clearStoredPassword(key) {
+    try {
+      localStorage.removeItem("hugo-encrypt:" + key);
+    } catch (error) {
+      // Ignore unavailable storage.
+    }
+    try {
+      sessionStorage.removeItem("hugo-encrypt:" + key);
+    } catch (error) {
+      // Ignore unavailable storage.
     }
   }
 
@@ -232,37 +258,41 @@
       box.classList.add("hugo-encrypt-pending");
       box.textContent = "正在解密...";
       decrypt(payload, savedPassword).then(function (html) {
+        storePassword(payload.id, savedPassword);
         box.innerHTML = html;
         box.classList.remove("hugo-encrypt-box", "hugo-encrypt-pending");
         box.classList.add("hugo-encrypt-unlocked");
         afterUnlock(box);
       }).catch(function () {
+        clearStoredPassword(payload.id);
         box.classList.remove("hugo-encrypt-pending");
-        renderPasswordForm(box, payload, savedPassword);
+        renderPasswordForm(box, payload);
       });
       return;
     }
 
-    renderPasswordForm(box, payload, "");
+    renderPasswordForm(box, payload);
   }
 
-  function renderPasswordForm(box, payload, initialPassword) {
+  function renderPasswordForm(box, payload) {
     var form = document.createElement("form");
     form.className = "hugo-encrypt-form";
     form.innerHTML = [
-      '<div class="hugo-encrypt-lock" aria-hidden="true">LOCK 🔒</div>',
-      '<label class="hugo-encrypt-label" for="' + payload.id + '-password">' + escapeHtml(payload.prompt) + "</label>",
+      '<div class="hugo-encrypt-header">',
+      '<span class="hugo-encrypt-lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>',
+      '<div class="hugo-encrypt-copy"><span class="hugo-encrypt-title">受保护内容</span>',
+      '<label class="hugo-encrypt-label" for="' + payload.id + '-password">' + escapeHtml(payload.prompt) + '</label></div>',
+      '</div>',
       '<div class="hugo-encrypt-row">',
-      '<input id="' + payload.id + '-password" class="hugo-encrypt-input" type="password" autocomplete="current-password">',
+      '<input id="' + payload.id + '-password" class="hugo-encrypt-input" type="password" autocomplete="current-password" placeholder="输入密码" required>',
       '<button class="hugo-encrypt-button" type="submit">解锁</button>',
       "</div>",
+      '<p class="hugo-encrypt-hint">解锁后，此浏览器会记住密码</p>',
       '<p class="hugo-encrypt-message" role="status" aria-live="polite"></p>'
     ].join("");
 
     var input = form.querySelector("input");
     var message = form.querySelector(".hugo-encrypt-message");
-    input.value = initialPassword || "";
-
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
       var password = input.value;
