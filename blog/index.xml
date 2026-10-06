@@ -5,7 +5,13 @@
         <description>Recent content in 博客 on Aoidayo</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-CN</language>
-        <lastBuildDate>Sat, 03 Oct 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://blog.aoidayo.site/blog/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 06 Oct 2026 12:00:00 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/blog/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>我的QA索引</title>
+            <link>https://blog.aoidayo.site/work/my-qa-index/</link>
+            <pubDate>Tue, 06 Oct 2026 12:00:00 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/work/my-qa-index/</guid>
+            <description>此文章包含加密内容。</description>
+        </item><item>
             <title>SpringBoot2.6&#43;单例bean字段注入的循环依赖问题</title>
             <link>https://blog.aoidayo.site/java/spring/spring-l3cache-qa/</link>
             <pubDate>Sat, 03 Oct 2026 00:00:00 +0000</pubDate>
