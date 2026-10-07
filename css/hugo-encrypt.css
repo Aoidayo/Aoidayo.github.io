@@ -142,6 +142,16 @@
         flex-direction: column;
     }
 
+    .hugo-encrypt-input,
+    .hugo-encrypt-button {
+        height: 48px;
+    }
+
+    .hugo-encrypt-input {
+        flex: none;
+        width: 100%;
+    }
+
     .hugo-encrypt-button {
         width: 100%;
     }
