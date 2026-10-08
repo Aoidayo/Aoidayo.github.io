@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？\nA：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？\nA：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。\n类加载器 Q：什么是类加载器？它的整体结构是什么样的？\nA：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？\nA：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。\nQ：什么是双亲委派？\nA：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？\nA：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？\nA：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。\nQ：如何破坏双亲委派？\nA：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。\nQ：SPI为什么破坏了双亲委派？\nA：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n">
-<title>jvm</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？ A：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？ A：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。 类加载器 Q：什么是类加载器？它的整体结构是什么样的？ A：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？ A：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。 Q：什么是双亲委派？ A：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？ A：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？ A：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。 Q：如何破坏双亲委派？ A：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。 Q：SPI为什么破坏了双亲委派？ A：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n运行时内存分布 Q：JVM运行时内存的不同区域 A：jvm运行时内存分为共享区 和 线程私有的部分。\n共享区\n元空间：开辟在本地内存，存储类名、方法定义以及字节码、符号引用转的直接引用。内部还有运行时常量池，运行时常量池存常量基本字段、字面量、常量对象引用、常量字符串引用。元空间中存静态字段、静态对象引用，静态字符串引用。元空间开辟在本地内存，可以动态伸缩，不由jvm管理。 堆：young gen、old gen，字符串常量池。由jvm管理，jvm运行时内存中最大的一块区域。 线程私有\n">
+<title>JVM 八股</title>
 
 
 <link rel="canonical" href="https://blog.aoidayo.site/work/jvm-qa/">
@@ -11,13 +11,13 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="/css/stack.css">
-<meta property='og:title' content="jvm">
-<meta property='og:description' content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？\nA：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？\nA：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。\n类加载器 Q：什么是类加载器？它的整体结构是什么样的？\nA：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？\nA：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。\nQ：什么是双亲委派？\nA：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？\nA：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？\nA：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。\nQ：如何破坏双亲委派？\nA：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。\nQ：SPI为什么破坏了双亲委派？\nA：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n">
+<meta property='og:title' content="JVM 八股">
+<meta property='og:description' content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？ A：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？ A：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。 类加载器 Q：什么是类加载器？它的整体结构是什么样的？ A：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？ A：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。 Q：什么是双亲委派？ A：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？ A：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？ A：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。 Q：如何破坏双亲委派？ A：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。 Q：SPI为什么破坏了双亲委派？ A：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n运行时内存分布 Q：JVM运行时内存的不同区域 A：jvm运行时内存分为共享区 和 线程私有的部分。\n共享区\n元空间：开辟在本地内存，存储类名、方法定义以及字节码、符号引用转的直接引用。内部还有运行时常量池，运行时常量池存常量基本字段、字面量、常量对象引用、常量字符串引用。元空间中存静态字段、静态对象引用，静态字符串引用。元空间开辟在本地内存，可以动态伸缩，不由jvm管理。 堆：young gen、old gen，字符串常量池。由jvm管理，jvm运行时内存中最大的一块区域。 线程私有\n">
 <meta property='og:url' content='https://blog.aoidayo.site/work/jvm-qa/'>
 <meta property='og:site_name' content='Aoidayo'>
 <meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-06T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-06T12:00:00&#43;08:00'/>
-<meta name="twitter:title" content="jvm">
-<meta name="twitter:description" content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？\nA：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？\nA：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。\n类加载器 Q：什么是类加载器？它的整体结构是什么样的？\nA：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？\nA：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。\nQ：什么是双亲委派？\nA：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？\nA：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？\nA：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。\nQ：如何破坏双亲委派？\nA：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。\nQ：SPI为什么破坏了双亲委派？\nA：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n">
+<meta name="twitter:title" content="JVM 八股">
+<meta name="twitter:description" content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？ A：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？ A：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。 类加载器 Q：什么是类加载器？它的整体结构是什么样的？ A：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？ A：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。 Q：什么是双亲委派？ A：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？ A：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？ A：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。 Q：如何破坏双亲委派？ A：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。 Q：SPI为什么破坏了双亲委派？ A：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n运行时内存分布 Q：JVM运行时内存的不同区域 A：jvm运行时内存分为共享区 和 线程私有的部分。\n共享区\n元空间：开辟在本地内存，存储类名、方法定义以及字节码、符号引用转的直接引用。内部还有运行时常量池，运行时常量池存常量基本字段、字面量、常量对象引用、常量字符串引用。元空间中存静态字段、静态对象引用，静态字符串引用。元空间开辟在本地内存，可以动态伸缩，不由jvm管理。 堆：young gen、old gen，字符串常量池。由jvm管理，jvm运行时内存中最大的一块区域。 线程私有\n">
     <link rel="shortcut icon" href="/img/hugo.ico" />
 
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
@@ -284,7 +284,7 @@
 
     <div class="article-title-wrapper">
         <h2 class="article-title">
-            <a href="/work/jvm-qa/">jvm</a>
+            <a href="/work/jvm-qa/">JVM 八股</a>
         </h2>
 
         
@@ -373,8 +373,9 @@
     
     
     <p>按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
-<p><strong>Q：JVM是什么？什么结构？支持哪些功能？</strong></p>
-<p>A：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>JVM是什么？什么结构？支持哪些功能？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。</p>
 <p>JVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。</p>
 <p>JVM中使用类加载器<del>和字节码验证器</del>对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。</p>
 <p>具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。</p>
@@ -392,11 +393,18 @@
 <p>字节码执行引擎：解释器，JIT即时编译器，垃圾回收。</p>
 </li>
 </ul>
-<p><strong>Q：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？</strong></p>
-<p>A：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>JVM和JDK、JRE的关系？JVM只能执行java字节码吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。</div></div>
+</details>
+
 <h2 id="类加载器">类加载器
-</h2><p><strong>Q：什么是类加载器？它的整体结构是什么样的？</strong></p>
-<p>A：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。</p>
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是类加载器？它的整体结构是什么样的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。</p>
 <p>整体结构：加载，link（验证、准备、解析），初始化</p>
 <ul>
 <li>
@@ -424,13 +432,24 @@
 </li>
 </ul>
 <p>注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。</p>
-<p><strong>Q：什么是类加载器的加载过程？</strong></p>
-<p>A：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。</p>
-<p><strong>Q：什么是双亲委派？</strong></p>
-<p>A：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是类加载器的加载过程？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是双亲委派？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。</p>
 <p>父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。</p>
-<p><strong>Q：有哪些类加载器？</strong></p>
-<p>A：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>有哪些类加载器？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。</p>
 <ul>
 <li>
 <p>启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。</p>
@@ -450,18 +469,32 @@
 </ul>
 </li>
 </ul>
-<p><strong>Q：为什么需要双亲委派？</strong></p>
-<p>A：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。</p>
-<p><strong>Q：如何破坏双亲委派？</strong></p>
-<p>A：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。</p>
-<p><strong>Q：SPI为什么破坏了双亲委派？</strong></p>
-<p>A：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要双亲委派？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何破坏双亲委派？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>SPI为什么破坏了双亲委派？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。</p>
 <p>具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用<code>ServiceLoader.load(Driver.class)</code>，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时<code>ServiceLoader.load</code>通过Thread Context ClassLoader委派加载给AppClassLoader执行如<code>mysql-connector.jar</code>中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。</p>
 <p>aff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。</p>
 <p>JDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。</p>
+</div></div>
+</details>
+
 <h2 id="运行时内存分布">运行时内存分布
-</h2><p><strong>Q：JVM运行时内存的不同区域</strong></p>
-<p>A：jvm运行时内存分为共享区 和 线程私有的部分。</p>
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>JVM运行时内存的不同区域</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>jvm运行时内存分为共享区 和 线程私有的部分。</p>
 <ul>
 <li>
 <p>共享区</p>
@@ -496,21 +529,43 @@
 </ul>
 </li>
 </ul>
-<p><strong>Q：栈帧中的动态链接</strong></p>
-<p>A：一个指向实际调用者方法的指针or引用。</p>
-<p><strong>Q：空方法在vm栈帧中的局部变量表是不是空的？static方法呢？</strong></p>
-<p>A：<code>public void method(){}</code>在vm栈的栈帧中还有this，<code>public static void method</code>的栈帧局部变量表就是空的。</p>
-<p><strong>Q：对象一定在堆中吗？</strong></p>
-<p>A：不一定，如果对象只在一个方法中使用，那么jvm会进行逃逸分析，创建在vm栈局部变量表中。</p>
-<p><strong>Q：元空间中存什么？</strong></p>
-<p>A：参考((20260909090019-7052g4p &ldquo;sy/不同时代堆和方法区/Java8的运行时内存布局&rdquo;))</p>
-<p><strong>Q：IntegerCache存在哪里？</strong></p>
-<p>A：-128~127的integer存在堆的IntegerCache中，<code>new Integer(-128~127)</code>都是从integerCache中取出的相同对象。但是<code>new Integer(128)</code>就是不同对象了。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>栈帧中的动态链接</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">一个指向实际调用者方法的指针or引用。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>空方法在vm栈帧中的局部变量表是不是空的？static方法呢？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>public void method(){}</code>在vm栈的栈帧中还有this，<code>public static void method</code>的栈帧局部变量表就是空的。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>对象一定在堆中吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">不一定，如果对象只在一个方法中使用，那么jvm会进行逃逸分析，创建在vm栈局部变量表中。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>元空间中存什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">参考((20260909090019-7052g4p &ldquo;sy/不同时代堆和方法区/Java8的运行时内存布局&rdquo;))</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>IntegerCache存在哪里？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">-128~127的integer存在堆的IntegerCache中，<code>new Integer(-128~127)</code>都是从integerCache中取出的相同对象。但是<code>new Integer(128)</code>就是不同对象了。</div></div>
+</details>
+
 <h2 id="字节码执行引擎">字节码执行引擎
-</h2><p><strong>Q：字节码执行引擎的组成？</strong></p>
-<p>A：解释器，JIT编译器，GC。</p>
-<p><strong>Q：JIT编译器的作用？什么是运行时优化？</strong></p>
-<p>A：JIT编译器负责将热点代码的编译加入缓存，以及进行运行时优化。</p>
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>字节码执行引擎的组成？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">解释器，JIT编译器，GC。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>JIT编译器的作用？什么是运行时优化？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>JIT编译器负责将热点代码的编译加入缓存，以及进行运行时优化。</p>
 <p>热点代码进缓存：在JVM解释执行过程中统计热点代码，将热点代码编译后放进codeCache中，提高代码的执行效率。值得注意的是，热点代码按次数统计，但是按周期进行衰减以便统计实时热点。</p>
 <p>运行时优化：</p>
 <ul>
@@ -530,24 +585,44 @@
 </ul>
 </li>
 </ul>
-<p><strong>Q：什么是垃圾回收？垃圾回收的步骤？</strong></p>
-<p>A：回收堆中长期不使用或者没有引用的对象。垃圾回收的步骤：首先进行两次可达性分析的标记，从GCRoot触发，如果两次判定为不可达，进行对象回收，如果对象在新生代，则使用标记-复制回收，如果对象在老年代，则使用标记-整理回收。</p>
-<p><strong>Q：可达性分析是什么？GC Root指哪些对象？可达性分析的隐患？</strong></p>
-<p>A：可达性分析指：启动可达性分析时暂停所有应用线程，避免应用线程修改对象间引用关系导致gc回收的内存错误和数据丢失。从一组GC Root触发，不可达的对象将会被回收。GC Root一般泛指：vm栈中的局部变量（实际存储在堆中）、类静态对象、元空间常量对象和静态对象。可达性分析的隐患就是如果是full gc，一次涉及分析的对象过多，暂停时间长，会影响实际SpringApplication性能。</p>
-<p><strong>Q：finalize方法了解吗？</strong></p>
-<p>A：类似亡语，在第一次可达性分析标记为不可达后触发，可以在finalize中将自己修改为可达，第二次标记时从GC Root向下dfs遍历为可达后，就不会触发回收。</p>
-<p><strong>Q：回收时处理空间的不同方法？以及适用范围。</strong></p>
-<p>A：标记-清理、标记-复制、标记-整理 三种。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是垃圾回收？垃圾回收的步骤？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">回收堆中长期不使用或者没有引用的对象。垃圾回收的步骤：首先进行两次可达性分析的标记，从GCRoot触发，如果两次判定为不可达，进行对象回收，如果对象在新生代，则使用标记-复制回收，如果对象在老年代，则使用标记-整理回收。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>可达性分析是什么？GC Root指哪些对象？可达性分析的隐患？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">可达性分析指：启动可达性分析时暂停所有应用线程，避免应用线程修改对象间引用关系导致gc回收的内存错误和数据丢失。从一组GC Root触发，不可达的对象将会被回收。GC Root一般泛指：vm栈中的局部变量（实际存储在堆中）、类静态对象、元空间常量对象和静态对象。可达性分析的隐患就是如果是full gc，一次涉及分析的对象过多，暂停时间长，会影响实际SpringApplication性能。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>finalize方法了解吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">类似亡语，在第一次可达性分析标记为不可达后触发，可以在finalize中将自己修改为可达，第二次标记时从GC Root向下dfs遍历为可达后，就不会触发回收。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>回收时处理空间的不同方法？以及适用范围。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>标记-清理、标记-复制、标记-整理 三种。</p>
 <p>标记-清理：直接清理对象，容易留下很多内存碎片。开销低、速度块，但内存利用率不高。</p>
 <p>标记-复制：将内存区域化成两块，每次清理的时候，将可达对象移动到另外一边。开销适中、速度适中、内存利用率有50%。</p>
 <p>标记-整理：整理时将可达对象移动到内存的一端。开销最大，内存利用率最高。</p>
 <p>对于新生代对象，容易频繁gc，使用标记-复制比较合适。对于老年代对象，触发GC的次数不多，可以使用开销最大内存利用率最高的标记-整理。</p>
-<p><strong>Q：对堆中新生代和老年代的不同GC？</strong></p>
-<p>A：Minor GC，Fixed GC、Major GC 和 Full GC。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>对堆中新生代和老年代的不同GC？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Minor GC，Fixed GC、Major GC 和 Full GC。</p>
 <p>Minor GC：又被称作young gc，清理新生代，在新生代区域没有足够空间时触发。提前做空间分配担保：如果从新生代升入老年代的对象过多，老年代空间不够时，从young gc改成触发 full gc。</p>
 <p>Fixed GC：较小力度的新生代和老年代的gc，只会清理过久没有使用的对象。</p>
 <p>Major GC：清理老年代。</p>
 <p>Full GC：完全清理新生代和老年代，停顿所有应用线程做可达性分析。</p>
+</div></div>
+</details>
+
 
     
 </section>
