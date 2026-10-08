@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？\nA：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？\nA：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。\n类加载器 Q：什么是类加载器？它的整体结构是什么样的？\nA：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？\nA：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。\nQ：什么是双亲委派？\nA：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？\nA：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？\nA：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。\nQ：如何破坏双亲委派？\nA：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。\nQ：SPI为什么破坏了双亲委派？\nA：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n">
+<title>jvm</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/jvm-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="jvm">
+<meta property='og:description' content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？\nA：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？\nA：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。\n类加载器 Q：什么是类加载器？它的整体结构是什么样的？\nA：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？\nA：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。\nQ：什么是双亲委派？\nA：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？\nA：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？\nA：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。\nQ：如何破坏双亲委派？\nA：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。\nQ：SPI为什么破坏了双亲委派？\nA：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/jvm-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-06T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-06T12:00:00&#43;08:00'/>
+<meta name="twitter:title" content="jvm">
+<meta name="twitter:description" content="按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：JVM是什么？什么结构？支持哪些功能？\nA：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。\nJVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。\nJVM中使用类加载器和字节码验证器对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。\n具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。\n类加载器\nJVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。\nJNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。 字节码执行引擎：解释器，JIT即时编译器，垃圾回收。\nQ：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？\nA：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。\n类加载器 Q：什么是类加载器？它的整体结构是什么样的？\nA：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。\n整体结构：加载，link（验证、准备、解析），初始化\n加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。\n加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。 链接：分三个步骤，验证、准备、解析。\n验证：字节码验证器，验证字节码是否符合JVM规范。 准备：为类的静态变量开辟空间并赋默认值。 解析：将符号引用转换为直接引用，也就是static string name 的name名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。 初始化：执行静态代码块和静态变量赋值。\n使用\n卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。\n注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。\nQ：什么是类加载器的加载过程？\nA：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。\nQ：什么是双亲委派？\nA：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。\n父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。\nQ：有哪些类加载器？\nA：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。\n启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。\n扩展类加载器，用于加载jre.lib.ext扩展类。\nApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如@Controller示例XXController.class.getClassLoader()获取的就是ApplicationClassLoader。\n用户自定义类加载器，实现classLoader的findClass或者loadClass方法。\n如果实现findClass方法，那么类进行加载时先做双亲委派。 如果实现loadClass，则不走双亲委派进行直接加载。 常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。 Q：为什么需要双亲委派？\nA：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。\nQ：如何破坏双亲委派？\nA：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。\nQ：SPI为什么破坏了双亲委派？\nA：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。\n具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用ServiceLoader.load(Driver.class)，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时ServiceLoader.load通过Thread Context ClassLoader委派加载给AppClassLoader执行如mysql-connector.jar中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。\naff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。\nJDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#类加载器">类加载器</a></li>
+    <li><a href="#运行时内存分布">运行时内存分布</a></li>
+    <li><a href="#字节码执行引擎">字节码执行引擎</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/jvm-qa/">jvm</a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-06T12:00:00&#43;08:00'>Tuesday, October 6, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#类加载器">类加载器</a></li>
+    <li><a href="#运行时内存分布">运行时内存分布</a></li>
+    <li><a href="#字节码执行引擎">字节码执行引擎</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>按照学习顺序来组织一下JVM的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
+<p><strong>Q：JVM是什么？什么结构？支持哪些功能？</strong></p>
+<p>A：JVM是平台特定的java虚拟机，可以执行符合字节码规范编译而来的class文件。</p>
+<p>JVM支持类加载机制、通过不同的GC垃圾回收器进行运行时内存管理、JIT运行时优化。</p>
+<p>JVM中使用类加载器<del>和字节码验证器</del>对class字节码文件进行处理，然后使用解释+编译混合的模式执行代码，对于非热点代码使用解释器直接执行，对于热点代码通过JIT即时编译器缓存机器码到本地内存的code cache中。</p>
+<p>具体来说，JVM的结构可以分为几个部分：类加载器，jvm运行时内存以及JNI和本地方法库、元空间，JIT字节码执行引擎。</p>
+<ul>
+<li>
+<p>类加载器</p>
+</li>
+<li>
+<p>JVM运行时内存：包括线程共享的堆空间，线程私有的VM栈、本地方法栈、PC程序计数器，以及在本地内存中开辟的元空间。其中堆、VM栈、本地方法栈以及PC都由JVM的GC管理，元空间的管理不由GC负责，直接像本地内存申请，支持动态伸缩。</p>
+<ul>
+<li>JNI和本地方法库，执行非java代码的接口，一般是系统内置方法或者使用其他语言编写的本地方法。</li>
+</ul>
+</li>
+<li>
+<p>字节码执行引擎：解释器，JIT即时编译器，垃圾回收。</p>
+</li>
+</ul>
+<p><strong>Q：JVM和JDK、JRE的关系？JVM只能执行java字节码吗？</strong></p>
+<p>A：JDK开发环境，提供javacompiler，jdebugger、plugin等插件，将java代码编译为字节码。JRE java运行时环境，包括JVM，和JVM分开的是java核心类库。JVM是运行字节码的核心，当然它是平台特定的，同时不仅支持java的字节码，只要符合规范生成的字节码它都可以运行，比如kotlin、scala的字节码。</p>
+<h2 id="类加载器">类加载器
+</h2><p><strong>Q：什么是类加载器？它的整体结构是什么样的？</strong></p>
+<p>A：类加载器负责将类加载、连接、初始化到java中，就是将类加载到jvm中并完成一系列链接和初始化的过程，最后可以被jvm使用。</p>
+<p>整体结构：加载，link（验证、准备、解析），初始化</p>
+<ul>
+<li>
+<p>加载：读取class文件，解析类文件，将类元信息注册到元空间，堆空间的old gen中加载class对象。</p>
+<ul>
+<li>加载方式：双亲委派加载，加载时优先委托给自己的父加载器进行加载，父加载不了再向子加载传递。</li>
+</ul>
+</li>
+<li>
+<p>链接：分三个步骤，验证、准备、解析。</p>
+<ul>
+<li>验证：字节码验证器，验证字节码是否符合JVM规范。</li>
+<li>准备：为类的静态变量开辟空间并赋默认值。</li>
+<li>解析：将符号引用转换为直接引用，也就是<code>static string name</code> 的<code>name</code>名称string转换为实际地址的引用。当然这也只是类静态变量可以在这个时候进行解析，还有一部分解析需要在运行时完成。</li>
+</ul>
+</li>
+<li>
+<p>初始化：执行静态代码块和静态变量赋值。</p>
+</li>
+<li>
+<p>使用</p>
+</li>
+<li>
+<p>卸载：尽管本地内存的元空间不归jvm管理，但是当jvm卸载类的时候，堆old gen中的class对象和本地内存元空间中的类元信息都会被一并移除。</p>
+</li>
+</ul>
+<p>注意：加载和链接是交叉进行的，并非一定是加载结束后才进行链接。</p>
+<p><strong>Q：什么是类加载器的加载过程？</strong></p>
+<p>A：使用双亲委派加载不同信任程度的类，在元空间中生成类元信息，在堆的old gen中生成class对象，以供后续的链接、初始化和使用。</p>
+<p><strong>Q：什么是双亲委派？</strong></p>
+<p>A：双亲委派就是类加载阶段加载的流程，某个类需要加载时，首先需要询问父加载器是否可以加载，一直被抛到顶层父加载器，如果顶层不能加载，再传递给子加载器进行处理。</p>
+<p>父加载器：这里的父加载器其实就是加载器类中的parent字段指向，并非实际的父类。</p>
+<p><strong>Q：有哪些类加载器？</strong></p>
+<p>A：启动类加载器（BootStrapClassLoader），扩展类加载器（ExtClassLoader），应用程序类加载器（ApplicationClassLoader）以及用户自定义类加载器。</p>
+<ul>
+<li>
+<p>启动类加载器，加载java的核心类库，避免核心类库被修改，保证核心类库的加载安全。</p>
+</li>
+<li>
+<p>扩展类加载器，用于加载jre.lib.ext扩展类。</p>
+</li>
+<li>
+<p>ApplicationClassLoader，应用程序类加载器，一般用于加载我们编写的代码，比如<code>@Controller</code>示例<code>XXController.class.getClassLoader()</code>获取的就是ApplicationClassLoader。</p>
+</li>
+<li>
+<p>用户自定义类加载器，实现classLoader的findClass或者loadClass方法。</p>
+<ul>
+<li>如果实现findClass方法，那么类进行加载时先做双亲委派。</li>
+<li>如果实现loadClass，则不走双亲委派进行直接加载。</li>
+<li>常见的例子有两个：一个是DevToolsClassLoader，在jvm中一个类只能被一个类加载器加载一次，热部署加载器的实现方式就是在第二次热部署前，卸载前一个热部署类加载器classloaderA和他加载的所有类，再通过创建一个热部署类加载器classloader-b加载之前加载过的所有类。另外一个是LaunchedURLClassLoader，我们知道jvm不能直接加载repackage的jar，也就是不能加载jar包中的jar包，所以需要使用这个类加载器加载内部jar中的class。</li>
+</ul>
+</li>
+</ul>
+<p><strong>Q：为什么需要双亲委派？</strong></p>
+<p>A：1、对不同类的信任程度不同，需要保证核心类库的安全性。2、避免重复加载，父加载器可以加载的，子加载器不需要重复加载。</p>
+<p><strong>Q：如何破坏双亲委派？</strong></p>
+<p>A：1、一个是SPI机制，使用系统内置的ServiceLoader加载metainf中的指定类到jvm中。2、自定义实现classLoader的loadClass，不实现findClass走双亲委派逻辑。代表类有DevToolsClassLoader和LauncedURLClassLoader。</p>
+<p><strong>Q：SPI为什么破坏了双亲委派？</strong></p>
+<p>A：SPI有一个逆向委派的过程，这个逆向委派破坏了双亲委派。</p>
+<p>具体的，java.sql.DriverManager和Driver由bootstrap加载，DriverManager初始化的时候调用<code>ServiceLoader.load(Driver.class)</code>，因为需要getResource的时候metainf中的service/java.sql.Driver文件，但是bootstrap只能看到核心类库，此时<code>ServiceLoader.load</code>通过Thread Context ClassLoader委派加载给AppClassLoader执行如<code>mysql-connector.jar</code>中Driver的加载。这是逆向委派破坏了双亲委派的一个例子。</p>
+<p>aff：SPI 的&quot;发现&quot;动作由 Bootstrap 加载的 ServiceLoader 发起，但它要加载的东西只有 AppClassLoader 看得见；JDK 用&quot;线程上下文类加载器&quot;（TCCL，默认 AppClassLoader）这根逆着委派方向拉的绳子，让父加载器的代码能够请求子加载器帮忙——这就是 SPI 不破坏双亲委派、但必须依赖一个&quot;逆向通道&quot;才能工作的全部原因。</p>
+<p>JDBC 就是这根绳子第一次被大规模使用的经典场景，你在 mysql-connector.jar 里能亲眼看到那个 META-INF/services/java.sql.Driver 文件。</p>
+<h2 id="运行时内存分布">运行时内存分布
+</h2><p><strong>Q：JVM运行时内存的不同区域</strong></p>
+<p>A：jvm运行时内存分为共享区 和 线程私有的部分。</p>
+<ul>
+<li>
+<p>共享区</p>
+<ul>
+<li>元空间：开辟在本地内存，存储类名、方法定义以及字节码、符号引用转的直接引用。内部还有运行时常量池，运行时常量池存常量基本字段、字面量、常量对象引用、常量字符串引用。元空间中存静态字段、静态对象引用，静态字符串引用。元空间开辟在本地内存，可以动态伸缩，不由jvm管理。</li>
+<li>堆：young gen、old gen，字符串常量池。由jvm管理，jvm运行时内存中最大的一块区域。</li>
+</ul>
+</li>
+<li>
+<p>线程私有</p>
+<ul>
+<li>
+<p>vm栈：包含：局部变量表、动态链接（比如AnimalObj.sound, 只有到运行时才知道这个是那个子类的实现，本质上就是指向实际方法的指针/引用）。默认开启新线程创建的vm栈是1mb，常见的vm栈会小一点。</p>
+<ul>
+<li>线程A执行时，创建线程vm栈，之后线程A调用的所有方法的方法栈帧都压入线程A所在vm栈。</li>
+</ul>
+</li>
+<li>
+<p>PC：程序计数器，指向代码行数。</p>
+</li>
+<li>
+<p>本地方法栈：通过JNI在本地方法库中查找本地方法，在调用本地方法时分配的栈，创建在本地内存中。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>本地内存</p>
+<ul>
+<li>codecache：缓存jit编译的热点代码的机器码。</li>
+<li>本地方法栈</li>
+<li>元空间</li>
+</ul>
+</li>
+</ul>
+<p><strong>Q：栈帧中的动态链接</strong></p>
+<p>A：一个指向实际调用者方法的指针or引用。</p>
+<p><strong>Q：空方法在vm栈帧中的局部变量表是不是空的？static方法呢？</strong></p>
+<p>A：<code>public void method(){}</code>在vm栈的栈帧中还有this，<code>public static void method</code>的栈帧局部变量表就是空的。</p>
+<p><strong>Q：对象一定在堆中吗？</strong></p>
+<p>A：不一定，如果对象只在一个方法中使用，那么jvm会进行逃逸分析，创建在vm栈局部变量表中。</p>
+<p><strong>Q：元空间中存什么？</strong></p>
+<p>A：参考((20260909090019-7052g4p &ldquo;sy/不同时代堆和方法区/Java8的运行时内存布局&rdquo;))</p>
+<p><strong>Q：IntegerCache存在哪里？</strong></p>
+<p>A：-128~127的integer存在堆的IntegerCache中，<code>new Integer(-128~127)</code>都是从integerCache中取出的相同对象。但是<code>new Integer(128)</code>就是不同对象了。</p>
+<h2 id="字节码执行引擎">字节码执行引擎
+</h2><p><strong>Q：字节码执行引擎的组成？</strong></p>
+<p>A：解释器，JIT编译器，GC。</p>
+<p><strong>Q：JIT编译器的作用？什么是运行时优化？</strong></p>
+<p>A：JIT编译器负责将热点代码的编译加入缓存，以及进行运行时优化。</p>
+<p>热点代码进缓存：在JVM解释执行过程中统计热点代码，将热点代码编译后放进codeCache中，提高代码的执行效率。值得注意的是，热点代码按次数统计，但是按周期进行衰减以便统计实时热点。</p>
+<p>运行时优化：</p>
+<ul>
+<li>
+<p>方法内联：将高频执行的方法直接内联到调用处，减少栈帧创建、辅助逃逸分析。</p>
+</li>
+<li>
+<p>分支预测：分两种，一种是普通的if else，将常用的分支提前到前面执行；另外一种是多态的调用，加入animal.sound方法99%都是cat.sound调用，那么就会进行优化，大概是这个样子</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="n">animal</span><span class="w"> </span><span class="k">instanceof</span><span class="w"> </span><span class="n">cat</span><span class="p">){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">cat</span><span class="p">.</span><span class="na">sound</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="k">else</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">animal</span><span class="p">.</span><span class="na">sound</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+</ul>
+<p><strong>Q：什么是垃圾回收？垃圾回收的步骤？</strong></p>
+<p>A：回收堆中长期不使用或者没有引用的对象。垃圾回收的步骤：首先进行两次可达性分析的标记，从GCRoot触发，如果两次判定为不可达，进行对象回收，如果对象在新生代，则使用标记-复制回收，如果对象在老年代，则使用标记-整理回收。</p>
+<p><strong>Q：可达性分析是什么？GC Root指哪些对象？可达性分析的隐患？</strong></p>
+<p>A：可达性分析指：启动可达性分析时暂停所有应用线程，避免应用线程修改对象间引用关系导致gc回收的内存错误和数据丢失。从一组GC Root触发，不可达的对象将会被回收。GC Root一般泛指：vm栈中的局部变量（实际存储在堆中）、类静态对象、元空间常量对象和静态对象。可达性分析的隐患就是如果是full gc，一次涉及分析的对象过多，暂停时间长，会影响实际SpringApplication性能。</p>
+<p><strong>Q：finalize方法了解吗？</strong></p>
+<p>A：类似亡语，在第一次可达性分析标记为不可达后触发，可以在finalize中将自己修改为可达，第二次标记时从GC Root向下dfs遍历为可达后，就不会触发回收。</p>
+<p><strong>Q：回收时处理空间的不同方法？以及适用范围。</strong></p>
+<p>A：标记-清理、标记-复制、标记-整理 三种。</p>
+<p>标记-清理：直接清理对象，容易留下很多内存碎片。开销低、速度块，但内存利用率不高。</p>
+<p>标记-复制：将内存区域化成两块，每次清理的时候，将可达对象移动到另外一边。开销适中、速度适中、内存利用率有50%。</p>
+<p>标记-整理：整理时将可达对象移动到内存的一端。开销最大，内存利用率最高。</p>
+<p>对于新生代对象，容易频繁gc，使用标记-复制比较合适。对于老年代对象，触发GC的次数不多，可以使用开销最大内存利用率最高的标记-整理。</p>
+<p><strong>Q：对堆中新生代和老年代的不同GC？</strong></p>
+<p>A：Minor GC，Fixed GC、Major GC 和 Full GC。</p>
+<p>Minor GC：又被称作young gc，清理新生代，在新生代区域没有足够空间时触发。提前做空间分配担保：如果从新生代升入老年代的对象过多，老年代空间不够时，从young gc改成触发 full gc。</p>
+<p>Fixed GC：较小力度的新生代和老年代的gc，只会清理过久没有使用的对象。</p>
+<p>Major GC：清理老年代。</p>
+<p>Full GC：完全清理新生代和老年代，停顿所有应用线程做可达性分析。</p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/work/my-qa-index/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">我的QA索引</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
