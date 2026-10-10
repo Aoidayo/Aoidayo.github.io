@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下网络的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：OSI七层、TCP/IP五层？ A：OSI七层：应用、表示、会话、传输、网络、数据链路、物理。\nTCP/IP五层：应用、传输、网络、数据链路、物理。\n具体的：\n应用层：应用报文协议在这上面工作，常见的协议有http、https、dns、ftp、smtp、esmtp、dhcp\nhttp：bs数据传输。 dns：通过域名解析ip地址，报文长度大于512B改用tcp，小于使用udp ftp：常见的文件传输，基于tcp smtp：邮件传输协议，无加密，基于tcp。esmtp实现加密和权限校验。 dhcp：动态分配ip地址，基于tcp。 表示：进行数据处理，常见的就是编解码、加解密、解压缩。例如：TLS加解密、rtsp转流、flv编解码，gzip解压缩。\n会话：管理应用间会话。session、cookie工作在这个上面。\n传输：tcp/udp传输，进程之间的通信，传输携带port的segment。\n实现差错控制、流量控制、可靠传输，单位是segment。 网络：ip packet的传输，携带destIp和srcIp。负责将数据从srcIp传输到destIp。\n实现路由选择、分组转发、拥塞控制、差错控制、流量控制、可靠传输，单位是含src/destIp的packet。 数据链路： mac frame传输，携带destMac和srcMac。负责相邻节点之间bit流的可靠传输，纠错以及流量控制。\n物理：相邻节点之间传输透明bit流。\nQ：网络分层的原因 A：分层减少每层差错，单独控制和完善。\n各层相互独立 整体灵活 每层的问题单独解决 Q：从输入 URL 到页面展示到底发生了什么？ A：首先进行URL解析，然后DNS域名解析url对应ip，然后需要进行tcp三次握手在服务端和浏览器之间建立连接，连接建立成功后，封装应用层报文进行请求，响应获取后浏览器解析html并触发绘制。\nARP目标mac查询以及路由器和交换机转发：以tcp报文为例，源ip和目标ip分别是当前客户端A和目标B服务器ip，源mac地址是a-mac，目标mac地址通过ARP广播获取：（1）如果服务器B在本地局域网则返回携带本机mac的ARP Reply。（2）如果不在，通常封装目标mac为本地路由器的r1-l-mac。封装完成后frame由交换机按mac地址进行转发。路由器收到后解frame，根据目标ip查询，如果在本机则ARP 目标ip的mac进行封装转发，如果不在本机则在路由表中查询得到下一跳ip，同样通过arp得到下一跳ip的mac地址后封装转发（r1-r-mac，r2-l-mac）。r2收到后进行类似操作，目标ip对应的目标服务器在本地，通过arp广播得到b-mac，最后封装frame发送至目标服务器。\n当用户在浏览器中输入 URL 并按下回车后，浏览器首先会解析 URL，获取协议、域名、端口和请求路径等信息，然后进行 DNS 域名解析。首先检查浏览器缓存、操作系统缓存和 Hosts 文件，如果没有命中，则向本地 DNS 服务器发起递归查询。本地 DNS 服务器如果也没有缓存，就依次向根域名服务器、顶级域名服务器和权威域名服务器进行迭代查询，最终获得目标服务器的 IP 地址并返回给客户端。获取 IP 后，浏览器需要与服务器建立连接，如果使用 TCP，则通过三次握手建立 TCP 连接；如果是 HTTPS，还需要进行 TLS 握手，验证服务器证书并协商加密密钥。随后浏览器构造 HTTP 请求报文，经过 TLS 加密（HTTPS）后交给传输层，TCP 根据实际发送情况将数据组织成报文段，并添加源端口、目的端口、序列号等 TCP 首部信息；接着交给网络层，IP 协议添加源 IP、目的 IP 等信息，形成 IP 数据报，并根据路由表确定下一跳；然后交给数据链路层，如果使用 IPv4 以太网，则通过 ARP 获取下一跳设备的 MAC 地址，将 IP 数据报封装成以太网帧，添加源 MAC、目的 MAC 和帧尾校验信息，最后通过物理网卡发送。数据在网络中传输时，交换机根据目的 MAC 地址转发以太网帧，路由器根据目的 IP 地址查询路由表并转发 IP 数据报，每经过一次路由器的三层转发，通常都需要重新封装链路层帧，因此 MAC 地址逐跳变化，而源 IP 和目的 IP 在不考虑 NAT 的情况下通常保持不变。数据到达服务器后，服务器从数据链路层到应用层逐层解封装，TCP 完成数据重组并交付给应用程序，Web 服务器解析 HTTP 请求、执行业务逻辑并生成 HTTP 响应，再经过相应的协议封装返回给客户端。浏览器收到响应后，解析 HTML 构建 DOM 树，解析 CSS 构建 CSSOM 树，结合两者生成渲染树，随后进行布局（Layout）、绘制（Paint）和合成（Composite），最终将网页显示在屏幕上。在解析页面的过程中，如果遇到 CSS、JavaScript、图片等资源，浏览器还会根据需要发起额外的网络请求。需要注意，现代浏览器可能复用已有连接，而 HTTP/3 基于 QUIC，不需要 TCP 三次握手。\n">
+<title>计网 八股</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/net-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="计网 八股">
+<meta property='og:description' content="按照学习顺序来组织一下网络的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：OSI七层、TCP/IP五层？ A：OSI七层：应用、表示、会话、传输、网络、数据链路、物理。\nTCP/IP五层：应用、传输、网络、数据链路、物理。\n具体的：\n应用层：应用报文协议在这上面工作，常见的协议有http、https、dns、ftp、smtp、esmtp、dhcp\nhttp：bs数据传输。 dns：通过域名解析ip地址，报文长度大于512B改用tcp，小于使用udp ftp：常见的文件传输，基于tcp smtp：邮件传输协议，无加密，基于tcp。esmtp实现加密和权限校验。 dhcp：动态分配ip地址，基于tcp。 表示：进行数据处理，常见的就是编解码、加解密、解压缩。例如：TLS加解密、rtsp转流、flv编解码，gzip解压缩。\n会话：管理应用间会话。session、cookie工作在这个上面。\n传输：tcp/udp传输，进程之间的通信，传输携带port的segment。\n实现差错控制、流量控制、可靠传输，单位是segment。 网络：ip packet的传输，携带destIp和srcIp。负责将数据从srcIp传输到destIp。\n实现路由选择、分组转发、拥塞控制、差错控制、流量控制、可靠传输，单位是含src/destIp的packet。 数据链路： mac frame传输，携带destMac和srcMac。负责相邻节点之间bit流的可靠传输，纠错以及流量控制。\n物理：相邻节点之间传输透明bit流。\nQ：网络分层的原因 A：分层减少每层差错，单独控制和完善。\n各层相互独立 整体灵活 每层的问题单独解决 Q：从输入 URL 到页面展示到底发生了什么？ A：首先进行URL解析，然后DNS域名解析url对应ip，然后需要进行tcp三次握手在服务端和浏览器之间建立连接，连接建立成功后，封装应用层报文进行请求，响应获取后浏览器解析html并触发绘制。\nARP目标mac查询以及路由器和交换机转发：以tcp报文为例，源ip和目标ip分别是当前客户端A和目标B服务器ip，源mac地址是a-mac，目标mac地址通过ARP广播获取：（1）如果服务器B在本地局域网则返回携带本机mac的ARP Reply。（2）如果不在，通常封装目标mac为本地路由器的r1-l-mac。封装完成后frame由交换机按mac地址进行转发。路由器收到后解frame，根据目标ip查询，如果在本机则ARP 目标ip的mac进行封装转发，如果不在本机则在路由表中查询得到下一跳ip，同样通过arp得到下一跳ip的mac地址后封装转发（r1-r-mac，r2-l-mac）。r2收到后进行类似操作，目标ip对应的目标服务器在本地，通过arp广播得到b-mac，最后封装frame发送至目标服务器。\n当用户在浏览器中输入 URL 并按下回车后，浏览器首先会解析 URL，获取协议、域名、端口和请求路径等信息，然后进行 DNS 域名解析。首先检查浏览器缓存、操作系统缓存和 Hosts 文件，如果没有命中，则向本地 DNS 服务器发起递归查询。本地 DNS 服务器如果也没有缓存，就依次向根域名服务器、顶级域名服务器和权威域名服务器进行迭代查询，最终获得目标服务器的 IP 地址并返回给客户端。获取 IP 后，浏览器需要与服务器建立连接，如果使用 TCP，则通过三次握手建立 TCP 连接；如果是 HTTPS，还需要进行 TLS 握手，验证服务器证书并协商加密密钥。随后浏览器构造 HTTP 请求报文，经过 TLS 加密（HTTPS）后交给传输层，TCP 根据实际发送情况将数据组织成报文段，并添加源端口、目的端口、序列号等 TCP 首部信息；接着交给网络层，IP 协议添加源 IP、目的 IP 等信息，形成 IP 数据报，并根据路由表确定下一跳；然后交给数据链路层，如果使用 IPv4 以太网，则通过 ARP 获取下一跳设备的 MAC 地址，将 IP 数据报封装成以太网帧，添加源 MAC、目的 MAC 和帧尾校验信息，最后通过物理网卡发送。数据在网络中传输时，交换机根据目的 MAC 地址转发以太网帧，路由器根据目的 IP 地址查询路由表并转发 IP 数据报，每经过一次路由器的三层转发，通常都需要重新封装链路层帧，因此 MAC 地址逐跳变化，而源 IP 和目的 IP 在不考虑 NAT 的情况下通常保持不变。数据到达服务器后，服务器从数据链路层到应用层逐层解封装，TCP 完成数据重组并交付给应用程序，Web 服务器解析 HTTP 请求、执行业务逻辑并生成 HTTP 响应，再经过相应的协议封装返回给客户端。浏览器收到响应后，解析 HTML 构建 DOM 树，解析 CSS 构建 CSSOM 树，结合两者生成渲染树，随后进行布局（Layout）、绘制（Paint）和合成（Composite），最终将网页显示在屏幕上。在解析页面的过程中，如果遇到 CSS、JavaScript、图片等资源，浏览器还会根据需要发起额外的网络请求。需要注意，现代浏览器可能复用已有连接，而 HTTP/3 基于 QUIC，不需要 TCP 三次握手。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/net-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-10T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-10T12:00:00&#43;08:00'/>
+<meta name="twitter:title" content="计网 八股">
+<meta name="twitter:description" content="按照学习顺序来组织一下网络的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nQ：OSI七层、TCP/IP五层？ A：OSI七层：应用、表示、会话、传输、网络、数据链路、物理。\nTCP/IP五层：应用、传输、网络、数据链路、物理。\n具体的：\n应用层：应用报文协议在这上面工作，常见的协议有http、https、dns、ftp、smtp、esmtp、dhcp\nhttp：bs数据传输。 dns：通过域名解析ip地址，报文长度大于512B改用tcp，小于使用udp ftp：常见的文件传输，基于tcp smtp：邮件传输协议，无加密，基于tcp。esmtp实现加密和权限校验。 dhcp：动态分配ip地址，基于tcp。 表示：进行数据处理，常见的就是编解码、加解密、解压缩。例如：TLS加解密、rtsp转流、flv编解码，gzip解压缩。\n会话：管理应用间会话。session、cookie工作在这个上面。\n传输：tcp/udp传输，进程之间的通信，传输携带port的segment。\n实现差错控制、流量控制、可靠传输，单位是segment。 网络：ip packet的传输，携带destIp和srcIp。负责将数据从srcIp传输到destIp。\n实现路由选择、分组转发、拥塞控制、差错控制、流量控制、可靠传输，单位是含src/destIp的packet。 数据链路： mac frame传输，携带destMac和srcMac。负责相邻节点之间bit流的可靠传输，纠错以及流量控制。\n物理：相邻节点之间传输透明bit流。\nQ：网络分层的原因 A：分层减少每层差错，单独控制和完善。\n各层相互独立 整体灵活 每层的问题单独解决 Q：从输入 URL 到页面展示到底发生了什么？ A：首先进行URL解析，然后DNS域名解析url对应ip，然后需要进行tcp三次握手在服务端和浏览器之间建立连接，连接建立成功后，封装应用层报文进行请求，响应获取后浏览器解析html并触发绘制。\nARP目标mac查询以及路由器和交换机转发：以tcp报文为例，源ip和目标ip分别是当前客户端A和目标B服务器ip，源mac地址是a-mac，目标mac地址通过ARP广播获取：（1）如果服务器B在本地局域网则返回携带本机mac的ARP Reply。（2）如果不在，通常封装目标mac为本地路由器的r1-l-mac。封装完成后frame由交换机按mac地址进行转发。路由器收到后解frame，根据目标ip查询，如果在本机则ARP 目标ip的mac进行封装转发，如果不在本机则在路由表中查询得到下一跳ip，同样通过arp得到下一跳ip的mac地址后封装转发（r1-r-mac，r2-l-mac）。r2收到后进行类似操作，目标ip对应的目标服务器在本地，通过arp广播得到b-mac，最后封装frame发送至目标服务器。\n当用户在浏览器中输入 URL 并按下回车后，浏览器首先会解析 URL，获取协议、域名、端口和请求路径等信息，然后进行 DNS 域名解析。首先检查浏览器缓存、操作系统缓存和 Hosts 文件，如果没有命中，则向本地 DNS 服务器发起递归查询。本地 DNS 服务器如果也没有缓存，就依次向根域名服务器、顶级域名服务器和权威域名服务器进行迭代查询，最终获得目标服务器的 IP 地址并返回给客户端。获取 IP 后，浏览器需要与服务器建立连接，如果使用 TCP，则通过三次握手建立 TCP 连接；如果是 HTTPS，还需要进行 TLS 握手，验证服务器证书并协商加密密钥。随后浏览器构造 HTTP 请求报文，经过 TLS 加密（HTTPS）后交给传输层，TCP 根据实际发送情况将数据组织成报文段，并添加源端口、目的端口、序列号等 TCP 首部信息；接着交给网络层，IP 协议添加源 IP、目的 IP 等信息，形成 IP 数据报，并根据路由表确定下一跳；然后交给数据链路层，如果使用 IPv4 以太网，则通过 ARP 获取下一跳设备的 MAC 地址，将 IP 数据报封装成以太网帧，添加源 MAC、目的 MAC 和帧尾校验信息，最后通过物理网卡发送。数据在网络中传输时，交换机根据目的 MAC 地址转发以太网帧，路由器根据目的 IP 地址查询路由表并转发 IP 数据报，每经过一次路由器的三层转发，通常都需要重新封装链路层帧，因此 MAC 地址逐跳变化，而源 IP 和目的 IP 在不考虑 NAT 的情况下通常保持不变。数据到达服务器后，服务器从数据链路层到应用层逐层解封装，TCP 完成数据重组并交付给应用程序，Web 服务器解析 HTTP 请求、执行业务逻辑并生成 HTTP 响应，再经过相应的协议封装返回给客户端。浏览器收到响应后，解析 HTML 构建 DOM 树，解析 CSS 构建 CSSOM 树，结合两者生成渲染树，随后进行布局（Layout）、绘制（Paint）和合成（Composite），最终将网页显示在屏幕上。在解析页面的过程中，如果遇到 CSS、JavaScript、图片等资源，浏览器还会根据需要发起额外的网络请求。需要注意，现代浏览器可能复用已有连接，而 HTTP/3 基于 QUIC，不需要 TCP 三次握手。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#http">Http</a></li>
+    <li><a href="#https">Https</a></li>
+    <li><a href="#tcp">TCP</a></li>
+    <li><a href="#udp">UDP</a></li>
+    <li><a href="#appendix">Appendix</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/net-qa/">计网 八股</a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-10T12:00:00&#43;08:00'>Saturday, October 10, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#http">Http</a></li>
+    <li><a href="#https">Https</a></li>
+    <li><a href="#tcp">TCP</a></li>
+    <li><a href="#udp">UDP</a></li>
+    <li><a href="#appendix">Appendix</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>按照学习顺序来组织一下网络的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>OSI七层、TCP/IP五层？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>OSI七层：应用、表示、会话、传输、网络、数据链路、物理。</p>
+<p>TCP/IP五层：应用、传输、网络、数据链路、物理。</p>
+<p>具体的：</p>
+<ul>
+<li>
+<p>应用层：应用报文协议在这上面工作，常见的协议有http、https、dns、ftp、smtp、esmtp、dhcp</p>
+<ul>
+<li>http：bs数据传输。</li>
+<li>dns：通过域名解析ip地址，报文长度大于512B改用tcp，小于使用udp</li>
+<li>ftp：常见的文件传输，基于tcp</li>
+<li>smtp：邮件传输协议，无加密，基于tcp。esmtp实现加密和权限校验。</li>
+<li>dhcp：动态分配ip地址，基于tcp。</li>
+</ul>
+</li>
+<li>
+<p>表示：进行数据处理，常见的就是编解码、加解密、解压缩。例如：TLS加解密、rtsp转流、flv编解码，gzip解压缩。</p>
+</li>
+<li>
+<p>会话：管理应用间会话。session、cookie工作在这个上面。</p>
+</li>
+<li>
+<p>传输：tcp/udp传输，进程之间的通信，传输携带port的segment。</p>
+<ul>
+<li>实现差错控制、流量控制、可靠传输，单位是segment。</li>
+</ul>
+</li>
+<li>
+<p>网络：ip packet的传输，携带destIp和srcIp。负责将数据从srcIp传输到destIp。</p>
+<ul>
+<li>实现路由选择、分组转发、拥塞控制、差错控制、流量控制、可靠传输，单位是含src/destIp的packet。</li>
+</ul>
+</li>
+<li>
+<p>数据链路： mac frame传输，携带destMac和srcMac。负责相邻节点之间bit流的可靠传输，纠错以及流量控制。</p>
+</li>
+<li>
+<p>物理：相邻节点之间传输透明bit流。</p>
+</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>网络分层的原因</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>分层减少每层差错，单独控制和完善。</p>
+<ul>
+<li>各层相互独立</li>
+<li>整体灵活</li>
+<li>每层的问题单独解决</li>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>从输入 URL 到页面展示到底发生了什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>首先进行URL解析，然后DNS域名解析url对应ip，然后需要进行tcp三次握手在服务端和浏览器之间建立连接，连接建立成功后，封装应用层报文进行请求，响应获取后浏览器解析html并触发绘制。</p>
+<p><strong>ARP目标mac查询以及路由器和交换机转发</strong>：以tcp报文为例，源ip和目标ip分别是当前客户端A和目标B服务器ip，源mac地址是a-mac，目标mac地址通过ARP广播获取：（1）如果服务器B在本地局域网则返回携带本机mac的ARP Reply。（2）如果不在，通常封装目标mac为本地路由器的r1-l-mac。封装完成后frame由交换机按mac地址进行转发。路由器收到后解frame，根据目标ip查询，如果在本机则ARP 目标ip的mac进行封装转发，如果不在本机则在路由表中查询得到下一跳ip，同样通过arp得到下一跳ip的mac地址后封装转发（r1-r-mac，r2-l-mac）。r2收到后进行类似操作，目标ip对应的目标服务器在本地，通过arp广播得到b-mac，最后封装frame发送至目标服务器。</p>
+<p>当用户在浏览器中输入 URL 并按下回车后，浏览器首先会<strong>解析 URL</strong>，获取协议、域名、端口和请求路径等信息，然后进行 <strong>DNS 域名解析</strong>。首先检查浏览器缓存、操作系统缓存和 Hosts 文件，如果没有命中，则向本地 DNS 服务器发起递归查询。本地 DNS 服务器如果也没有缓存，就依次向根域名服务器、顶级域名服务器和权威域名服务器进行迭代查询，最终获得目标服务器的 IP 地址并返回给客户端。获取 IP 后，浏览器需要与服务器建立连接，如果使用 TCP，则通过<strong>三次握手建立 TCP 连接</strong>；如果是 HTTPS，还需要进行 TLS 握手，验证服务器证书并协商加密密钥。随后浏览器构造 HTTP 请求报文，经过 TLS 加密（HTTPS）后交给传输层，TCP 根据实际发送情况将数据组织成报文段，并添加源端口、目的端口、序列号等 TCP 首部信息；接着交给网络层，IP 协议添加源 IP、目的 IP 等信息，形成 IP 数据报，并根据路由表确定下一跳；然后交给数据链路层，如果使用 IPv4 以太网，则通过 ARP 获取下一跳设备的 MAC 地址，将 IP 数据报封装成以太网帧，添加源 MAC、目的 MAC 和帧尾校验信息，最后通过物理网卡发送。数据在网络中传输时，<strong>交换机根据目的 MAC 地址转发以太网帧，路由器根据目的 IP 地址查询路由表并转发 IP 数据报</strong>，每经过一次路由器的三层转发，通常都需要重新封装链路层帧，因此 MAC 地址逐跳变化，而源 IP 和目的 IP 在不考虑 NAT 的情况下通常保持不变。数据到达服务器后，服务器从数据链路层到应用层逐层解封装，TCP 完成数据重组并交付给应用程序，Web 服务器解析 HTTP 请求、执行业务逻辑并生成 HTTP 响应，再经过相应的协议封装返回给客户端。浏览器收到响应后，<strong>解析 HTML 构建 DOM 树</strong>，解析 CSS 构建 CSSOM 树，结合两者生成渲染树，随后进行布局（Layout）、绘制（Paint）和合成（Composite），最终将网页显示在屏幕上。在解析页面的过程中，如果遇到 CSS、JavaScript、图片等资源，浏览器还会根据需要发起额外的网络请求。需要注意，现代浏览器可能复用已有连接，而 HTTP/3 基于 QUIC，不需要 TCP 三次握手。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>ARP目标mac查询以及路由器和交换机转发</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">以tcp报文为例，源ip和目标ip分别是当前客户端A和目标B服务器ip，源mac地址是a-mac，目标mac地址通过ARP广播获取：（1）如果服务器B在本地局域网则返回携带本机mac的ARP Reply。（2）如果不在，通常封装目标mac为本地路由器的r1-l-mac。封装完成后frame由交换机按mac地址进行转发。路由器收到后解frame，根据目标ip查询，如果在本机则ARP 目标ip的mac进行封装转发，如果不在本机则在路由表中查询得到下一跳ip，同样通过arp得到下一跳ip的mac地址后封装转发（r1-r-mac，r2-l-mac）。r2收到后进行类似操作，目标ip对应的目标服务器在本地，通过arp广播得到b-mac，最后封装frame发送至目标服务器。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>DNS查询</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>分两种，DNS递归查询和DNS迭代查询。</p>
+<p>通常我们浏览器输入URL后，就是client DNS递归查询 给本地DNS Server，然后本地DNS Server进行DNS迭代查询：先查本地缓存有没有，没有则询问根DNSServer；根DNSServer返回管理指定顶级域名DNS Server的委派；本地DNS Server再询问顶级域名DNS Server，顶级域名DNS Server再返回权威域名服务器地址；本地DNS Server询问权威域名服务器，权威域名服务器查询域名对应的资源比如A记录（域名-ipv4）、CNAME（域名-域名）记录返回给本地DNSServer，本地DNS Server得到对应ip后返回给client。（如果返回的是CNAME，那么本地DNS Server可能需要再进行一次迭代查询，查询CNAME中对应ip的地址。CNAME会增加潜在的DNS迭代域名解析次数，但是有缓存就不需要）。</p>
+</div></div>
+</details>
+
+<h2 id="http">Http
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Http是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Hyper text transfer protocol，超文本传输协议。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Http响应码？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">200请求成功；302临时重定向，但是访问的资源还在，需要使用别的url访问；304资源为修改，告知客户端可以继续使用缓存；400客户端请求错误；404请求url不存在；401鉴权失败，403权限补足；500服务器内部错误；502 网关错误 bad gateway。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Get和post的区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>用途、body、缓存。</p>
+<p>1、用途不同：get用于请求资源，服务端要保证多次get的幂等性。post用于写请求，天然不幂等。</p>
+<p>2、是否携带request body：默认get不携带body，参数在路径中添加（pathvariable或者requestprarm）；post使用body传递参数。</p>
+<p>3、是否可被缓存：get请求的结果可以被缓存；post请求的结果无法缓存。通过http报文中的method字段进行区分。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Http和Https有什么区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>是否加密、握手次数、默认端口。</p>
+<p>1、是否加密：https在http和tcp之间的表示层使用ssl/tls进行加解密。</p>
+<p>2、握手次数：https连接建立还有一次ssl/tls握手。</p>
+<p>3、默认端口：http默认80端口，https默认443端口。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>URI和URL是什么？encodeURIComponent和encodeURI什么区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">URI是统一资源标识，URL是统一资源位置，更侧向资源的访问。一个URL同时也是URI，可以说URL是URI的子集。encodeURIComponent和encodeURI都是对URL进行再编码，区别是encodeURIComponent会对uri中的特殊字符比如<code>&amp;=</code>进行再编码。实践中只有encodeURIComponent有用，因为只需要编码部分字符串比如<code>keyword={xxx}, xxx=java&amp;mysql</code>，使用encodeURIComponent对<code>&amp;</code>进行编码。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Http1.0和Http1.1的区别？管线化的问题</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>长连接、缓存控制、管线化请求（pipelining requests）</p>
+<p>长连接：多个http请求维持使用同一个tcp连接，参数connection: keep-alive，http1.1的默认参数，不需要显式添加。</p>
+<p>管线化：解决http1.0的请求队头阻塞（请求B必须等待请求A的响应A回来后才能发送），可以在响应没有回来的时候发送多个请求。</p>
+<p>管线化的问题：但是在服务端的响应写出需要按请求顺序写出，这是请求响应模型的响应队头阻塞。同时http1.1的管线化请求并没有被浏览器大规模的支持，所有更常见的情况还是为了提升请求的并发度，会建立多个tcp连接来进行请求，而不是在一个tcp连接上管线化请求。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Http2什么改进，什么缺陷？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>二进制帧格式、首部压缩、stream消息解决请求响应模型的队头阻塞；问题就是TCP有序接收导致的队头阻塞。</p>
+<p>Http2重新定义二进制帧格式，支持首部压缩，公共部分使用索引号表示。</p>
+<p>支持stream化每一个请求（比如HTML请求、CSS请求、JS请求），一个tcp连接的请求中可以携带多个stream-id的frame，每个frame中包含指定的stream-id。接收端根据frame中的stream-id中的内容进行http2消息组装。解决了之前「一个tcp连接中请求的队头阻塞和响应的队头阻塞」。响应时只要指定stream-id的数据完整且已经能组装为一个http消息就可以处理并返回。</p>
+<p>server-push：服务端可以主动推送，不过收益有限，支持的浏览器也不多。</p>
+<p>存在的问题：TCP传输层队头阻塞。因为TCP传输是可靠有序的，所以当<code>TCP#1, TCP#2, TCP#3, TCP#4, TCP#5</code>中的<code>TCP#3</code>丢失了，此时接收端无法绕过<code>TCP#3</code>将<code>TCP#4~5</code>交付给Http2，这样导致多个stream受到影响。TCP按序读取，所以会有队头阻塞问题，即使后面的TCP段到达且4~5段中有完整的一个stream消息，但只要中间有一个丢失了，应用层也无法直接读取后面的。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Http3什么改进？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Http3基于udp的quic：quic建立连接只要一个RTT，基于udp无tcp的队头阻塞问题，连接复用。</p>
+<ul>
+<li>无队头阻塞：http3支持不同stream的独立交付，stream5-framex的丢失不会导致后来的stream7的无法交付。</li>
+<li>连接建立1RTT</li>
+<li>连接复用：原来的连接基于ip port的四元组确定，现在使用统一连接id标识，网络连接变化（比如从wifi切流量）但是上下文信息不变（连接id、tls秘钥），则继续复用原TCP连接。</li>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是缓存控制？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>缓存控制，也叫cache control，是强制缓存的一种。</p>
+<p>强制缓存：客户端请求后，服务端响应结果携带cache-control和expire，指定这个响应过期的相对时间和绝对时间。客户端将响应缓存在本地，下次请求时如果没有过期，则复用本地缓存中的响应；如果过期了，进行协商缓存。</p>
+<p>协商缓存：强制缓存过期时使用协商缓存，client发送请求 携带本地缓存中的etag，server端和本地资源校验，如果etag相同则返回304 继续复用之前的响应，如果etag不相同 server端则200返回新的响应。</p>
+</div></div>
+</details>
+
+<h2 id="https">Https
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要使用Https？有哪些不使用https导致问题的例子。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Https使用ssl/tls加解密。最出名的一个https中间人劫持例子是2018 年的MyEtherWallet 劫持。</p>
+<p>简单讲讲这个MyEtherWallet 劫持例子：攻击者通过劫持BGP将一部分用户的流量导向自己的DNS服务，这些流量请求后续进入攻击者伪造网站，攻击者伪造网站仿造证书过期让用户点击信任证书，如果用户接受攻击者证书，攻击者就可以建立两条 TLS 连接，分别与浏览器和真实服务器通信，从而读取和篡改经过自己的明文数据。</p>
+<p>本质上和https无关，这个问题的根因在与用户信任了攻击者证书。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Https的基本加密原理？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">简单来说，我们要给网站上https需要先向权威机构申请根证书机构CA申请证书，得到公钥私钥，私钥放在服务器上，公钥传递给所有客户端。客户端信任后，下次发送请求的时候用公钥加密并发送信息给server，中间链路上即使有中间人攻击，中间人没有私钥自然也无法读取和篡改，到server的时候因为是非对称加密（对称加密是指用同一把钥匙上锁和开锁，非对称加密指的是A钥匙加密、B钥匙解密）。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Https连接的建立流程？什么是tls四次握手？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Https先tcp三次握手，然后tls四次握手，最后建立连接使用会话秘钥进行加密连接。</p>
+<p>tls四次握手：tls四次握手，两个RTT来回是tls1.2的规范，实际上tls1.3只需要一个RTT即可完成。</p>
+<ul>
+<li>1、ClientHello，客户端发送：生成的client random随机数，支持的加密算法。</li>
+<li>2、ServerHello，服务端接收后发送：生成的server random随机数，确认的加密算法（后续用于加密client&amp;server random 以及 pre-master-key），以及公钥证书。</li>
+<li>3、客户端接收公钥证书后首先校验证书，没问题则生成随机数pre-master-key，并使用确认的加密算法生成后续加密解密需要的「会话秘钥」，随机数会使用公钥证书加密传输到server端。</li>
+<li>4、server端收到并使用私钥解密pre-master-key，生成「会话秘钥」。</li>
+</ul>
+<p>后续的数据传输都使用「会话秘钥」进行加密。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么tls需要生成会话秘钥而不是直接使用公钥？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>先说明一点，tls加密的过程是通过非对称加密协商出对称加密秘钥，之后使用对称加密秘钥进行数据传输。这里的对称加密秘钥就是生成的会话秘钥。</p>
+<p>为什么需要对称加密？</p>
+<ul>
+<li>非对称加密开销大。</li>
+<li>非对称加密能够加密的明文长度受非对称加密秘钥长度的限制。</li>
+<li>如果攻击者录制了tls流量，之后获取到了服务器私钥也无法解读出之前流量的明文。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么说公司一定能直到你在访问哪些网站？甚至查看了哪些https内容</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>通过中间人注入，你是用的电脑就是公司的，安全部门不仅仅只是抓流量这么简单，通过安全软件安装的一系列中间证书，你的流量在公司的网关处可以被解密为明文，然后公司的网关再放行给你访问的网站，你访问的网站的响应他们也可以抓到明文。</p>
+<p>如果员工使用的是公司管理的电脑和网络，公司可以通过 DNS 日志、目标 IP、TLS SNI、代理日志以及终端安全软件等方式了解网站访问情况，并不一定需要解密 HTTPS。</p>
+<p>对于 HTTPS 内容，公司还可以通过安装受信任的企业根 CA 证书，结合 TLS 检查代理实现中间人解密。具体来说，企业网关分别与员工电脑和目标服务器建立独立的 TLS 连接，使用企业 CA 签发的替代证书取得客户端信任，从而在网关处解密、检查并重新加密 HTTP 请求与响应。因此，HTTPS 能够防止未被信任的中间设备窃听和篡改，但不能保证通信内容对用户主动信任的企业代理保密。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是tls1.3？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>tls1.3，server和client各自生成临时秘钥（公钥和私钥），通过1RTT交换公钥，通过「客户端秘钥+server公钥」和「client公钥+server私钥」生成「共享秘钥」，完成连接建立。</p>
+<p><del>很神奇吧，椭圆加密算法。</del></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么TLS1.2+Http2需要2RTT才能建立，而Http3+TLS1.2只要1RTT？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>下面两张图就能概括为什么了。简单介绍下：TLS1.2+Http2需要先建立tcp连接，在tcp握手的最后一个client ack时可以顺带发送clienthello，后面的tls握手时，在客户端通过非对称秘钥协商得到会话私钥为止，大约2RTT。TLS1.3+Http3需要1RTT，初始的QUIC initial就带上clienthello，即使使用tls1.2，在第三次客户端请求时就已经协商好会话秘钥了，客户端就可以直接发送加密的http请求了。如果使用tls1.3，1RTT建立完成，客户端服务端互相发送公钥，客户端想要发送加密请求也得等到第三次了。</p>
+<p><img alt="alt text" class="gallery-image" data-flex-basis="282px" data-flex-grow="117" height="1156" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/work/net-qa/assets/image.png" srcset="/work/net-qa/assets/image_hu_dbd943e3df51abe1.png 800w, /work/net-qa/assets/image.png 1359w" width="1359">
+<img alt="alt text" class="gallery-image" data-flex-basis="380px" data-flex-grow="158" height="862" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/work/net-qa/assets/image_2.png" srcset="/work/net-qa/assets/image_2_hu_488962f3c107925b.png 800w, /work/net-qa/assets/image_2.png 1366w" width="1366"></p>
+</div></div>
+</details>
+
+<h2 id="tcp">TCP
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>面向一对一连接、可靠有序的，基于字节流的传输层通信协议。</p>
+<ul>
+<li>面向一对一连接的：通信前需要先建立连接，一对一，进程之间的通信。</li>
+<li>可靠有序的：可靠的字节流传输，如果乱序或者有字节没有顺序接受到，需要等待重试或者丢弃。</li>
+<li>基于字节流的：TCP传输的数据是一连串无结构的字节流。</li>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>有一个ip的server监听一个端口，最多可以建立多少tcp连接？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">客户端ip数量 * 客户端可用端口数量 = <code>2^32(2^(8*4)) * 2^16(65536) = 2^48</code> 个，但实际能建立多少个还需要收到服务端内存限制以及可创建文件描述符数量限制。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP三次握手，TCP请求响应中的seq和ack。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>先说seq和ack，然后再说tcp三次握手。</p>
+<p>seq：当前tcp报文中第一个字节的序列号，如果是tcp握手阶段可以是client或者server的initialized serialized number初始化序列号。</p>
+<p>ack：期望对方发送的第一个字节的序列号，ack number-1就是已经接收到的。</p>
+<p>TCP三次握手：</p>
+<ul>
+<li>客户端和服务端开始都是closed，之后server进入listen监听，client发送syn请求，携带client isn初始序列号：seq=client_isn，ack为空。发送完成后client进入syn-sent状态。</li>
+<li>server端接收到client_isn后，返回syn+ack报文：seq=server_isn，ack=client_isn+1，发送完成后server进入syn-rcvd状态。</li>
+<li>client接收到syn+ack后，返回ack报文：seq=client_isn+1, ack=server_isn+1。client进入established状态。在第三次握手的时候，可以携带数据进行传输。</li>
+<li>server端接受到ack后，进入established状态。</li>
+</ul>
+<p>最后给一个client和server的seq和ack表格：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th></th>
+					<th>seq</th>
+					<th>ack</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>client TCP三次握手 syn</td>
+					<td>1000=client_isn</td>
+					<td>null</td>
+			</tr>
+			<tr>
+					<td>server TCP三次握手 syn+ack</td>
+					<td>5000=server_isn</td>
+					<td>1001(client_isn+1)</td>
+			</tr>
+			<tr>
+					<td>client TCP三次握手 ack</td>
+					<td>1001</td>
+					<td>5001</td>
+			</tr>
+			<tr>
+					<td>client 普通请求 携带字节Hello</td>
+					<td>1001</td>
+					<td>5001</td>
+			</tr>
+			<tr>
+					<td>server 响应</td>
+					<td>5001（纯ack的seq可以不变化，设置为5001）</td>
+					<td>1006</td>
+			</tr>
+			<tr>
+					<td>client 请求 携带aoi</td>
+					<td>1006</td>
+					<td>5001（没有收到数据，所以ack还是5001）</td>
+			</tr>
+			<tr>
+					<td>server响应</td>
+					<td>5001（没有发送数据，5001）</td>
+					<td>1009（1006、1007、1008，期望收到的下一个就是1009）</td>
+			</tr>
+	</tbody>
+</table></div>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP三次握手，为什么不能是两次握手？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>三个理由：避免重复连接、减少资源开销、同步序列号保证后续的可靠字节流传输</p>
+<p>避免重复连接：TCP两次握手时，Server端在发出syn+ack后分配资源建立连接，也无法确定是否是client历史丢失的syn报文。如果使用三次握手，在第三次握手的时候client判断延迟的syn+ack报文同时返回RST reset报文（本质上就是让client判断历史连接并避免建立重复连接），不让server端建立连接。</p>
+<p>减少资源开销：如果两次握手，syn多次丢失时，client会进行多次重传导致server端建立多个无效历史连接。</p>
+<p>同步序列号保证后续可靠字节流传输：同步client_isn和server_isn，在后续连接建立后通过seq和ack的交替保证字节流的可靠有序传输。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP三次握手时的重传逻辑？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>syn报文丢失，client重传。syn+ack丢失时，client和server都会认为是自己发送的报文超时，client传syn的同时server传syn+ack。第三次的ack报文丢失时，server发现客户端响应一直每到，重传syn+ack。</p>
+<p>注：ack报文丢失不会重传，syn报文丢失重传。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP连接为什么需要随机初始序列号？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>避免接收历史报文；增加黑客伪造四元组tcp报文的难度。</p>
+<p>避免接收历史报文：TCP连接使用四元组+seq num来标识，如果都使用相同的seq num初始化，那么历史连接中晚到的报文就会被当前连接读取。</p>
+<p>增加黑客伪造四元组tcp报文的难度：使用随机序列号，增加黑客的伪造难度，提高tcp的安全型。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是半连接队列？什么是SYN攻击？如何避免SYN攻击？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Server端进入listen状态后维护一个半连接队列和全连接队列，在收到syn报文返回syn+ack后，将这个连接加入半连接队列，若一直没有响应则重传syn+ack。syn攻击就是通过伪造ip向指定服务器发送大量syn包但不返回ack，使半连接队列队满，无法处理新的syn请求。</p>
+<p>如何避免syn攻击：</p>
+<ul>
+<li>减少syn+ack重传次数</li>
+<li>提高半连接队列容量</li>
+<li>syncookie，synproxy，避免直接建立半连接添加到半连接队列，过滤伪造的syn攻击，只有确认能返回ack的才允许后续加入半连接队列。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>在ip层分片，为什么在tcp层还需要mss呢？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>其他几个概念：什么是mtu和mss？什么是最大ip数据报文，什么是传输时ip数据报文分片？ip层传输和tcp传输的不同？</p>
+<p>mtu和mss：mtu是max tranfer unit 最大传输单元，也就是最大ip数据报文的大小 1500B，不算扩增字段，如果ip首部和tcp首部都是20B，那么最大tcp数据报文长度是1460B（即mss=1460B，mss是max segment size）。</p>
+<p>最大ip数据报文和ip层传输时分片：ip数据报文的长度本身不做限制，如果传递大小4000B，那么在传输时会分片为三个ip分片（每个最大MTU）。ip层在传输时如果一个ip分片丢失，那么这个ip数据报文就不能交付，需要所有分片一起重传。这也是ip和tcp的不同，tcp层一个报文丢失，只会超时重传这一个。</p>
+<p>最后回答为什么tcp层为什么需要mss：避免 IP 分片，降低丢包后的重传代价。</p>
+<ul>
+<li>通过主动限制tcp层报文长度，避免ip层分片，提高网络传输效率。主动在tcp层进行分片，避免ip层丢失一个分片导致的所有分片超时重传（具体说，ip层进行的分片，某个分片丢失会导致ip数据报文无法交付，这样client端无法收到tcp的确认，ip层无法重传，但tcp层又不清楚ip层分片了，此时超时后只能整个重传tcp）。</li>
+</ul>
+<p>注：一个4000B的tcp报文，在发送的时候可能是一个tcp连接中多次mss=1460B的数据传输，通过seq保证有序提交和可靠传输。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP的四次挥手？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>TCP四次挥手过程中定义主动断开方为A，被动端口方为B。A的状态有established、fin wait1、fin wait2以及time wait，B的状态有established、close wait以及last ack。最后的状态都是close。报文传递是两个RTT的fin和ack。</p>
+<p>具体的：</p>
+<ul>
+<li>A发送FIN报文，进入FIN WAIT1，此时不再发送数据，还可以接收B的响应。</li>
+<li>B收到FIN报文，进入CLOSE WAIT阶段 处理和响应剩余数据，不再接收请求，同时发送ack让A进入FIN WAIT2阶段。</li>
+<li>B处理完数据后，发送FIN报文，进入LAST ACK阶段，此时不再进行收发。</li>
+<li>A收到FIN报文后，响应ACK报文给B，B在收到后进入ClOSE关闭，A进入TIME WAIT，在等待两个报文最大存活时间后（2msl=max segment live time）也关闭。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么time wait要等待2msl？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>避免历史报文影响新tcp连接；确保当前tcp连接正确关闭。</p>
+<p>避免历史报文影响新连接：设置2msl，确保所有之前的报文都活不过2msl。</p>
+<p>确保当前tcp连接正确关闭：如果4ack丢失后，server端迟迟无法关闭直到1RTO（Retransmission Timeout 重传超时）时触发fin报文重传，此时client接收到fin报文后再传ack并重置2msl计时器。</p>
+<p>如果client直接关闭，那么server没能关闭就会一直占用内存和端口资源。</p>
+<p><strong>设置2msl，确保ack报文丢失后，server端重传的fin报文能被client接收。</strong></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要time wait阶段？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">避免历史报文影响新tcp连接；确保当前tcp连接正确关闭。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>time wait过多什么危害？为什么time wait过多？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">占用内存和端口资源。time wait过多的原因：http长连接没开，开了长连接但是请求太多了。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如果已经建立了连接，客户端突然终止没机会四次挥手以及进程突然终止？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">如果四次挥手了，tcp连接和两边资源都关闭了。如果没有四次挥手，B端有保活计时器，隔一段时间进行探测，如果一直没有响应则断开连接，如果有响应则重置保活计时器时间并保持连接。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要四次挥手？可以三次挥手吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>TCP 四次挥手是因为全双工连接需要分别关闭两个发送方向（A端不发送数据传FIN报文，B端不再发送数据传fin报文）；如果被动关闭方能够同时发送 ACK 和 FIN，就可以变成三次挥手。</p>
+<p>四次挥手分别是A端的fin ack和B端的fin ack，服务端需要处理数据并进行响应，整体流程是保证两边完成剩余工作、没有数据需要收发的情况下关闭tcp连接。</p>
+<p>可以三次挥手替代四次挥手：如果B端没有数据要处理和发送，可以直接同时合并发送ACK和FIN报文，此时就是三次挥手。另外一种情况就是延迟ack到B端可以关闭数据发送并发送fin报文的时候，合并发送ack+fin报文。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP重传机制有哪些？分别解决了什么问题？拿一个例子来说明？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>超时重传，快速重传，选择性重传SACK，重复重传DSACK。</p>
+<p>超时重传：发送方发送数据时开启计时器，超过1RTO（略大于1RTT）时重传。</p>
+<ul>
+<li>问题：网络延迟时很多报文都需要等待超时重传，等待时间过长。</li>
+</ul>
+<p>快速重传：发送方连续收到多个有相同ACK序列号的ACK报文，此时触发重传。</p>
+<ul>
+<li>问题：快速重传不知道是传一个还是传多个，如果是seq3~6都丢失了，也只能从seq3开始重传。</li>
+</ul>
+<p>SACK：selective ack，接收端返回ack和sack区间，<code>[ack, sack[0])</code>就是丢失的部分，需要重传。</p>
+<ul>
+<li>问题：如果需要重传，不确定具体原因是ACK丢失/数据延迟型的重复接收，还是数据丢失的情况。</li>
+</ul>
+<p>DSACK：duplicate selective ack，重复选择性重传，接收端如果收到重复数据，会使用DSACK描述并返回。发送端收到后可以判断前一次重传是否多余（ACK丢失、数据延迟，重传多余；重传有效：数据丢失）。</p>
+<p>例子可参考：onenote/网络</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP的滑动窗口？为什么需要滑动窗口？什么是累积确认？窗口大小由哪方决定？接收窗口和发送窗口的大小相等吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>TCP Sender发送一个Data报文 Receiver返回一个ACK的方式比较慢，使用滑动窗口表示剩余可以发送的数据，已经发送的数据缓存在滑动窗口中，没有满的时候都可以持续发，当R返回ack后，可以将ack前面的数据从sender-window中移除。</p>
+<p>什么是累积确认：举个例子加入<code>seq500~599</code>和<code>seq600 ~ 699</code>同时发送，第一个的ack600丢失，此时第二个的ack700可以直接覆盖前一个，对ack报文的丢失容错较高，减少重传。</p>
+<p>窗口大小由哪方决定：主要有R端决定，S端的可发送窗口大小不能超过R的可接收窗口。R会在每次返回ack的时候携带剩余R-window-size，避免S端一次发送过多内容导致R无法处理。</p>
+<p>接收窗口和发送窗口的大小相等吗：不一定，一般是R-window约等于S-window，因为R端返回ack同步R-window的时候有延迟，可能会出现R处理较慢但S-window又比较大的时候，也回出现R处理比较快但S-window比较小。总体大小相等，但受网络延迟和R端处理能力的影响，S-window和R-window会有波动。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP的流量控制？什么是糊涂窗口？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>每次R返回R-window-size中的剩余大小来让Sender调解Sender-window-size，如果返回的wind=0,则sender不再发送而是开启定时任务询问receiver剩余wind大小，当wind&gt;0时再重新发送。</p>
+<p>糊涂窗口：当R太忙了，r-window-size会越来越小，sender收到后会条件window-size，即使是小窗口的报文也会发送，而R又来不及处理，导致两边最后windsize都到0。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何处理糊涂窗口？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Receiver不发送小wind，Sender不发送小数据。</p>
+<p>Receiver不发送小wind：如果wind&lt;min(mss or 接收缓冲区大小的一半)（max segment size，ip层报文最大长度，包含ip首部20B和tcp首部的20B，1500B）时直接返回0，当wind&gt;mss时再返回wind。</p>
+<p>Sender不发送小数据：Nagle算法。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是Nagle算法？什么是延迟确认？为什么Nagle算法不建议和延迟确认一起用？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Nagle算法，当有已发送未ACK的数据时，新产生的小数据先缓冲直到ACK返回（ACK返回后，组合这些小数据一起发送） 或者 积累到较大的数据量时 在发送。本质上是延迟发送，可以减少Sender的小数据发送。</p>
+<p>延迟确认：<code>seq100~199 和 seq200~seq299</code>前后到达时，先不返回前一个的ack，后一个处理完成后一起返回<code>ack 300</code>。本质上就是延迟确认。</p>
+<p>不适合搭配一起使用，一个是延迟发，一个是延迟接收，两个一起搭配可能会造成更大的延迟和性能问题。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP的拥塞控制？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>发送端在确定发送速率的时候，不仅要考虑接收端的接收能力，还要考虑是否会使网络发生拥塞。因此通过拥塞窗口cwnd和接收窗口rwnd来维护发送窗口swnd，调节接收能力。</p>
+<p>前置概念：cwnd、rwnd、swnd，<code>swnd = min(cwnd, rwnd)</code>，其中cwnd是<code>crowded window</code>拥塞窗口。</p>
+<p>拥塞控制：</p>
+<ul>
+<li>慢开始：从初始cwnd=1开始逐步增加cwnd, 然后每次传输轮次后不断倍增cwnd直到达到ssthresh=16。</li>
+<li>拥塞避免/加法增大：达到ssthresh后，每次传输轮次完成后cwnd+1mss。</li>
+<li>乘法减小ssthresh，重新慢开始：网络拥堵出现ACK超时时，乘法减小ssthresh为当前cwnd/2，然后重新进入慢开始。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP拥塞控制的另一种：快重传与快恢复？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>当Receiver收到失序到达的报文立刻ack，Sender端收到多次相同的ack时触发快重传，同时进入快恢复算法（如果当前是在拥塞避免 加法增大环节时）：ssthresh设置为当前cwnd的一半，cwnd设置为ssthresh开始拥塞避免 加法增大。</p>
+<p>使用快重传和快恢复的原因是：仍然有多次重复ack收到表示网络也没有那么拥塞，但前一次丢失可能有多种原因，所以进入快恢复阶段减少swnd，没必要一次直接将cwnd降到1。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么有了流量控制，还要拥塞控制？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>流量控制是为避免发送方速度过快，接收方来不及处理。</p>
+<p>拥塞控制是为了避免发送方发送过快导致网络拥塞。</p>
+<p>两者结合，调节发送方swnd，综合考虑接收方rwnd和网络拥塞状况（cwnd）。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP缺点</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>内核实现、升级困难；乱序数据只能等待顺序数据到达接上，或者在缓存中等待过期；和tls等搭配的https建连时间长；网络迁移时重建连接。</p>
+<ul>
+<li>内核实现，升级困难</li>
+<li>收到乱序数据时，乱序数据存在缓存中，要么等顺序数据到达接上后面的乱序数据，要么在缓存中等待过期。</li>
+<li>和tls搭配的https建连时间长。</li>
+<li>网络迁移时TCP需要重建连接：TCP使用四元组标识连接，网络变动时需要重建。</li>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>TCP的粘包和半粘包（拆包）和解决方法？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>TCP中没有消息这一说，使用tcp发送消息时 tcp会根据你发送内容的大小进行合并（粘包）或拆分（半粘包、拆包）。</p>
+<ul>
+<li>
+<p>粘包：发送方发送多条短消息，但是接收方收到<u>多条粘在一起的短消息</u>。</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nl">发送方</span><span class="p">:</span><span class="w">  </span><span class="n">write</span><span class="p">(</span><span class="s">&#34;hello&#34;</span><span class="p">)</span><span class="w">   </span><span class="n">write</span><span class="p">(</span><span class="s">&#34;world&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nl">接收方</span><span class="p">:</span><span class="w">  </span><span class="n">read</span><span class="p">()</span><span class="w"> </span><span class="n">一次性读到</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="s">&#34;helloworld&#34;</span><span class="w">   </span><span class="err">←</span><span class="w"> </span><span class="n">两条消息粘在一起了</span><span class="err">！</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>拆包：发送方发送的是一条长消息，但是接收方接收了<u>半条消息</u>。</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nl">发送方</span><span class="p">:</span><span class="w">  </span><span class="n">write</span><span class="p">(</span><span class="s">&#34;a very very long message..............&#34;</span><span class="p">)</span><span class="w">  </span><span class="n">一次写入2000字节</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="nl">接收方</span><span class="p">:</span><span class="w">  </span><span class="n">第1次</span><span class="w"> </span><span class="nf">read</span><span class="p">()</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">只读到前1460字节</span><span class="err">（</span><span class="n">受MSS</span><span class="o">/</span><span class="n">MTU限制</span><span class="err">，</span><span class="n">没法一次发完2000字节</span><span class="err">）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="n">第2次</span><span class="w"> </span><span class="nf">read</span><span class="p">()</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">读到剩下的540字节</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+</ul>
+<p>常见解决方法：</p>
+<ul>
+<li>定义消息体<code>消息长度|消息</code>：开头使用一个int/long表示当前消息的长度，然后按照这个读取和拆分。</li>
+</ul>
+</div></div>
+</details>
+
+<h2 id="udp">UDP
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是UDP？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>面向无连接的，首部8B轻量，无拥塞控制、不限制一对一的不可靠通信协议</p>
+<p>面向无连接的：发送数据不需要建立连接。</p>
+<p>不限制一对一：支持一对一、一对多、多对一、多对多。</p>
+<p>无拥塞控制：网络环境和接收方不会影响发送方的发送速率。</p>
+<p>不可靠传输：丢失不重传。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何基于UDP实现可靠传输</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>QUIC over UDP。</p>
+<ul>
+<li>
+<p>QUIC发送多条消息时会分割为多个不同stream-id的消息并发送：比如<code>stream1@1, stream1@2, stream2@1, stream3@2</code>，即使<code>stream3@2</code>先到达，也可以在stream3的独立滑动窗口中乱序确认，直到所有的<code>stream3@x</code>到达与完整<code>stream3</code>数据包组装。</p>
+</li>
+<li>
+<p>无队头阻塞：quic支持不同stream的独立交付，每个stream有一个独立的滑动窗口，不会相互影响。stream5-framex的丢失不会导致后来的stream7的无法交付。</p>
+</li>
+<li>
+<p>QUIC连接建立1RTT。QUIC中包含tls1.3，在1.5RTT内完成QUIC initial 和handshake。</p>
+<ul>
+<li>
+<p>QUIC 跑在 UDP 之上，UDP 本身<strong>无连接</strong>，不需要三次握手这种动作。QUIC 自己在<strong>应用层协议内部</strong>实现了一套&quot;连接建立+加密协商&quot;合并的流程，直接把 <strong>TLS 1.3</strong> 内嵌进了协议设计里（QUIC 强制使用 TLS 1.3，没有 1.2 的选项）。</p>
+</li>
+<li>
+<p>QUIC建连 1.5RTT</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">客户端</span><span class="w">                                    </span><span class="n">服务端</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                          </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│──</span><span class="w"> </span><span class="n">Initial</span><span class="w"> </span><span class="n">Packet</span><span class="w"> </span><span class="err">──────────────────────▶│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">(</span><span class="n">ClientHello</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">QUIC传输参数</span><span class="p">)</span><span class="w">            </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                          </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│◀──</span><span class="w"> </span><span class="n">Initial</span><span class="w"> </span><span class="n">Packet</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Handshake</span><span class="w"> </span><span class="n">Packet</span><span class="w"> </span><span class="err">───│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">(</span><span class="n">ServerHello</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">证书</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">加密参数</span><span class="w">         </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">    </span><span class="o">+</span><span class="w"> </span><span class="n">QUIC传输参数</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">已可用1</span><span class="o">-</span><span class="n">RTT密钥</span><span class="p">)</span><span class="w">      </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                          </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│──</span><span class="w"> </span><span class="n">Handshake</span><span class="w"> </span><span class="n">Packet</span><span class="w"> </span><span class="err">─────────────────────▶│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">(</span><span class="n">Finished</span><span class="p">)</span><span class="w">                            </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                          </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│═══</span><span class="w"> </span><span class="n">连接建立完成</span><span class="err">，</span><span class="n">可发送应用数据</span><span class="w"> </span><span class="err">══════════│</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>TLS1.3 1RTT建立</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Client</span><span class="w">                                              </span><span class="n">Server</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                                     </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│──</span><span class="w"> </span><span class="n">ClientHello</span><span class="w"> </span><span class="err">────────────────────────────────────▶│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="o">+</span><span class="w"> </span><span class="n">key_share</span><span class="w"> </span><span class="p">(</span><span class="n">客户端提前算好的DH公钥参数</span><span class="p">)</span><span class="w">             </span><span class="err">│</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">client_public</span><span class="o">+</span><span class="n">server_private</span><span class="w"> </span><span class="n">计算出共享密钥</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="o">+</span><span class="w"> </span><span class="n">supported_versions</span><span class="p">,</span><span class="w"> </span><span class="n">cipher_suites</span><span class="w">                </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                                     </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│◀──</span><span class="w"> </span><span class="n">ServerHello</span><span class="w"> </span><span class="err">───────────────────────────────────</span><span class="w"> </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="o">+</span><span class="w"> </span><span class="n">key_share</span><span class="w"> </span><span class="p">(</span><span class="n">服务端DH公钥参数</span><span class="p">)</span><span class="w">                      </span><span class="err">│</span><span class="w"> </span><span class="err">#</span><span class="w"> </span><span class="n">server_public</span><span class="o">+</span><span class="n">server_private</span><span class="w"> </span><span class="n">计算出相同的共享秘钥</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">{</span><span class="n">EncryptedExtensions</span><span class="p">}</span><span class="w">                              </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">{</span><span class="n">Certificate</span><span class="p">}</span><span class="w">            </span><span class="err">←</span><span class="w"> </span><span class="n">这里开始已加密</span><span class="err">！</span><span class="w">         </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">{</span><span class="n">CertificateVerify</span><span class="p">}</span><span class="w">                                </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">   </span><span class="p">{</span><span class="n">Finished</span><span class="p">}</span><span class="w">                                         </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                                     </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│──</span><span class="w"> </span><span class="p">{</span><span class="n">Finished</span><span class="p">}</span><span class="w"> </span><span class="err">──────────────────────────────────────▶│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│</span><span class="w">                                                     </span><span class="err">│</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="err">│═══</span><span class="w"> </span><span class="n">Application</span><span class="w"> </span><span class="nf">Data</span><span class="w"> </span><span class="p">(</span><span class="n">加密</span><span class="p">)</span><span class="w"> </span><span class="err">════════════════════════│</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>连接复用：原来的连接基于ip port的四元组确定，现在使用统一连接id标识，网络连接变化（比如从wifi切流量）但是上下文信息不变（连接id、tls秘钥），则继续复用原TCP连接。复用时重建连接1RTT。</p>
+</li>
+</ul>
+</div></div>
+</details>
+
+<h2 id="appendix">Appendix
+</h2><p>网上的八股主要还是偏向于http、tcp/ip、udp协议这些，关于计网里面IP层、物理链路层的东西没有做详细介绍。</p>
+<p>参考：<a class="link" href="https://lansongxx.github.io/MyStudyNote/handbook/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.html#_3-%E4%BB%8E%E8%BE%93%E5%85%A5-url-%E5%88%B0%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA%E5%88%B0%E5%BA%95%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88"  target="_blank" rel="noopener"
+    >计算机网络 | 八股速记</a>，天勤</p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/work/my-qa-index/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">我的QA索引</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
