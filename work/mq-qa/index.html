@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下消息队列的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\n参考：\n链接 面经-消息队列-小林 ((20261016102730-o11ymr9 &lsquo;消息队列-小林&rsquo;)) 面经-消息队列-cecelia ((20261015214334-1cprz8l &lsquo;消息队列-Cecelia&rsquo;)) 面经-RabbitMQ ((20261016103858-gt6q28t &lsquo;RabbitMQ-小林&rsquo;)) RabbitMQ ((20260811110443-e4vvct3 &lsquo;rabbitmq&rsquo;)) MQTT ((20260811110443-dfm3re0 &lsquo;mqtt&rsquo;)) 基本概念 Q：什么是消息队列？ A：使用队列来通信的组件，本质就是生产者发消息，队列存储并投递消息，消费者消费并确认消息。我们常说的MQ（Message Queue）指的就是消息中间件，常见的消息中间件有rabbitmq、rocketmq、kafka。 Q：为什么需要消息队列？什么是解耦、异步、削峰？ A：消息队列的三个作用：解耦、异步、削峰。\n解耦：解耦上下游业务的依赖关系，使上下游业务分开执行。没有mq时，订单服务需要依次同步调用下游服务，下游服务的执行耗时包含在订单服务中；新增下游服务的时候需要在订单服务中更新调用。引入mq后，订单服务创建“订单服务已创建”消息到broker，下游服务订阅并处理。\n异步：将不需要同步的操作通过mq转为异步，提高处理速度。\n削峰：让突发请求先进入队列，下游按照自己的能力进行处理。\n如果DB每秒最多1W并发，但是秒杀业务每秒10W。如果直接处理，服务直面峰值流量，直接耗尽DB连接、CPU资源、OOM后退出。通过mq队列，请求写进入mq等待，DB先只处理1W请求，后续请求排队等待处理。 削峰的问题：长期生成&raquo;消费，会导致消息积压，mq内存不足OOM。使用mq只能缓解短期流量，面对长期峰值流量，必须DB扩容/源端控制限流。\nQ：消息队列有什么问题？有什么引入成本 A：引入消息中间件后，毕竟多了一层中间件，会出现一致性等问题\n消息丢失。 重复消息导致的重复消费，消费如果没有做幂等会导致重复消费问题。 积压：长期生产&raquo;消费，导致OOM资源耗尽 消息失败：消息多次失败后的处理 乱序：需要顺序处理的消息乱序 最终一致性：数据库事务和 MQ 属于两个系统，上下游的「数据库写，消息发送/消息确认」之间存在宕机窗口，无法合并为一个事务，只能尽力保证其最终一致性。 消息可靠性 Q：如何保证消息不丢失？如何保证生产者可靠性、broker可靠性、消费者可靠性。 A：从三个角度回答：1、生产者发送消息等待broker确认，超时或者失败时重发，关键消息落库由后台线程重试避免宕机丢失。2、broker可靠性，收到消息后本地持久化+副本节点复制后再返回确认。3、消费者业务处理成功并提交数据库事务后给broker确认消息，消费者需要保证幂等处理宕机窗口ACK发送失败时broker的重复消息。\n可靠消息需要生产确认、broker持久化、消费确认，通常采用「至少一次确认+消费幂等」，极端情况使用监控、对账和一致性补偿。\nQ：最多一次、至少一次、恰好一次分别是什么？QoS0、QoS1、QoS2分别指的是什么？ A：最多一次指的是 消息最多投递一次，有可能会出现消息丢失。至少一次指的是 publisher 和 consumer 之间的消息传递至少一次，失败或者超时时重试，确保consumer能消费到消息，但是可能会出现重复消费问题。恰好一次指的是 publisher 投递一次，consumer处理一次，因为mq和数据库以及业务系统是不同的组件，一次成功需要不同组件的共同保证。\n恰好一次，无论中间发生什么故障，每条消息对最终业务状态的影响既不丢失、也不重复，等价于只被处理了一次。正如你所总结的，由于 MQ、网络、数据库和业务系统是跨进程的异构组件，纯靠 MQ 自身无法独立实现端到端的“恰好一次”，工业界通常采用 “至少一次投递（At-Least-Once）+ 消费端幂等性设计（或事务状态表）” 来共同保证。 QoS指的是MQTT的服务质量等级，基本含义和上面差不多，但是具体实现方式主要是基于TCP和应用层的握手。\n重复消息与重复消费 Q：为什么会有重复消息？ A：mq通常使用 至少一次消息 + 消费幂等来保证消息可靠性，在这个可靠性下重复消息是很常见的。生产者发送消息后broker返回的ack丢失 / 生产者发送的消息丢失，就会导致重发；消费者返回ack时宕机或者返回的ack丢失，会导致broker的重复消息。\n">
+<title>消息队列</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/mq-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="消息队列">
+<meta property='og:description' content="按照学习顺序来组织一下消息队列的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\n参考：\n链接 面经-消息队列-小林 ((20261016102730-o11ymr9 &lsquo;消息队列-小林&rsquo;)) 面经-消息队列-cecelia ((20261015214334-1cprz8l &lsquo;消息队列-Cecelia&rsquo;)) 面经-RabbitMQ ((20261016103858-gt6q28t &lsquo;RabbitMQ-小林&rsquo;)) RabbitMQ ((20260811110443-e4vvct3 &lsquo;rabbitmq&rsquo;)) MQTT ((20260811110443-dfm3re0 &lsquo;mqtt&rsquo;)) 基本概念 Q：什么是消息队列？ A：使用队列来通信的组件，本质就是生产者发消息，队列存储并投递消息，消费者消费并确认消息。我们常说的MQ（Message Queue）指的就是消息中间件，常见的消息中间件有rabbitmq、rocketmq、kafka。 Q：为什么需要消息队列？什么是解耦、异步、削峰？ A：消息队列的三个作用：解耦、异步、削峰。\n解耦：解耦上下游业务的依赖关系，使上下游业务分开执行。没有mq时，订单服务需要依次同步调用下游服务，下游服务的执行耗时包含在订单服务中；新增下游服务的时候需要在订单服务中更新调用。引入mq后，订单服务创建“订单服务已创建”消息到broker，下游服务订阅并处理。\n异步：将不需要同步的操作通过mq转为异步，提高处理速度。\n削峰：让突发请求先进入队列，下游按照自己的能力进行处理。\n如果DB每秒最多1W并发，但是秒杀业务每秒10W。如果直接处理，服务直面峰值流量，直接耗尽DB连接、CPU资源、OOM后退出。通过mq队列，请求写进入mq等待，DB先只处理1W请求，后续请求排队等待处理。 削峰的问题：长期生成&raquo;消费，会导致消息积压，mq内存不足OOM。使用mq只能缓解短期流量，面对长期峰值流量，必须DB扩容/源端控制限流。\nQ：消息队列有什么问题？有什么引入成本 A：引入消息中间件后，毕竟多了一层中间件，会出现一致性等问题\n消息丢失。 重复消息导致的重复消费，消费如果没有做幂等会导致重复消费问题。 积压：长期生产&raquo;消费，导致OOM资源耗尽 消息失败：消息多次失败后的处理 乱序：需要顺序处理的消息乱序 最终一致性：数据库事务和 MQ 属于两个系统，上下游的「数据库写，消息发送/消息确认」之间存在宕机窗口，无法合并为一个事务，只能尽力保证其最终一致性。 消息可靠性 Q：如何保证消息不丢失？如何保证生产者可靠性、broker可靠性、消费者可靠性。 A：从三个角度回答：1、生产者发送消息等待broker确认，超时或者失败时重发，关键消息落库由后台线程重试避免宕机丢失。2、broker可靠性，收到消息后本地持久化+副本节点复制后再返回确认。3、消费者业务处理成功并提交数据库事务后给broker确认消息，消费者需要保证幂等处理宕机窗口ACK发送失败时broker的重复消息。\n可靠消息需要生产确认、broker持久化、消费确认，通常采用「至少一次确认+消费幂等」，极端情况使用监控、对账和一致性补偿。\nQ：最多一次、至少一次、恰好一次分别是什么？QoS0、QoS1、QoS2分别指的是什么？ A：最多一次指的是 消息最多投递一次，有可能会出现消息丢失。至少一次指的是 publisher 和 consumer 之间的消息传递至少一次，失败或者超时时重试，确保consumer能消费到消息，但是可能会出现重复消费问题。恰好一次指的是 publisher 投递一次，consumer处理一次，因为mq和数据库以及业务系统是不同的组件，一次成功需要不同组件的共同保证。\n恰好一次，无论中间发生什么故障，每条消息对最终业务状态的影响既不丢失、也不重复，等价于只被处理了一次。正如你所总结的，由于 MQ、网络、数据库和业务系统是跨进程的异构组件，纯靠 MQ 自身无法独立实现端到端的“恰好一次”，工业界通常采用 “至少一次投递（At-Least-Once）+ 消费端幂等性设计（或事务状态表）” 来共同保证。 QoS指的是MQTT的服务质量等级，基本含义和上面差不多，但是具体实现方式主要是基于TCP和应用层的握手。\n重复消息与重复消费 Q：为什么会有重复消息？ A：mq通常使用 至少一次消息 + 消费幂等来保证消息可靠性，在这个可靠性下重复消息是很常见的。生产者发送消息后broker返回的ack丢失 / 生产者发送的消息丢失，就会导致重发；消费者返回ack时宕机或者返回的ack丢失，会导致broker的重复消息。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/mq-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-16T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-16T12:00:00&#43;08:00'/>
+<meta name="twitter:title" content="消息队列">
+<meta name="twitter:description" content="按照学习顺序来组织一下消息队列的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\n参考：\n链接 面经-消息队列-小林 ((20261016102730-o11ymr9 &lsquo;消息队列-小林&rsquo;)) 面经-消息队列-cecelia ((20261015214334-1cprz8l &lsquo;消息队列-Cecelia&rsquo;)) 面经-RabbitMQ ((20261016103858-gt6q28t &lsquo;RabbitMQ-小林&rsquo;)) RabbitMQ ((20260811110443-e4vvct3 &lsquo;rabbitmq&rsquo;)) MQTT ((20260811110443-dfm3re0 &lsquo;mqtt&rsquo;)) 基本概念 Q：什么是消息队列？ A：使用队列来通信的组件，本质就是生产者发消息，队列存储并投递消息，消费者消费并确认消息。我们常说的MQ（Message Queue）指的就是消息中间件，常见的消息中间件有rabbitmq、rocketmq、kafka。 Q：为什么需要消息队列？什么是解耦、异步、削峰？ A：消息队列的三个作用：解耦、异步、削峰。\n解耦：解耦上下游业务的依赖关系，使上下游业务分开执行。没有mq时，订单服务需要依次同步调用下游服务，下游服务的执行耗时包含在订单服务中；新增下游服务的时候需要在订单服务中更新调用。引入mq后，订单服务创建“订单服务已创建”消息到broker，下游服务订阅并处理。\n异步：将不需要同步的操作通过mq转为异步，提高处理速度。\n削峰：让突发请求先进入队列，下游按照自己的能力进行处理。\n如果DB每秒最多1W并发，但是秒杀业务每秒10W。如果直接处理，服务直面峰值流量，直接耗尽DB连接、CPU资源、OOM后退出。通过mq队列，请求写进入mq等待，DB先只处理1W请求，后续请求排队等待处理。 削峰的问题：长期生成&raquo;消费，会导致消息积压，mq内存不足OOM。使用mq只能缓解短期流量，面对长期峰值流量，必须DB扩容/源端控制限流。\nQ：消息队列有什么问题？有什么引入成本 A：引入消息中间件后，毕竟多了一层中间件，会出现一致性等问题\n消息丢失。 重复消息导致的重复消费，消费如果没有做幂等会导致重复消费问题。 积压：长期生产&raquo;消费，导致OOM资源耗尽 消息失败：消息多次失败后的处理 乱序：需要顺序处理的消息乱序 最终一致性：数据库事务和 MQ 属于两个系统，上下游的「数据库写，消息发送/消息确认」之间存在宕机窗口，无法合并为一个事务，只能尽力保证其最终一致性。 消息可靠性 Q：如何保证消息不丢失？如何保证生产者可靠性、broker可靠性、消费者可靠性。 A：从三个角度回答：1、生产者发送消息等待broker确认，超时或者失败时重发，关键消息落库由后台线程重试避免宕机丢失。2、broker可靠性，收到消息后本地持久化+副本节点复制后再返回确认。3、消费者业务处理成功并提交数据库事务后给broker确认消息，消费者需要保证幂等处理宕机窗口ACK发送失败时broker的重复消息。\n可靠消息需要生产确认、broker持久化、消费确认，通常采用「至少一次确认+消费幂等」，极端情况使用监控、对账和一致性补偿。\nQ：最多一次、至少一次、恰好一次分别是什么？QoS0、QoS1、QoS2分别指的是什么？ A：最多一次指的是 消息最多投递一次，有可能会出现消息丢失。至少一次指的是 publisher 和 consumer 之间的消息传递至少一次，失败或者超时时重试，确保consumer能消费到消息，但是可能会出现重复消费问题。恰好一次指的是 publisher 投递一次，consumer处理一次，因为mq和数据库以及业务系统是不同的组件，一次成功需要不同组件的共同保证。\n恰好一次，无论中间发生什么故障，每条消息对最终业务状态的影响既不丢失、也不重复，等价于只被处理了一次。正如你所总结的，由于 MQ、网络、数据库和业务系统是跨进程的异构组件，纯靠 MQ 自身无法独立实现端到端的“恰好一次”，工业界通常采用 “至少一次投递（At-Least-Once）+ 消费端幂等性设计（或事务状态表）” 来共同保证。 QoS指的是MQTT的服务质量等级，基本含义和上面差不多，但是具体实现方式主要是基于TCP和应用层的握手。\n重复消息与重复消费 Q：为什么会有重复消息？ A：mq通常使用 至少一次消息 + 消费幂等来保证消息可靠性，在这个可靠性下重复消息是很常见的。生产者发送消息后broker返回的ack丢失 / 生产者发送的消息丢失，就会导致重发；消费者返回ack时宕机或者返回的ack丢失，会导致broker的重复消息。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#基本概念">基本概念</a></li>
+    <li><a href="#消息可靠性">消息可靠性</a></li>
+    <li><a href="#重复消息与重复消费">重复消息与重复消费</a></li>
+    <li><a href="#顺序消息">顺序消息</a></li>
+    <li><a href="#消息积压">消息积压</a></li>
+    <li><a href="#消息失败">消息失败</a></li>
+    <li><a href="#延迟消息">延迟消息</a></li>
+    <li><a href="#最终一致性">最终一致性</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/mq-qa/">消息队列</a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-16T12:00:00&#43;08:00'>Friday, October 16, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#基本概念">基本概念</a></li>
+    <li><a href="#消息可靠性">消息可靠性</a></li>
+    <li><a href="#重复消息与重复消费">重复消息与重复消费</a></li>
+    <li><a href="#顺序消息">顺序消息</a></li>
+    <li><a href="#消息积压">消息积压</a></li>
+    <li><a href="#消息失败">消息失败</a></li>
+    <li><a href="#延迟消息">延迟消息</a></li>
+    <li><a href="#最终一致性">最终一致性</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>按照学习顺序来组织一下消息队列的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
+<p>参考：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th></th>
+					<th>链接</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>面经-消息队列-小林</td>
+					<td>((20261016102730-o11ymr9 &lsquo;消息队列-小林&rsquo;))</td>
+			</tr>
+			<tr>
+					<td>面经-消息队列-cecelia</td>
+					<td>((20261015214334-1cprz8l &lsquo;消息队列-Cecelia&rsquo;))</td>
+			</tr>
+			<tr>
+					<td>面经-RabbitMQ</td>
+					<td>((20261016103858-gt6q28t &lsquo;RabbitMQ-小林&rsquo;))</td>
+			</tr>
+			<tr>
+					<td>RabbitMQ</td>
+					<td>((20260811110443-e4vvct3 &lsquo;rabbitmq&rsquo;))</td>
+			</tr>
+			<tr>
+					<td>MQTT</td>
+					<td>((20260811110443-dfm3re0 &lsquo;mqtt&rsquo;))</td>
+			</tr>
+	</tbody>
+</table></div>
+<h2 id="基本概念">基本概念
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是消息队列？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">使用队列来通信的组件，本质就是生产者发消息，队列存储并投递消息，消费者消费并确认消息。我们常说的MQ（Message Queue）指的就是消息中间件，常见的消息中间件有rabbitmq、rocketmq、kafka。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要消息队列？什么是解耦、异步、削峰？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>消息队列的三个作用：解耦、异步、削峰。</p>
+<p>解耦：解耦上下游业务的依赖关系，使上下游业务分开执行。没有mq时，订单服务需要依次同步调用下游服务，下游服务的执行耗时包含在订单服务中；新增下游服务的时候需要在订单服务中更新调用。引入mq后，订单服务创建“订单服务已创建”消息到broker，下游服务订阅并处理。</p>
+<p>异步：将不需要同步的操作通过mq转为异步，提高处理速度。</p>
+<p>削峰：让突发请求先进入队列，下游按照自己的能力进行处理。</p>
+<ul>
+<li>如果DB每秒最多1W并发，但是秒杀业务每秒10W。如果直接处理，服务直面峰值流量，直接耗尽DB连接、CPU资源、OOM后退出。通过mq队列，请求写进入mq等待，DB先只处理1W请求，后续请求排队等待处理。</li>
+</ul>
+<p>削峰的问题：长期生成&raquo;消费，会导致消息积压，mq内存不足OOM。使用mq只能缓解短期流量，面对长期峰值流量，必须DB扩容/源端控制限流。</p>
+<p><img alt="57715bdb2aefaaaa760297433d93dde6" data-title-escaped="解耦、异步、削峰最常见的场景" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="assets/57715bdb2aefaaaa760297433d93dde6-20261016153637-q4j54jq.png" title="解耦、异步、削峰最常见的场景"></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>消息队列有什么问题？有什么引入成本</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>引入消息中间件后，毕竟多了一层中间件，会出现一致性等问题</p>
+<ul>
+<li>消息丢失。</li>
+<li>重复消息导致的重复消费，消费如果没有做幂等会导致重复消费问题。</li>
+<li>积压：长期生产&raquo;消费，导致OOM资源耗尽</li>
+<li>消息失败：消息多次失败后的处理</li>
+<li>乱序：需要顺序处理的消息乱序</li>
+<li>最终一致性：数据库事务和 MQ 属于两个系统，上下游的「数据库写，消息发送/消息确认」之间存在宕机窗口，无法合并为一个事务，只能尽力保证其最终一致性。</li>
+</ul></div></div>
+</details>
+
+<h2 id="消息可靠性">消息可靠性
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何保证消息不丢失？如何保证生产者可靠性、broker可靠性、消费者可靠性。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>从三个角度回答：1、生产者发送消息等待broker确认，超时或者失败时重发，关键消息落库由后台线程重试避免宕机丢失。2、broker可靠性，收到消息后本地持久化+副本节点复制后再返回确认。3、消费者业务处理成功并提交数据库事务后给broker确认消息，消费者需要保证幂等处理宕机窗口ACK发送失败时broker的重复消息。</p>
+<p>可靠消息需要生产确认、broker持久化、消费确认，通常采用「至少一次确认+消费幂等」，极端情况使用监控、对账和一致性补偿。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>最多一次、至少一次、恰好一次分别是什么？QoS0、QoS1、QoS2分别指的是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>最多一次指的是 消息最多投递一次，有可能会出现消息丢失。至少一次指的是 publisher 和 consumer 之间的消息传递至少一次，失败或者超时时重试，确保consumer能消费到消息，但是可能会出现重复消费问题。恰好一次指的是 publisher 投递一次，consumer处理一次，因为mq和数据库以及业务系统是不同的组件，一次成功需要不同组件的共同保证。</p>
+<ul>
+<li>恰好一次，无论中间发生什么故障，每条消息对最终业务状态的影响<strong>既不丢失、也不重复，等价于只被处理了一次</strong>。正如你所总结的，由于 MQ、网络、数据库和业务系统是跨进程的异构组件，纯靠 MQ 自身无法独立实现端到端的“恰好一次”，工业界通常采用  <strong>“至少一次投递（At-Least-Once）+ 消费端幂等性设计（或事务状态表）”</strong>  来共同保证。</li>
+</ul>
+<p>QoS指的是MQTT的服务质量等级，基本含义和上面差不多，但是具体实现方式主要是基于TCP和应用层的握手。</p>
+</div></div>
+</details>
+
+<h2 id="重复消息与重复消费">重复消息与重复消费
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么会有重复消息？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>mq通常使用 至少一次消息 + 消费幂等来保证消息可靠性，在这个可靠性下重复消息是很常见的。生产者发送消息后broker返回的ack丢失 / 生产者发送的消息丢失，就会导致重发；消费者返回ack时宕机或者返回的ack丢失，会导致broker的重复消息。</p>
+<p>生产者发送消息时会产生重复：</p>
+<ul>
+<li>
+<p>生产者前置处理完成后，发送消息时宕机，如果不将这个消息落库生产者都不会再进行重试。</p>
+</li>
+<li>
+<p>生产者超时或者失败重发。</p>
+<ul>
+<li>生产者发送消息后，消息丢失需要重发。</li>
+<li>broker收到消息后返回的ack丢失，生产者超时重发。</li>
+<li>broker收到消息后返回nack，生产者失败重发。</li>
+</ul>
+</li>
+</ul>
+<p>消费者的业务处理和消息确认无法合并为一个原子操作，发送ACK时宕机或者ACK丢失时broker重发会有重复消息：</p>
+<ul>
+<li>consumer消费的流程：业务处理，消息确认。</li>
+<li>consumer 业务处理完成后，发送确认消息时宕机/ACK丢失，Broker重发消息，产生重复消息，自然consumer需要重复消费。</li>
+<li>如果consumer的消息确认在业务处理之前，给borker返回ACK后，业务处理失败/宕机，此时broker不会重发消息，导致最终一致性问题（broker认为消息对应业务处理成功了，但是consumer处理业务时异常了）。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何去重？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>重复消息去重分为两个部分：broker去重，consumer消费幂等。</p>
+<ul>
+<li>
+<p>broker去重：生产者生产消息时携带业务唯一键，broker根据这个业务唯一键进行去重。</p>
+<ul>
+<li><strong>不建议依赖超时重发消息时消息系统生成的消息id，这个消息id可能可能每次不同，不适合用作去重键。</strong></li>
+</ul>
+</li>
+<li>
+<p>consumer 去重：分两个部分，防重复 &amp; 防并发。</p>
+<ul>
+<li>consumer消费流程（这里添加一个去重）：去重，业务处理，消息确认。</li>
+<li>防重复：结合DB消息状态表<code>(业务唯一键bid, status)</code>做幂等处理。1、去重检查，如果DB消息状态表中没有bid1，则可以处理；如果bid1存在且status为done 直接返回ack。2、业务处理，写业务表之类，业务完成后写bid1 status为done。3、消费确认。</li>
+<li>防并发：并发的原因：consumer1宕机了后borker重发消息给consumer2，consumer1恢复后执行本地重试，consumer1和consumer2并发处理一条消息。此时需要使用分布式锁（比如redis的setnx）来串行消费，先拿到redis key的消费，没拿到的阻塞。</li>
+</ul>
+</li>
+</ul>
+<p>consumer去重防重复的时候，DB消息状态表和业务表的修改需要保证事务性，如果bid修改为done但业务失败回滚，收到重复消息时检查bid的status为done直接跳过返回ack，导致broker认为完成，业务系统认为业务未完成，导致最终一致性问题。</p>
+<p>防重复的方法：消息业务唯一键落库，业务处理状态机维护。</p>
+<p>防并发的方法：使用redis的分布式锁保证并发consumer的串行处理。</p>
+</div></div>
+</details>
+
+<h2 id="顺序消息">顺序消息
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是顺序消息？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">例如秒杀业务中秒杀下单并迅速秒退，生产了三条消息（T1待支付，T2已支付，T3已取消/已退款）。业务处理时要求T1、T2、T3顺序以及T1 T3顺序，不允许T3执行后T2又覆盖。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何实现顺序消息？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>局部有序进入同一个queue中；串行消费；失败处理和状态机约束乱序问题。</p>
+<p>局部有序进入同一个queue中：顺序消息只能实现局部有序，全局有序的开销太大且没有必要。局部有序指：同一订单的三次变更T1T2T3有序，如果是一个订单，通过orderid计算对应queue。相同orderid的投递到一个queue中。</p>
+<p>串行消费：rabbitmq允许一个queue有多个consumer，可以开启SAC（Single Active Consumer）单一活跃消费者、其余consumer作为热备，并设置prefetch=1来控制单次只能处理一个消息。</p>
+<p>不是串行消费就代表消息顺序了，还是有顺序的可能：</p>
+<ul>
+<li>当consumer处理必定失败，重试次数超过指定后requeue到死信队列。运维重放死信队列，T3结束后执行死信队列里面的T2,将已取消/已退款修改为已支付。出现乱序问题问题。</li>
+<li>consumer1处理T2时停顿，broker超时没有收到consumer1的消费ack，投递到consumer2中处理完T2和T3，此时consumer1恢复并处理T2事务，导致已支付状态覆盖已退款。</li>
+</ul>
+<p>如何进行失败处理呢？可以使用状态机约束乱序问题</p>
+<ul>
+<li>只允许 T1 到 T3, T1到T2到T3的状态变更，不允许T3变更到T2。</li>
+</ul>
+</div></div>
+</details>
+
+<h2 id="消息积压">消息积压
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是消息积压。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">消息积压，指生产速率远大于消费速率，消息在队列中积压。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>几百万条消息积压了怎么办？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>先定位问题，再考虑消费者扩容，扩容时考虑下游服务和数据库状态，避免扩容后队列清空但下游被打挂。</p>
+<p>1、判断是生产突增还是消费故障，如果是消费故障先恢复，恢复后如果消费仍追不上生产，则消息积压不会缓解需要考虑扩容。如果是生产突增，则也需要考虑扩容。</p>
+<p>2、扩容，具体来说是增加consumer。</p>
+<ul>
+<li>给queue添加consumer，增大prefetch匹配到消费者消费速率。</li>
+<li>如果单queue被打满（erlang进程cpu占满，达到单queue的性能上界），改变拓扑。用一致性哈希交换机（consistent hash exchange）或者业务维度分片（让生产者直接按key写到不同的队列），把一个队列拆成多个队列，再分别挂消费者，同时保证同一个业务的处理顺序。</li>
+</ul>
+<p>3、扩容的时候需要考虑下游服务状态（包括数据库，业务系统），避免扩容后队列清空但是下游服务被打挂。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>消费速率突然下降如何排查？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>先定位问题，在考虑消费者扩容。</p>
+<p>1、定位消息积压明显上升的时间点。观察生产/消费速率，以及消息在队列中的积压曲线。</p>
+<p>2、排查是消费者下游服务的内部问题，还是下游服务依赖问题：消费者状态、实例健康状态；DB慢sql、锁状态等等。</p>
+<p>3、消费者出现问题则尽快尝试恢复。cpu占用低不代表没有问题，有可能是消费这业务阻塞在数据库连接RPC调用等io占用搞的任务上。若想避免消息快速积压可以先拉一个消费者起来缓解当前问题。</p>
+</div></div>
+</details>
+
+<h2 id="消息失败">消息失败
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>消息失败如何处理？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>消息失败 多次重试，超过上限则投递死信队列，对于毒丸消息需要特殊处理。</p>
+<p>消息失败分两种，一种是临时错误，一种是永久性错误。</p>
+<p>对于临时错误可以尝试根据重试策略进行多次重试，不能无限重试，避免二次打击故障下游。递增间隔退避重试（或者也可以考虑重试限流），达到上限后转死信队列。</p>
+<p>死信队列：消费失败多次达到上限时，投递死信队列（消息队列自动生成的消息键，业务唯一键，失败原因，重试次数），隔离故障保留现场，提供审计与修复入口。修复时需要受控回放死信，走幂等校验后检查业务状态，避免乱序覆盖已有业务状态。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是毒消息？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>毒丸消息，永久性的错误，重试也不会成功。</p>
+<p>如果这种消息在普通队列中，可以直接移除。如果在顺序队列中，需要顺序处理则应该即时告警人工处理并移除后续对应业务键的消息。</p>
+</div></div>
+</details>
+
+<h2 id="延迟消息">延迟消息
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>延迟消息在rabbitmq中如何实现？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>延迟消息的实现 在rabbitmq中有两种方法</p>
+<ul>
+<li>
+<p>TTL-Queue + 死信交换机交换到 + 实际业务队列 实现延迟消息。具体的：消息先发送到 指定ttl无消费者的queue上，TTL到期后变成死信由死信交换机转发到有消费者的业务队列消费。</p>
+<ul>
+<li>消息到期时不一定立马会投递到死信exchange上，只有在队头的才会（rabbitmq只会检查队头那条消息是否已经过期，rabbitmq假设消息是按进入顺序排列的，队头的消息理应是最早可能过期的那条，没过期就不会去看后面的消息，这是出于性能考虑，没有为每条消息单独维护一个定时器去全局扫描。），非队头的到期也不会投递死信，最后延迟的时间可能会远超ttl时间。</li>
+<li>同一个队列的ttl必须相同或者按照从低到高的顺序投递消息，不支持乱序ttl延迟消息。</li>
+</ul>
+</li>
+<li>
+<p>RabbitMQ的延迟交换机插件：声明x-delayed-message交换机，发消息时消息头x-delay指定延迟时间，交换机收到后先暂存到RabbitMQ自带的Mnesia数据库，使用erlang定时器排定投递时间，到点后正常路由。</p>
+<ul>
+<li>问题：只能在声明交换机上使用，高可用弱，消息量大时有丢失和性能压力。</li>
+</ul>
+</li>
+</ul>
+</div></div>
+</details>
+
+<h2 id="最终一致性">最终一致性
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是最终一致性？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>数据库事务和 MQ 属于两个系统，无法合并成一个事务。所以最终一致性需要重试来保证数据库事务提交和MQ消息发送的一致性。</p>
+<p>消费者ACK有Broker的重试，但是生产者发送消息宕机时需要本地消息表处理。</p>
+<p>生产者发送消息 和 消费者返回确认，都需要至少经历两个过程：1、写数据库 2、发消息。</p>
+<ul>
+<li>
+<p>生产者：生产者发送消息过程中的这个问题可以使用「本地消息表 outbox or 事务消息（only rocketmq）」模式解决。</p>
+<ul>
+<li>
+<p>以生产者发送消息的这种情况为例，写数据库和发消息无论什么前后顺序，都有故障窗口：</p>
+<ul>
+<li>
+<p>先写数据库，再发消息。</p>
+<ul>
+<li>生产者发送消息时宕机，恢复后数据库已经写了，但是消息没有发给下游任务处理。此时不满足最终一致性。</li>
+</ul>
+</li>
+<li>
+<p>先发消息，再写数据库。</p>
+<ul>
+<li>数据库回滚，消息已经发出。下游服务在处理一条不存在的业务。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>消费者：消费者发送确认消息出现以下两个问题时：</p>
+<ul>
+<li>写数据库，再发消息。发消息时宕机，此时broker超时没有收到，重试，消费者幂等处理后完成。</li>
+<li><del>先发ACK消息，再写数据库。数据库宕机，此时broker收到ack，不再重试，此时订单下游服务没有处理。</del>  这太变态了，不推荐。</li>
+</ul>
+</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>处理生产者发送消息最终一致性的本地消息表（Transcational Outbox）</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ol>
+<li>
+<p>业务数据 和 待发送事件 在事务中写入数据库。</p>
+<pre tabindex="0"><code>BEGIN TRANSACTION;
+  INSERT INTO orders (...) VALUES (...);          -- 业务数据
+  INSERT INTO outbox (id, type, payload, status) 
+    VALUES (xxx, &#39;OrderCreated&#39;, &#39;{...}&#39;, &#39;PENDING&#39;);  -- 待发送事件
+COMMIT;
+</code></pre><p>这一步结束后，&ldquo;订单创建&quot;和&quot;待发送事件&quot;要么同时成功，要么同时失败，因为它们是同一个数据库事务。这就彻底消灭了你问的那个纠结点：&ldquo;写数据库和发消息中间会不会掉链子&rdquo;——因为这一步根本不涉及发消息，只是在数据库里多写一行&quot;备忘录&rdquo;，纯数据库操作，事务天然保证一致。</p>
+</li>
+<li>
+<p>一个独立运行的后台程序负责向mq中发送消息，发送成功收到ack则修改本地消息表中的状态</p>
+<pre tabindex="0"><code>每隔一小段时间（比如1秒）:
+  SELECT * FROM outbox WHERE status = &#39;PENDING&#39;;
+  对每一条记录:
+    尝试发送到 MQ
+    发送成功 -&gt; UPDATE outbox SET status = &#39;SENT&#39;
+    发送失败 -&gt; 不管，下一轮循环再试一次
+</code></pre><p>因为&quot;业务数据&quot;和&quot;这条消息该发出去&quot;这个事实，已经被绑在同一个数据库事务里安全落盘了。哪怕后台程序挂了、重启了、发送失败了十次，只要 outbox 表里这条记录还是 PENDING 状态，它就一直会被后台任务捡起来重试，直到真正发送成功变成 SENT。消息&quot;丢&quot;的唯一方式是数据库事务本身没提交成功，但那种情况下业务数据也没写进去，所以不存在&quot;业务成功了但消息没了&quot;的割裂状态。</p>
+</li>
+</ol>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么数据库事务和MQ不能合并为一个事务？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MQ的网络调用耗时不适合放在事务中。如果是生产者消息那么是否消息发送和ack需要放一起呢？消息发出后如果异常回滚了，发出去的消息无法撤回；如果成功了，那么这个事务会超级耗时。如果是消费者在事务最后发送ack消息，ack丢失和ack时宕机事务没有提交就是broker重试，和不包ack是一个处理方式，没有必要。</p>
+<p>数据库和 MQ 是两个独立系统，没有统一的事务协调器，所以无法做成真正原子的&quot;一个事务&quot;。</p>
+<p>你说的&quot;事务里发消息等 ACK 再提交&quot;只是把故障窗口从&quot;写库后发消息&quot;挪到了&quot;MQ ACK 后、COMMIT 前&quot;——如果这一步宕机，消息已经被消费者看到，但数据库还没提交，照样产生数据不一致，而且消息发出去就不可撤销，没法跟着 ROLLBACK 一起撤回。同时这种写法会让数据库事务被网络调用拖长，拉低吞吐、拖累并发。</p>
+<p>所以业界的解法不是硬凑&quot;强一致事务&quot;，而是走最终一致性：</p>
+<ul>
+<li><strong>Outbox 模式</strong>（RabbitMQ 等常用）：消息先作为一条记录和业务数据同库同事务落盘，再由独立的后台任务异步轮询发送、失败重试。</li>
+<li><strong>半消息机制</strong>（RocketMQ）：Broker 层面原生支持&quot;先占位不可见，业务确认后再提交/回滚，确认丢失就回查&quot;。</li>
+</ul>
+<p>两者思路一致：先保证本地状态落盘不可丢，再异步、可重试地把消息送出去，用幂等兜住可能的重复，而不是追求发送动作本身的原子性。</p>
+</div></div>
+</details>
+
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/work/my-qa-index/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">我的QA索引</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
