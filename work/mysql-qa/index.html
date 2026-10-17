@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nMysql整体架构 Q：Mysql的整体架构是什么？\nA：Mysql的整体架构可以分成四部分：\n1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。 2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。 3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。 4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件） Q：一个事务中的sql如何执行？\n事务\nBEGIN; update accounts set balance = balance - 100 where id = 1; update accounts set balance = balance - 100 where id = 2; commit; 客户端开启事务：客户端在数据库连接中发送begin，后续的sql都属于这个事务，直到发送commit或者rollback。\nServer层处理每条sql：连接器收到sql后，教给解析器和预处理器处理（词法分析、语法分析、语法树构建、预处理），然后优化器根据sql和具体情况选择索引，指定执行计划，最后执行期调用innodb执行sql。\ninnodb存储引擎层读取和修改数据：通过索引定位数据页位置，如果数据页在bufferpool中直接读取，如果不在则从ibd中读取并加载到buffer pool中。根据具体情况加锁。修改前的数据添加到当前行的历史undo log版本链中，修改后更新对应的redo log 和 binlog。\n事务中多sql共享事务状态：事务中后执行的sql可以看见前一条sql的修改，事务提交前事务中执行的修改不会被其他事务看到。 事务提交：事务提交时，通过2PC保证redo log和binlog的事务一致性，将redo log和binlog落盘，随后释放客户端持有的锁，返回对应执行结果。 后台写回磁盘：事务提交时修改的脏页不需要立刻落盘，有redo log保证崩溃时的事务持久化，由后台线程将buffer pool中的脏页逐步刷盘。 如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。\nInnodb存储结构 ibd表空间文件 每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。\nQ：为什么需要有extent？\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nMysql整体架构 Q：Mysql的整体架构是什么？ A：Mysql的整体架构可以分成四部分：\n1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。 2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。 3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。 4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件） Q：一个事务中的sql如何执行？ A：事务\nBEGIN; update accounts set balance = balance - 100 where id = 1; update accounts set balance = balance - 100 where id = 2; commit; 客户端开启事务：客户端在数据库连接中发送begin，后续的sql都属于这个事务，直到发送commit或者rollback。\nServer层处理每条sql：连接器收到sql后，教给解析器和预处理器处理（词法分析、语法分析、语法树构建、预处理），然后优化器根据sql和具体情况选择索引，指定执行计划，最后执行期调用innodb执行sql。\ninnodb存储引擎层读取和修改数据：通过索引定位数据页位置，如果数据页在bufferpool中直接读取，如果不在则从ibd中读取并加载到buffer pool中。根据具体情况加锁。修改前的数据添加到当前行的历史undo log版本链中，修改后更新对应的redo log 和 binlog。\n事务中多sql共享事务状态：事务中后执行的sql可以看见前一条sql的修改，事务提交前事务中执行的修改不会被其他事务看到。 事务提交：事务提交时，通过2PC保证redo log和binlog的事务一致性，将redo log和binlog落盘，随后释放客户端持有的锁，返回对应执行结果。 后台写回磁盘：事务提交时修改的脏页不需要立刻落盘，有redo log保证崩溃时的事务持久化，由后台线程将buffer pool中的脏页逐步刷盘。 如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。\nInnodb存储结构 ibd表空间文件 每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。\nQ：为什么需要有extent？ A：按extent进行一次性的连续物理分配，让page连续，减少随机io，提高磁盘读写效率。\n在 InnoDB 中，最基础的读写单位是 Page（页，默认 16KB）。\n">
 <title>Mysql</title>
 
 
@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="/css/stack.css">
 <meta property='og:title' content="Mysql">
-<meta property='og:description' content="按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nMysql整体架构 Q：Mysql的整体架构是什么？\nA：Mysql的整体架构可以分成四部分：\n1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。 2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。 3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。 4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件） Q：一个事务中的sql如何执行？\n事务\nBEGIN; update accounts set balance = balance - 100 where id = 1; update accounts set balance = balance - 100 where id = 2; commit; 客户端开启事务：客户端在数据库连接中发送begin，后续的sql都属于这个事务，直到发送commit或者rollback。\nServer层处理每条sql：连接器收到sql后，教给解析器和预处理器处理（词法分析、语法分析、语法树构建、预处理），然后优化器根据sql和具体情况选择索引，指定执行计划，最后执行期调用innodb执行sql。\ninnodb存储引擎层读取和修改数据：通过索引定位数据页位置，如果数据页在bufferpool中直接读取，如果不在则从ibd中读取并加载到buffer pool中。根据具体情况加锁。修改前的数据添加到当前行的历史undo log版本链中，修改后更新对应的redo log 和 binlog。\n事务中多sql共享事务状态：事务中后执行的sql可以看见前一条sql的修改，事务提交前事务中执行的修改不会被其他事务看到。 事务提交：事务提交时，通过2PC保证redo log和binlog的事务一致性，将redo log和binlog落盘，随后释放客户端持有的锁，返回对应执行结果。 后台写回磁盘：事务提交时修改的脏页不需要立刻落盘，有redo log保证崩溃时的事务持久化，由后台线程将buffer pool中的脏页逐步刷盘。 如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。\nInnodb存储结构 ibd表空间文件 每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。\nQ：为什么需要有extent？\n">
+<meta property='og:description' content="按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nMysql整体架构 Q：Mysql的整体架构是什么？ A：Mysql的整体架构可以分成四部分：\n1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。 2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。 3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。 4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件） Q：一个事务中的sql如何执行？ A：事务\nBEGIN; update accounts set balance = balance - 100 where id = 1; update accounts set balance = balance - 100 where id = 2; commit; 客户端开启事务：客户端在数据库连接中发送begin，后续的sql都属于这个事务，直到发送commit或者rollback。\nServer层处理每条sql：连接器收到sql后，教给解析器和预处理器处理（词法分析、语法分析、语法树构建、预处理），然后优化器根据sql和具体情况选择索引，指定执行计划，最后执行期调用innodb执行sql。\ninnodb存储引擎层读取和修改数据：通过索引定位数据页位置，如果数据页在bufferpool中直接读取，如果不在则从ibd中读取并加载到buffer pool中。根据具体情况加锁。修改前的数据添加到当前行的历史undo log版本链中，修改后更新对应的redo log 和 binlog。\n事务中多sql共享事务状态：事务中后执行的sql可以看见前一条sql的修改，事务提交前事务中执行的修改不会被其他事务看到。 事务提交：事务提交时，通过2PC保证redo log和binlog的事务一致性，将redo log和binlog落盘，随后释放客户端持有的锁，返回对应执行结果。 后台写回磁盘：事务提交时修改的脏页不需要立刻落盘，有redo log保证崩溃时的事务持久化，由后台线程将buffer pool中的脏页逐步刷盘。 如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。\nInnodb存储结构 ibd表空间文件 每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。\nQ：为什么需要有extent？ A：按extent进行一次性的连续物理分配，让page连续，减少随机io，提高磁盘读写效率。\n在 InnoDB 中，最基础的读写单位是 Page（页，默认 16KB）。\n">
 <meta property='og:url' content='https://blog.aoidayo.site/work/mysql-qa/'>
 <meta property='og:site_name' content='Aoidayo'>
 <meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-06T12:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-06T12:00:00&#43;08:00'/>
 <meta name="twitter:title" content="Mysql">
-<meta name="twitter:description" content="按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nMysql整体架构 Q：Mysql的整体架构是什么？\nA：Mysql的整体架构可以分成四部分：\n1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。 2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。 3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。 4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件） Q：一个事务中的sql如何执行？\n事务\nBEGIN; update accounts set balance = balance - 100 where id = 1; update accounts set balance = balance - 100 where id = 2; commit; 客户端开启事务：客户端在数据库连接中发送begin，后续的sql都属于这个事务，直到发送commit或者rollback。\nServer层处理每条sql：连接器收到sql后，教给解析器和预处理器处理（词法分析、语法分析、语法树构建、预处理），然后优化器根据sql和具体情况选择索引，指定执行计划，最后执行期调用innodb执行sql。\ninnodb存储引擎层读取和修改数据：通过索引定位数据页位置，如果数据页在bufferpool中直接读取，如果不在则从ibd中读取并加载到buffer pool中。根据具体情况加锁。修改前的数据添加到当前行的历史undo log版本链中，修改后更新对应的redo log 和 binlog。\n事务中多sql共享事务状态：事务中后执行的sql可以看见前一条sql的修改，事务提交前事务中执行的修改不会被其他事务看到。 事务提交：事务提交时，通过2PC保证redo log和binlog的事务一致性，将redo log和binlog落盘，随后释放客户端持有的锁，返回对应执行结果。 后台写回磁盘：事务提交时修改的脏页不需要立刻落盘，有redo log保证崩溃时的事务持久化，由后台线程将buffer pool中的脏页逐步刷盘。 如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。\nInnodb存储结构 ibd表空间文件 每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。\nQ：为什么需要有extent？\n">
+<meta name="twitter:description" content="按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。\nMysql整体架构 Q：Mysql的整体架构是什么？ A：Mysql的整体架构可以分成四部分：\n1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。 2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。 3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。 4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件） Q：一个事务中的sql如何执行？ A：事务\nBEGIN; update accounts set balance = balance - 100 where id = 1; update accounts set balance = balance - 100 where id = 2; commit; 客户端开启事务：客户端在数据库连接中发送begin，后续的sql都属于这个事务，直到发送commit或者rollback。\nServer层处理每条sql：连接器收到sql后，教给解析器和预处理器处理（词法分析、语法分析、语法树构建、预处理），然后优化器根据sql和具体情况选择索引，指定执行计划，最后执行期调用innodb执行sql。\ninnodb存储引擎层读取和修改数据：通过索引定位数据页位置，如果数据页在bufferpool中直接读取，如果不在则从ibd中读取并加载到buffer pool中。根据具体情况加锁。修改前的数据添加到当前行的历史undo log版本链中，修改后更新对应的redo log 和 binlog。\n事务中多sql共享事务状态：事务中后执行的sql可以看见前一条sql的修改，事务提交前事务中执行的修改不会被其他事务看到。 事务提交：事务提交时，通过2PC保证redo log和binlog的事务一致性，将redo log和binlog落盘，随后释放客户端持有的锁，返回对应执行结果。 后台写回磁盘：事务提交时修改的脏页不需要立刻落盘，有redo log保证崩溃时的事务持久化，由后台线程将buffer pool中的脏页逐步刷盘。 如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。\nInnodb存储结构 ibd表空间文件 每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。\nQ：为什么需要有extent？ A：按extent进行一次性的连续物理分配，让page连续，减少随机io，提高磁盘读写效率。\n在 InnoDB 中，最基础的读写单位是 Page（页，默认 16KB）。\n">
     <link rel="shortcut icon" href="/img/hugo.ico" />
 
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
@@ -422,16 +422,20 @@
     
     <p>按照学习顺序来组织一下Mysql的一些八股，同时也方便以后复习的时候线性阅读，减少跳跃式阅读。</p>
 <h2 id="mysql整体架构">Mysql整体架构
-</h2><p><strong>Q：Mysql的整体架构是什么？</strong></p>
-<p>A：Mysql的整体架构可以分成四部分：</p>
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Mysql的整体架构是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Mysql的整体架构可以分成四部分：</p>
 <ul>
 <li>1、客户端，负责与SQL Server建立连接，例如JDBC、MysqlShell。</li>
 <li>2、Mysql Server，负责连接管理（连接器），解析与预处理（词法分析、语法分析、语法树构建、预处理），优化器根据SQL 索引 表情况 生成执行计划，执行器根据执行计划执行sql并获得返回，响应给客户端。Server层协调binlog对数据进行归档、主从复制。</li>
 <li>3、Innodb 存储引擎层，负责真正的数据读写、事务、并发。包括buffer pool(缓存undo log、数据页、索引页、锁），redo log buffer，double write buffer。</li>
 <li>4、磁盘：最后所有数据都会落在磁盘中。（ibd表空间文件、binlog增量文件、redolog循环写文件、undolog表空间文件）</li>
-</ul>
-<p><strong>Q：一个事务中的sql如何执行？</strong></p>
-<p>事务</p>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>一个事务中的sql如何执行？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>事务</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">BEGIN</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">update</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">update</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">
@@ -453,45 +457,67 @@
 </li>
 </ul>
 <p>如果中途执行了rollback或者事务失败，innodb会使用undo log撤销已经完成的修改。</p>
+</div></div>
+</details>
+
 <h2 id="innodb存储结构">Innodb存储结构
 </h2><h3 id="ibd表空间文件">ibd表空间文件
 </h3><p>每个表对应一个表空间文件ibd，ibd中的基本读写缓存单位是page，基本物理分配单位是extent，由segment分别管理不同类型的extent。</p>
-<p><strong>Q：为什么需要有extent？</strong></p>
-<p>A：按extent进行一次性的连续物理分配，让page连续，减少随机io，提高磁盘读写效率。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要有extent？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>按extent进行一次性的连续物理分配，让page连续，减少随机io，提高磁盘读写效率。</p>
 <p>在 InnoDB 中，最基础的读写单位是 Page（页，默认 16KB）。</p>
 <ul>
 <li>问题：如果数据库每次需要空间都只向操作系统申请 1 个 Page，即使 B+ 树叶子节点在逻辑上是用双向链表串联的，这些 Page 在磁盘上的物理位置可能散落在天南海北。当执行 <code>SELECT * FROM t WHERE id BETWEEN 1 AND 10000;</code> 进行范围扫描时，磁头就需要来回寻道，产生大量的随机 I/O。</li>
 <li>解决方法：InnoDB 决定“批发空间”——一次性在磁盘上划出 连续的 64 个 Page（$64 \times 16\text{ KB} = 1\text{ MB}$），这就是 Extent（区）。</li>
 <li>收益：属于同一个 Extent 的页，在物理磁盘块上是严格相邻的。执行顺序扫描时，InnoDB 可以直接触发预读机制（Read-Ahead），将连续的一整块 Extent 刷入内存缓冲区，将随机 I/O 转化为高效的顺序 I/O。</li>
 </ul>
-<p><strong>Q：为什么需要有段？</strong></p>
-<p>A：隔离不同类型的数据，防止物理混杂，保障范围扫描时的顺序 I/O 性能。若只有区（Extent）：B+ 树的叶子节点（数据页）与非叶子节点（索引页）会混在同一个 Extent 中。当执行范围扫描时，连续读取会被夹杂的索引页频繁打断，导致磁盘预读失效，顺序 I/O 退化。引入段（Segment）：一棵 B+ 树被严格拆分为数据段（叶子节点）与索引段（非叶子节点）。每个段各自申请并独占独立的 Extent，确保数据段内部的所有页都是纯粹的数据页。</p>
-<p><strong>Q：ibd的磁盘文件视角</strong></p>
-<p>A：一个 .ibd 文件在物理上就是由编号为 Extent 0、Extent 1、Extent 2、Extent 3……这样一个个 1MB 的物理块依次追加而成的。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要有段？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">隔离不同类型的数据，防止物理混杂，保障范围扫描时的顺序 I/O 性能。若只有区（Extent）：B+ 树的叶子节点（数据页）与非叶子节点（索引页）会混在同一个 Extent 中。当执行范围扫描时，连续读取会被夹杂的索引页频繁打断，导致磁盘预读失效，顺序 I/O 退化。引入段（Segment）：一棵 B+ 树被严格拆分为数据段（叶子节点）与索引段（非叶子节点）。每个段各自申请并独占独立的 Extent，确保数据段内部的所有页都是纯粹的数据页。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>ibd的磁盘文件视角</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>一个 .ibd 文件在物理上就是由编号为 Extent 0、Extent 1、Extent 2、Extent 3……这样一个个 1MB 的物理块依次追加而成的。</p>
 <p>Segment 不是磁盘上的连续大文件块，本质保存在特定的 INODE Page 中的数据段、索引段、回滚段的set，每个段中保存对应类型的extent。</p>
 <ul>
 <li>数据段里记录：“Extent 1、Extent 2、Extent 5 是归我使用的”。</li>
 <li>索引段里记录着：“Extent 3 是归我使用的”。</li>
 </ul>
 <p>这些 Extent 在物理文件上不必相邻，只要段内部分配给叶子节点的各个 Extent 内部的 64 个页是连续的数据页，扫描时就能享受局部顺序 I/O 的红利。</p>
-<p><strong>Q：为什么mysql的页大小是16KB，和os的页大小不一致？</strong></p>
-<p>A：常见的pgsql的页大小是8kb，mysql是16kb，更大的page size可以增加索引页的扇出，但也可能会带入无用数据，这是数据库内部对存储和缓存粒度的权衡。os页大小是虚拟内存管理的粒度，不是磁盘io时一定按页大小分割。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么mysql的页大小是16KB，和os的页大小不一致？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>常见的pgsql的页大小是8kb，mysql是16kb，更大的page size可以增加索引页的扇出，但也可能会带入无用数据，这是数据库内部对存储和缓存粒度的权衡。os页大小是虚拟内存管理的粒度，不是磁盘io时一定按页大小分割。</p>
 <p>Linux常见的内存页是4KB,而InnoDB默认是16 KB,但它们并不需要一样。操作系统的页主要用于虚拟内存管理,而数据库页是数据库自己管理磁盘和缓存的基本单位。等于说一个16 KB 的InnoDB 页在内存里可能跨越四个4 KB的OS页框,但读磁盘时数据库是按自己的页大小组织 I/O 的,不是被4 KB硬切。页大小的选择更多是折中,页大可以减少B+树的高度、提高顺序读的局部性,但也会带来单次读写的数据更多、可能有更多无用数据被带入。所以MySQL选16 KB更多是数据库内部的权衡,而不是要去跟操作系统页对齐。两者属于不同抽象层,不需要强求一致。</p>
 <p>InnoDB要把一个16KB的页读进Buffer Pool时,完全可以发起一次16KB的I/O请求。Linux会把这16KB的内存区域映射到多个4KB的物理内存页框,但这是内存管理的粒度,不是I/O次数被强制拆分。所以更准确的说法是:OS页大小决定的是虚拟内存的管理粒度,而InnoDB页大小决定数据库自己的存储和缓存粒度,两者不需要也通常不会相同。把“OS页大小直接等同于磁盘I/O次数”其实是不准确的。</p>
+</div></div>
+</details>
+
 <h3 id="b树">B+树
 </h3><p>innodb中的ibd表通过b+树组织：</p>
 <ul>
 <li>聚簇索引树的叶子节点中存放主键索引和完整行数据。</li>
 <li>普通索引树的叶子节点中存放索引和主键。</li>
 </ul>
-<p><strong>Q：为什么使用b+树，而不是使用AVL、红黑树或者B树？</strong></p>
-<p>A：b+树的非叶子节点中只存放索引，扇出高，叶子节点中只存放数据，相邻叶子节点使用双向链表组织，范围查询和排序效率高。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么使用b+树，而不是使用AVL、红黑树或者B树？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>b+树的非叶子节点中只存放索引，扇出高，叶子节点中只存放数据，相邻叶子节点使用双向链表组织，范围查询和排序效率高。</p>
 <p>AVL或者红黑树适合内存中使用，树更高，如果放在磁盘中会需要更多的磁盘io。</p>
 <p>B树的非叶子节点中也存放数据，扇出比b+树更小；数据分散在各个节点中，单点查询、范围查询以及插入删除效率较B+树更低；磁盘io次数更多。</p>
+</div></div>
+</details>
+
 <h3 id="一行记录">一行记录
-</h3><p><strong>Q：一行记录的存储格式？</strong></p>
-<p>A：</p>
-<p>一行记录：<code>(记录元信息 | 记录额外信息 | 字段1 |字段2 | 字段3 | ...)</code></p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>一行记录的存储格式？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>一行记录：<code>(记录元信息 | 记录额外信息 | 字段1 |字段2 | 字段3 | ...)</code></p>
 <ul>
 <li>
 <p>记录元信息：变长字段列表、null值列表、delete-mark删除标记、next-record、record-type。</p>
@@ -504,6 +530,9 @@
 <p>记录额外信息：row-id，trx-id, roll-ptr。</p>
 </li>
 </ul>
+</div></div>
+</details>
+
 <h2 id="索引">索引
 </h2><div class="table-wrapper"><table>
 	<thead>
@@ -541,10 +570,14 @@
 			</tr>
 	</tbody>
 </table></div>
-<p><strong>Q: 使用ddl sql定义或添加索引？查看指定表的索引？</strong></p>
-<p>A：参考((20261013091359-pgw53nn &lsquo;索引建立&rsquo;))</p>
-<p><strong>Q：什么是聚簇索引，什么是二级索引？聚簇索引和二级索引的区别？什么是回表？</strong></p>
-<p>A：聚簇索引指用于建立表空间主B+树的索引，一般的如果指定PRIMARY KEY则pk作为聚簇索引列，如果没有则查找是否表字段中有unique not null列，有则作为聚簇索引，没有则默认使用记录隐藏列中的row-id建立聚簇索引B+树。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>使用ddl sql定义或添加索引？查看指定表的索引？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">参考((20261013091359-pgw53nn &lsquo;索引建立&rsquo;))</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是聚簇索引，什么是二级索引？聚簇索引和二级索引的区别？什么是回表？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>聚簇索引指用于建立表空间主B+树的索引，一般的如果指定PRIMARY KEY则pk作为聚簇索引列，如果没有则查找是否表字段中有unique not null列，有则作为聚簇索引，没有则默认使用记录隐藏列中的row-id建立聚簇索引B+树。</p>
 <p>二级索引指非聚簇索引的index、key。和聚簇索引的区别在于：</p>
 <ol>
 <li>可以不是unique not null，不限制唯一键</li>
@@ -556,18 +589,25 @@
 <li><code>select * from demo_users where id = 1;</code> innodb在聚簇索引树中定位到id=1位置的数据后，直接返回。</li>
 <li><code>select * from demo_users where name = 'aoi';</code> innodb在二级索引树中定位到name=aoi后也得到聚簇索引值，为得到完整数据，需要回表从聚簇索引树中取完整值并返回。</li>
 </ul>
+</div></div>
+</details>
+
 <h3 id="explain">explain
-</h3><p><strong>Q：explain一般在看什么？</strong></p>
-<p>A：explain参考 ((20260923105532-aminnmp &ldquo;如何造数据测试explain？&rdquo;))。主要看type和extra，当type标注使用了索引之后，可以看keys，possible keys，key_len具体索引。接着就是看预估扫描行数rows和索引条件后的过滤比例filtered。</p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>explain一般在看什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>explain参考 ((20260923105532-aminnmp &ldquo;如何造数据测试explain？&rdquo;))。主要看type和extra，当type标注使用了索引之后，可以看keys，possible keys，key_len具体索引。接着就是看预估扫描行数rows和索引条件后的过滤比例filtered。</p>
 <p>rows是预估扫描的行数，filtered = 走完索引条件后，剩下的行还能通过全部条件留下来的比例（百分比估算值）。结合rows * filtered 才接近实际返回的行数。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 假设 demo_orders 有 idx_user_id
 </span></span></span><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">demo_orders</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- status = 2 / 索引过滤后的行数 = 命中比例
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- filtered 就反映 status = 2 大概能留下多少比例，比如 20.00 表示预估只有 20% 的候选行能通过。
-</span></span></span></code></pre></div><p><strong>Q：explain的type？</strong></p>
-<p>A：</p>
-<div class="table-wrapper"><table>
+</span></span></span></code></pre></div></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>explain的type？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><div class="table-wrapper"><table>
 	<thead>
 			<tr>
 					<th></th>
@@ -635,9 +675,12 @@
 </span></span></span></code></pre></div><p><code>const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL</code>越靠左越好；<code>range</code> 以上基本算“用上了索引”，<code>index</code>/<code>ALL</code> 属于大范围扫描，数据量大时要警惕。</p>
 <p><code>EXPLAIN</code> 里的 <code>key</code> 列是“实际用了哪个索引”，<code>possible_keys</code> 是“可选索引”。</p>
 <p>想看更详细的可以加 <code>EXPLAIN FORMAT=JSON</code> ，想看实际执行的计划可以使用<code>EXPLAIN ANALYZE</code> （MySQL 8.0.18+）。</p>
-<p><strong>Q：explain的extra？</strong></p>
-<p>A：</p>
-<div class="table-wrapper"><table>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>explain的extra？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><div class="table-wrapper"><table>
 	<thead>
 			<tr>
 					<th>extra</th>
@@ -673,16 +716,28 @@
 			</tr>
 	</tbody>
 </table></div>
-<p><strong>Q：什么是索引下推？</strong></p>
-<p>A：索引下推 ICP，index condition pushdown。将部分由server层完成的where过滤，下推至innodb层中完成。主要针对联合索引的范围查询问题，提前过滤减少回表次数。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是索引下推？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>索引下推 ICP，index condition pushdown。将部分由server层完成的where过滤，下推至innodb层中完成。主要针对联合索引的范围查询问题，提前过滤减少回表次数。</p>
 <p>比如<code>select * from t_test where a&gt;1 and b=3</code>，无icp，当在联合索引树中查出所有a&gt;1的后回表给聚簇索引树，最后返回给server层，server层通过<code>b=3</code>条件过滤后返回给client。其中回表了<code>a&gt;1</code>匹配次。</p>
 <p>如果有icp，那么在联合索引树中得到<code>a&gt;1</code>的记录后，应用icp，同时过滤出<code>b=3</code>的再回表给聚簇索引树，取出完整记录后返回给server层。其中回表的次数只有<code>a&gt;1 and b=3</code>匹配次。</p>
-<p><strong>Q：什么是覆盖索引？</strong></p>
-<p>A：不需要回表，直接在索引树中拿到需要的数据。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是覆盖索引？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>不需要回表，直接在索引树中拿到需要的数据。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- index(name)
 </span></span></span><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">t_test</span><span class="p">;</span><span class="w"> 
-</span></span></span></code></pre></div><p><strong>Q：什么是filesort文件排序？</strong></p>
-<p>A：当<code>select ... order by</code>的时候没有可复用的索引树，需要在mysqld内存的sort buffer中进行排序，如果是在量太大，则在磁盘临时文件中排序后返回。</p>
+</span></span></span></code></pre></div></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是filesort文件排序？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>当<code>select ... order by</code>的时候没有可复用的索引树，需要在mysqld内存的sort buffer中进行排序，如果是在量太大，则在磁盘临时文件中排序后返回。</p>
 <p>Mysql无法利用索引树直接得到有序结果时，额外做的一次排序。但是这个排序不一定真的需要走磁盘，很多时候都是在内存中排序，具体取决于数据量和sort_buffer_size的配置。</p>
 <p>具体的，在没有可用的有序索引时，Mysql</p>
 <ul>
@@ -690,18 +745,26 @@
 <li>2、在内存/磁盘的临时文件中，对这些数据按条件排序</li>
 <li>3、最后返回给客户端。</li>
 </ul>
+</div></div>
+</details>
+
 <h3 id="联合索引">联合索引
-</h3><p><strong>Q：联合索引B+树长什么样？有序范围是什么？什么是最左匹配查询？联合索引查询不生效的情况？</strong></p>
-<p>A：联合索引B+树也是普通的B+树，由<code>(a, b)</code>作为主键的索引树，a在整棵树中有序，b在相同的a中有序。</p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>联合索引B+树长什么样？有序范围是什么？什么是最左匹配查询？联合索引查询不生效的情况？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>联合索引B+树也是普通的B+树，由<code>(a, b)</code>作为主键的索引树，a在整棵树中有序，b在相同的a中有序。</p>
 <p>最左匹配查询：也就是联合索引生效的情况，不使用范围查询，且where条件从左到右使用联合索引中的字段<code>a or b</code>。</p>
 <p>联合索引查询不生效的情况：</p>
 <ul>
 <li>联合索引abc，只有范围查询列和左侧列可以使用联合索引，<code>select * from t_test where a=1 and b&gt;2 and c=3</code>，explain后可以发现<code>key=idx_a_b_c</code>，但是<code>key_len=8</code>，实际只使用了a和b两个字段。</li>
 <li>不按从走到右的顺序查询，比如<code>select * from t_test where b=1 and a =2</code>。</li>
 </ul>
+</div></div>
+</details>
+
 <h3 id="索引优化失效">索引优化/失效
-</h3><p><strong>Q：索引优化的几种方法？</strong></p>
-<p>A：索引优化的两个方向：1、优化索引空间占用，增大扇出提高索引效率。2、优化sql执行速度。</p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>索引优化的几种方法？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>索引优化的两个方向：1、优化索引空间占用，增大扇出提高索引效率。2、优化sql执行速度。</p>
 <ul>
 <li>
 <p>覆盖索引</p>
@@ -725,26 +788,40 @@
 <p>避免索引失效。</p>
 </li>
 </ul>
-<p><strong>Q：索引失效的几种情况？</strong></p>
-<p>A：</p>
-<ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>索引失效的几种情况？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ul>
 <li>索引的非最左匹配查询。</li>
 <li>索引使用函数</li>
 <li>索引使用表达式计算。</li>
 <li>索引使用了隐式类型转换（触发string字段与int值的比较，string字段隐式转换为int，不可转默认0）</li>
 </ul>
-<p><strong>Q：什么是雪花id算法？</strong></p>
-<p>A：64 位、分布式生成、趋势递增。生成算法依赖于机器标识和系统时钟。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>什么是雪花id算法？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>64 位、分布式生成、趋势递增。生成算法依赖于机器标识和系统时钟。</p>
 <p>雪花算法通常生成一个 64 位整数，经典结构如下：</p>
 <pre tabindex="0"><code> 1 位符号位 | 41 位时间戳 | 10 位机器标识 | 12 位序列号
       0     |  当前毫秒数  | 数据中心和节点 | 毫秒内递增序号
 </code></pre><p>生成 ID 时，服务先计算当前时间与自定义起始时间的毫秒差，再写入机器标识；同一节点在同一毫秒内生成的 ID，则通过递增序列号区分。各部分按位左移并组合成最终整数。</p>
 <p>经典结构可以支持约 69 年、1024 个节点，并允许单个节点每毫秒生成 4096 个 ID。它不依赖数据库，生成结果全局唯一且趋势递增，适合分布式系统；但需要保证机器标识不重复，并处理服务器时钟回拨问题。实际项目也可以根据节点数量和并发量调整各部分的位数。</p>
+</div></div>
+</details>
+
 <h2 id="事务">事务
-</h2><p><strong>Q：为什么需要事务？</strong></p>
-<p>A：如果没有事务，失败的sql需要手动回滚，对数据库的并发修改可能会导致一个账号存款多扣/少扣。</p>
-<p><strong>Q：事务有哪些特性？</strong></p>
-<p>A：ACID</p>
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要事务？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">如果没有事务，失败的sql需要手动回滚，对数据库的并发修改可能会导致一个账号存款多扣/少扣。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>事务有哪些特性？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>ACID</p>
 <ul>
 <li>
 <p>Atomic 原子性，由MVCC版本链实现，事务失败后回滚事务中已修改的数据。</p>
@@ -763,8 +840,12 @@
 <p>Druable 持久型，由redo log保证数据落盘。</p>
 </li>
 </ul>
-<p><strong>Q：并行事务有哪些问题？</strong></p>
-<p>A：脏读（读未提交），不可重复读，幻读。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>并行事务有哪些问题？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>脏读（读未提交），不可重复读，幻读。</p>
 <ul>
 <li>
 <p>脏读：A事务读到B事务未提交的数据。</p>
@@ -779,43 +860,74 @@
 <p>幻读：事务前后读取的数据数量不一致。</p>
 </li>
 </ul>
-<p><strong>Q：事务隔离级别？分别解决了哪些问题？</strong></p>
-<p>A：读未提交，读提交，可重复读，串行化。RU、RC、RR、Serial。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>事务隔离级别？分别解决了哪些问题？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>读未提交，读提交，可重复读，串行化。RU、RC、RR、Serial。</p>
 <p>读提交解决脏读问题；可重复读解决不可重复读问题和大部分幻读问题；串行化解决了幻读问题。</p>
-<p><strong>Q：事务隔离级别分别是怎么实现的？</strong></p>
-<p>A：</p>
-<ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>事务隔离级别分别是怎么实现的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ul>
 <li>读未提交：不需要做事务管理，啥都不做就是读未提交。</li>
 <li>读提交：在事务开始时创建readview，事务中的每个sql执行前创建readview，避免没有读取到已提交事务的修改。</li>
 <li>可重复读：在事务开始时创建readview，之后所有sql都只能通过mvcc版本链访问事务创建时readview中记录的已提交事务对应的数据，活跃未提交和之后创建的事务对应的修改数据都不能访问，需要沿mvcc版本链向下读取。</li>
 <li>串行化：每次事务开始时加锁，提交或回滚时释放锁，严格串行化，解决幻读问题。</li>
 </ul>
-<p><strong>Q：ReadView是什么？MVCC版本链是什么？</strong></p>
-<p>A：ReadView是事务开始某个时刻后，对当前活跃事务的一份<u>mysqld进程内内存快照</u>。只有已经提交的事务修改的数据才能访问。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>ReadView是什么？MVCC版本链是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>ReadView是事务开始某个时刻后，对当前活跃事务的一份<u>mysqld进程内内存快照</u>。只有已经提交的事务修改的数据才能访问。</p>
 <p>MVCC版本链指的是通过记录隐藏列中的<code>trx_id</code>和<code>roll_ptr</code>维护的表记录版本链，roll_ptr指向undo表回滚段中的历史记录，trx_id表示当前记录是那个事务修改的。</p>
-<p><strong>Q：MVCC是什么？</strong></p>
-<p>A：MVCC Multi Version Concurrent Control 多版本并发控制。MVCC解决普通查询如何无锁读取一致版本的数据。</p>
-<p><strong>Q：读提交如何实现的？</strong></p>
-<p>A：事务中每次sql执行前创建一次readview，此时每次读sql之前都能获取到当前所有提交的事务并访问。</p>
-<p><strong>Q：可重复读如何实现的？</strong></p>
-<p>A：事务开始时创建readview，后续的所有读sql都只能读取事务开始时创建的readview中已提交事务修改过的数据。</p>
-<p><strong>Q：可重复读如何解决大部分幻读问题？</strong></p>
-<p>A：不太复杂的并发场景下，可以解决一部分幻读问题，比如：</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>MVCC是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MVCC Multi Version Concurrent Control 多版本并发控制。MVCC解决普通查询如何无锁读取一致版本的数据。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>读提交如何实现的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">事务中每次sql执行前创建一次readview，此时每次读sql之前都能获取到当前所有提交的事务并访问。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>可重复读如何实现的？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">事务开始时创建readview，后续的所有读sql都只能读取事务开始时创建的readview中已提交事务修改过的数据。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>可重复读如何解决大部分幻读问题？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>不太复杂的并发场景下，可以解决一部分幻读问题，比如：</p>
 <ul>
 <li>A事务（trx_id = 51)中执行多次快照读，即使中间B事务（trx_id = 52)修改，快照读得到的数据量都是相同的：即使中间B事务修改提交，因为提交的数据trx_id&gt;A事务id，所以A事务无法访问，所以多次快照读得到的数据量相同。</li>
 <li>A事务（trx_id=51)开启时后续可能多次select的当前读，使用next-key lock锁住后续可能需要重新读取的数据行，其他事务无法修改。后续再多次<code>select for update</code>得到的都是相同的数据量。</li>
-</ul>
-<p><strong>Q：为什么说可重复读只解决了大部分的幻读问题，还有哪些问题没有解决？</strong></p>
-<p>A：存在几种比较复杂的情况，可重复读不能解决所有幻读问题。</p>
+</ul></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么说可重复读只解决了大部分的幻读问题，还有哪些问题没有解决？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>存在几种比较复杂的情况，可重复读不能解决所有幻读问题。</p>
 <ul>
 <li>A事务（trx_id=51）t1 执行快照读，数量是50；B事务（trx_id=52）t2 向 t1 快照读的范围内insert一条数据，这个数据的 trx_id = 52，A事务无法访问；A事务 t3 执行快照读，数量依旧是50；A事务 t4 修改这条 在事务开启时本不存在的 数据，此时数据的trx_id = 51；A事务t4 执行快照读，数量变为 51，<u>出现幻读。</u></li>
 <li>A事务（trx_id=51）t1 执行快照读，数量是50；B 事务 （trx_id=52）t2 向 t1 快照读的范围内insert一条数据，这个数据的 trx_id = 52，A事务无法访问；A事务 t3 执行当前读，此时当前读得到的数据数量是 51, <u>出现幻读。</u></li>
 </ul>
 <p>第一种是「快照读，别人insert，自己修改后再快照读」的幻读问题，第二种是「（别人修改）快照读（or 别人修改） 切 当前读」的幻读问题。</p>
+</div></div>
+</details>
+
 <h2 id="锁">锁
 </h2><p>MVCC 主要解决普通查询如何无锁读取一致版本，无法单独处理并发修改，因此还需要锁。</p>
-<p><strong>Q：表锁有哪些？</strong></p>
-<ul>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>表锁有哪些？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ul>
 <li>
 <p>表锁：有X排它锁和S共享锁两种，性能最差。X表锁、S表锁。</p>
 </li>
@@ -840,8 +952,12 @@
 </ul>
 </li>
 </ul>
-<p><strong>Q：行锁有哪些？</strong></p>
-<ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>行锁有哪些？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ul>
 <li>
 <p>record lock 行级锁：锁住某条索引记录，具体是否阻塞其他事务取决于共享锁或排他锁模式。InnoDB 的行锁实际加在索引上，查询扫描的索引记录越多，锁定的范围也可能越大。</p>
 <ul>
@@ -867,26 +983,44 @@
 <p>插入意向锁：当插入指定位置时发现有gap lock锁着，插入意向锁进入等待状态，等待该位置的gap lock释放。gap lock释放后，插入意向锁上锁成功，后续开始插入，插入完成后再加上记录独占锁，直到事务完成。</p>
 </li>
 </ul>
-<p><strong>Q：sql执行时加的锁？</strong></p>
-<ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>sql执行时加的锁？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ul>
 <li>select for update加行锁时，innodb内部是什么样的？</li>
 <li>插入一行的时候加了哪些锁</li>
 <li>不同类型sql自动添加的锁</li>
 </ul>
-<p>参考 onenote。</p>
-<p><strong>Q：死锁是什么？</strong></p>
-<p>A：事务A和事务B互相等待对方持有的锁释放，循环等待，形成死锁。</p>
+<p>参考 onenote。</p></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>死锁是什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>事务A和事务B互相等待对方持有的锁释放，循环等待，形成死锁。</p>
 <p>举个例子1：事务A和事务B都持有了id=5~10的gap lock，接下来事务A和B分别需要插入id=6和id=8的记录，此时因为对方持有的gap lock所以无法加插入意向锁，形成循环等待。</p>
 <p>举个例子2：事务 A 持有记录 1 的锁并等待记录 2，事务 B 持有记录 2 的锁并等待记录 1，两个事务都无法继续执行。</p>
-<p><strong>Q：如何处理死锁？</strong></p>
-<p>A：InnoDB 检测到死锁后，通常会选择回滚代价较小的事务并释放其持有的锁，让其他事务继续执行。业务程序需要捕获死锁错误，并对被回滚的事务进行有限次数的重试。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>如何处理死锁？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>InnoDB 检测到死锁后，通常会选择回滚代价较小的事务并释放其持有的锁，让其他事务继续执行。业务程序需要捕获死锁错误，并对被回滚的事务进行有限次数的重试。</p>
 <p>减少死锁的常见方法包括：让不同事务按照相同顺序获取锁、缩短事务执行时间、使用合适的索引减少锁定范围，以及避免在一个事务中一次修改过多数据。</p>
 <p><strong>为什么按照相同顺序获取锁可以避免死锁？</strong> 死锁的关键条件是形成循环等待：事务 A 等待事务 B，事务 B 又等待事务 A。如果所有事务都按照主键从小到大的顺序获取锁，后来的事务只会等待前面的事务，等待关系是一条直线，无法形成环。反之，如果两个事务按照相反顺序获取锁，就可能各自持有一部分锁并等待对方，最终形成死锁。</p>
-<p><strong>Q：死锁如何排查，如何避免？</strong></p>
-<p>A：排查可以使用 <code>SHOW ENGINE INNODB STATUS</code>，查看 <code>LATEST DETECTED DEADLOCK</code> 部分，其中会记录双方正在执行的 SQL、各自持有和等待的锁。避免死锁重点关注三件事：批量更新前按主键排序，保证所有事务按照相同顺序获取锁；将 RPC 等耗时操作移出事务，缩短持锁时间；唯一键插入冲突场景在业务语义适合时，可以使用 <code>ON DUPLICATE KEY UPDATE</code> 减少先查询再写入产生的竞态，但它不能彻底避免死锁。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>死锁如何排查，如何避免？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">排查可以使用 <code>SHOW ENGINE INNODB STATUS</code>，查看 <code>LATEST DETECTED DEADLOCK</code> 部分，其中会记录双方正在执行的 SQL、各自持有和等待的锁。避免死锁重点关注三件事：批量更新前按主键排序，保证所有事务按照相同顺序获取锁；将 RPC 等耗时操作移出事务，缩短持锁时间；唯一键插入冲突场景在业务语义适合时，可以使用 <code>ON DUPLICATE KEY UPDATE</code> 减少先查询再写入产生的竞态，但它不能彻底避免死锁。</div></div>
+</details>
+
 <h2 id="mysql日志">Mysql日志
-</h2><p><strong>Q：一个DML update的事务过程中，记录undo log、binlog、redolog的流程？哪个地方体现WAL、2PC。</strong></p>
-<p>A：分为事务执行时、事务提交时和事务提交后三个阶段。这里的binlog 和 redolog的持久化策略都是提交后就fsync。</p>
+</h2><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>一个DML update的事务过程中，记录undo log、binlog、redolog的流程？哪个地方体现WAL、2PC。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>分为事务执行时、事务提交时和事务提交后三个阶段。这里的binlog 和 redolog的持久化策略都是提交后就fsync。</p>
 <p>事务执行时：现在buffer pool中定位需要修改的数据页，生成undolog并记录回滚信息（生成undolog，也就是写入undo recrod写入到undo page页，并生成redo log record到redo log buffer中），修改buffer pool中的数据页，并生成redo log。在事务执行时，binlog event也对应写入 binlog Cache中。</p>
 <p>事务提交时：分三个阶段 Prepare，binlog写入，Commit。</p>
 <ul>
@@ -902,24 +1036,42 @@
 <p>（2）如果在2PC的binlog写入后宕机，通过redo log恢复后的事务状态 比 binlog中记录的少，发现binlog中有完整事务，但是redolog中对应的是prepare，这里会将redolog的commit状态补上。</p>
 <p>（3）如果在2PC的commit时宕机，redolog中残留部分prepare状态和commit状态，对照binlog中的事务状态进行恢复。</p>
 <p>（4）在2PC的commit后宕机，此时redolog和binlog都已经落盘，恢复时也是一致的事务状态。</p>
+</div></div>
+</details>
+
 <h3 id="undo-log">undo log
-</h3><p><strong>Q：undo log执行流程？</strong></p>
-<p>A：事务开始，执行事务，修改数据前向buffer pool中写入undo log，由后台线程负责落盘，redolog保证持久化。</p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>undo log执行流程？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>事务开始，执行事务，修改数据前向buffer pool中写入undo log，由后台线程负责落盘，redolog保证持久化。</p>
 <p>undo log 实现事务的原子性（失败回滚）和隔离型（MVCC创建readview后只能看见事务开始时已提交事务的修改）</p>
-<p><strong>Q：undo log存储？</strong></p>
-<p>A：undo log 是存在表空间文件<code>undo_001, undo_002</code>中的，和redo log和binlog这种顺序写 增量写的文件不同。</p>
-<p><strong>Q：undo log版本链？什么作用？</strong></p>
-<p>A：行纪录的记录头有三个属性「row_id，trx_id，roll_ptr」，roll_ptr指向前一个undo log，undo log中使用<code>(trx_id, roll_ptr, 本行值)</code>来串联undo log版本链（实际的存储更复杂，可以这么简单理解）。通过undo log版本链实现事务的原子性、隔离型。</p>
-<p><strong>Q：undo log对update 和 delete sql的特殊处理？</strong></p>
-<p>A：update主键列的分别维护两个不同id的两条undo log，update常规列的正常插入undo log并写入记录；delete插入undo log链后标记记录额外信息中的delete-mark为删除，然后等待没有活跃readview依赖这个undo log时彻底删除。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>undo log存储？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">undo log 是存在表空间文件<code>undo_001, undo_002</code>中的，和redo log和binlog这种顺序写 增量写的文件不同。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>undo log版本链？什么作用？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">行纪录的记录头有三个属性「row_id，trx_id，roll_ptr」，roll_ptr指向前一个undo log，undo log中使用<code>(trx_id, roll_ptr, 本行值)</code>来串联undo log版本链（实际的存储更复杂，可以这么简单理解）。通过undo log版本链实现事务的原子性、隔离型。</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>undo log对update 和 delete sql的特殊处理？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>update主键列的分别维护两个不同id的两条undo log，update常规列的正常插入undo log并写入记录；delete插入undo log链后标记记录额外信息中的delete-mark为删除，然后等待没有活跃readview依赖这个undo log时彻底删除。</p>
 <p>对于delete sql：删除时将这条记录的额外信息中的delete-mark标记为删除，生成undo log并修改聚簇索引B+树中这条记录对应的undo log链。这条聚簇索引树中的记录在没有活跃ReadView依赖时，由purge线程清理。</p>
 <p>对于update sql：区分修改的值是否属于主键列：</p>
 <ul>
 <li>不是主键列，生成undo log并写入记录，然后修改聚簇索引树中对应值。</li>
 <li>是主键列，先向这条旧id 对应的undo log链中插入新生成的undo log，然后标记这行删除，等待没有活跃readview依赖时由purge线程清理，；然后插入一条trx-id为当前事务的新记录，对应的是一条全新的undo log链（空）。</li>
 </ul>
-<p><strong>Q：undo log什么时候可以被清理？</strong></p>
-<p>A：指定undo log不再被活跃的readview依赖时，后台purge线程就会判断并清理。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>undo log什么时候可以被清理？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>指定undo log不再被活跃的readview依赖时，后台purge线程就会判断并清理。</p>
 <p>在RR模式下，每次事务开启都只创建一次readview，readview中包含(trx_id, m_ids, min_trx_id, max_trx_id)</p>
 <ul>
 <li>trx_id: 当前事务id</li>
@@ -936,18 +1088,30 @@
 <ul>
 <li>A事务提交后，此时可以清理ABCD四个事务的undo log，此时ABCD的undo log的版本 &lt; E事务的trx_id。</li>
 </ul>
+</div></div>
+</details>
+
 <h3 id="redo-log">redo log
-</h3><p><strong>Q：为什么需要redo log？</strong></p>
-<p>A：没有redolog时脏页为落盘就宕机时会丢失数据；通过wal写redo log，宕机后恢复对应数据，保证持久性。</p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>为什么需要redo log？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>没有redolog时脏页为落盘就宕机时会丢失数据；通过wal写redo log，宕机后恢复对应数据，保证持久性。</p>
 <p>innodb存储引擎层 事务提交后 数据、索引、undolog 写入buffer pool的脏页，如果此时宕机，重启后无法恢复这部分脏页导致数据丢失。</p>
 <p>添加redo log，在事务最终提交时写入redo record 到redo log buffer，按刷盘策略进行redolog的持久化，在宕机后通过redo log可以恢复这部分脏页数据。</p>
 <p>redolog实现ACID的持久性Consistency。</p>
-<p><strong>Q：redolog的磁盘存储、文件组织，文件内容？</strong></p>
-<p>A：redolog在磁盘中通过LSN 逻辑长序号组织文件，顺序读写，循环写。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>redolog的磁盘存储、文件组织，文件内容？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>redolog在磁盘中通过LSN 逻辑长序号组织文件，顺序读写，循环写。</p>
 <p>磁盘存储：在磁盘中 mysql8.0.30之前使用ib logfile0和1交替循环读写，mysql8.0.30之后默认redolog size=100MB，通过32个3.125mb的<code>ib_redoN</code>进行组织。</p>
 <p>文件内容：redolog顺序读写，每个redolog record记录<code>(表ibd，数据页X，offset位置Y，修改Z)</code>。</p>
-<p><strong>Q：redolog何时写入？何时清理？</strong></p>
-<p>A：事务执行过程中脏页写入后，向redolog buffer写入redo log record；脏页落盘后 清理旧的redolog文件。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>redolog何时写入？何时清理？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>事务执行过程中脏页写入后，向redolog buffer写入redo log record；脏页落盘后 清理旧的redolog文件。</p>
 <p>何时写入：分成写入redolog buffer，以及2PC阶段刷盘到redlog file中。</p>
 <ul>
 <li>写入redolog buffer：在数据页索引页在buffer pool中的脏页被修改时，生成redo log record 加入redolog buffer。</li>
@@ -958,22 +1122,33 @@
 <li>脏页落盘后，checkpoint向前推进，此时的redolog文件就可以清理对应部分了。下次写入redolog的时候，这部分就可以被覆盖写入。</li>
 <li>redolog file要写满的时候，mysql阻塞，强制将部分脏页刷盘释放redolog file。</li>
 </ul>
-<p><strong>Q：缓存中的redo log buffer什么时候落盘？</strong></p>
-<p>A：四种情况。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>缓存中的redo log buffer什么时候落盘？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>四种情况。</p>
 <ul>
 <li>mysql关机时</li>
 <li>写入量 超过 redo log buffer 剩余容量的一半时，先强制刷盘。</li>
 <li>事务提交阶段，将事务产生的redo log record刷盘。</li>
 <li>每秒由后台线程进行刷盘。</li>
-</ul>
+</ul></div></div>
+</details>
+
 <h3 id="binlog">binlog
-</h3><p><strong>Q：binlog是什么？SQL执行时如何写入和持久化的？binlog format有哪些？binlog什么作用？</strong></p>
-<p>A：binlog是mysql server层维护的，记录表更改的全量日志。</p>
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>binlog是什么？SQL执行时如何写入和持久化的？binlog format有哪些？binlog什么作用？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>binlog是mysql server层维护的，记录表更改的全量日志。</p>
 <p>SQL执行修改时，生成binlog并写入进程内存的binlog Cache中。事务提交时通过2PC保证和redo log的一致性，binlog写入os pageCache并fsync到磁盘文件中。</p>
 <p>binlog format有 RBR，SBR和MIXED，mysql8默认使用RBR，主从复制也要求使用RBR。SBR通常会存在一些不确定性sql，在binlog回放进行主从复制的时候会导致主从不一致。</p>
 <p>binlog什么作用：备份恢复和主从复制，通过设置binlog延迟也可以创建延迟从库。</p>
-<p><strong>Q：binlog和redolog的区别？</strong></p>
-<p>A：逻辑/物理日志，全量/部分，作用，具体文件。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>binlog和redolog的区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>逻辑/物理日志，全量/部分，作用，具体文件。</p>
 <div class="table-wrapper"><table>
 	<thead>
 			<tr>
@@ -1007,7 +1182,9 @@
 					<td>两个表空间文件<code>/var/lib/mysql/undo_001, undo_002</code></td>
 			</tr>
 	</tbody>
-</table></div>
+</table></div></div></div>
+</details>
+
 <h2 id="sql慢查询优化">SQL慢查询优化
 </h2><p>todo</p>
 <h2 id="mysql主从复制">Mysql主从复制
