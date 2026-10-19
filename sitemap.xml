@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
+        <loc>https://blog.aoidayo.site/work/my-qa-index/</loc><lastmod>2026-10-06T12:00:00&#43;08:00</lastmod>
+    </url>
+    <url>
         <loc>https://blog.aoidayo.site/</loc><lastmod>2026-10-19T22:00:00&#43;08:00</lastmod>
     </url>
     <url>
@@ -17,9 +20,6 @@
     </url>
     <url>
         <loc>https://blog.aoidayo.site/categories/</loc><lastmod>2026-10-06T12:00:00&#43;08:00</lastmod>
-    </url>
-    <url>
-        <loc>https://blog.aoidayo.site/work/my-qa-index/</loc><lastmod>2026-10-06T12:00:00&#43;08:00</lastmod>
     </url>
     <url>
         <loc>https://blog.aoidayo.site/tags/java/</loc><lastmod>2026-10-03T00:00:00&#43;00:00</lastmod>

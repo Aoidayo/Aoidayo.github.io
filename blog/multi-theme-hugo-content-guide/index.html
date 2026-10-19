@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Hugo 负责把markdown文章变成网页，虽然主题可以在themes中单独设置。\n但是一个站点如果想在 Stack 和 Blowfish 之间切换，很容易遇到一些问题：\n文章、图片和配置散落在不同仓库，修一篇文章要复制两份，换主题还会产生大量重复文件变更。 即使 使用一个themes文件夹组织不同的主题，layouts、shortcode、_index.md可能不同。 本文按实际仓库结构说明如何把文章集中管理，让两个主题读取同一份内容，同时保留各自的网站样式和配置。\n1. 三个仓库 这套多主题结构由三个 Git 仓库组成。同时最后推送到github.io仓库中，实际应该算是四个。\nYourName/you-blog-content 是内容仓库，保存文章 Markdown、文章图片和附件。它是文章的唯一源头。新增文章、修改正文或更新图片，都在这里完成。 YourName/you-blog-stack 是 Stack 站点源码，保存 Stack 主题、主题配置、站点布局、菜单、自定义样式和 Stack 专属页面。 YourName/you-blog-blowfish 是 Blowfish 站点源码，保存 Blowfish 主题、主题配置、站点布局、菜单、自定义样式和 Blowfish 专属页面。 两个站点源码仓库中都有一个名为 shared-content/ 的子模块目录。它是内容仓库在当前站点中的工作副本和版本指针，不是第二份需要维护的文章。真正的文章仍以 you-blog-content 的 main 分支为准。更新内容时先推送内容仓库，两个站点的部署工作流会读取它的最新版本。\n每个仓库的目录大致如下：\nyou-blog-content/ └── content/ └── blog/ └── my-post/ ├── index.md └── assets/image.png you-blog-stack/ 或 you-blog-blowfish/ ├── config/ # 当前主题和站点设置 ├── content/ # 当前主题专用页面 ├── layouts/ # 当前站点的模板和短代码 ├── themes/ # Stack 或 Blowfish 主题 └── shared-content/ # 子模块，指向内容仓库 这样拆分后，两个主题仓库仍可以独立调整外观。例如，Stack 可以使用自己的首页布局、菜单和文章卡片，Blowfish 可以保留另一套首页和主题选项。文章标题、正文、日期、分类、标签及附件则集中在内容仓库，不需要因为切换主题而复制一份。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Stack 与 Blowfish两个hugo主题共用一份Content文章仓库，保留各自页面与样式的多主题构建流程。">
 <title>hugo切换多主题构建</title>
 
 
@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="/css/stack.css">
 <meta property='og:title' content="hugo切换多主题构建">
-<meta property='og:description' content="Hugo 负责把markdown文章变成网页，虽然主题可以在themes中单独设置。\n但是一个站点如果想在 Stack 和 Blowfish 之间切换，很容易遇到一些问题：\n文章、图片和配置散落在不同仓库，修一篇文章要复制两份，换主题还会产生大量重复文件变更。 即使 使用一个themes文件夹组织不同的主题，layouts、shortcode、_index.md可能不同。 本文按实际仓库结构说明如何把文章集中管理，让两个主题读取同一份内容，同时保留各自的网站样式和配置。\n1. 三个仓库 这套多主题结构由三个 Git 仓库组成。同时最后推送到github.io仓库中，实际应该算是四个。\nYourName/you-blog-content 是内容仓库，保存文章 Markdown、文章图片和附件。它是文章的唯一源头。新增文章、修改正文或更新图片，都在这里完成。 YourName/you-blog-stack 是 Stack 站点源码，保存 Stack 主题、主题配置、站点布局、菜单、自定义样式和 Stack 专属页面。 YourName/you-blog-blowfish 是 Blowfish 站点源码，保存 Blowfish 主题、主题配置、站点布局、菜单、自定义样式和 Blowfish 专属页面。 两个站点源码仓库中都有一个名为 shared-content/ 的子模块目录。它是内容仓库在当前站点中的工作副本和版本指针，不是第二份需要维护的文章。真正的文章仍以 you-blog-content 的 main 分支为准。更新内容时先推送内容仓库，两个站点的部署工作流会读取它的最新版本。\n每个仓库的目录大致如下：\nyou-blog-content/ └── content/ └── blog/ └── my-post/ ├── index.md └── assets/image.png you-blog-stack/ 或 you-blog-blowfish/ ├── config/ # 当前主题和站点设置 ├── content/ # 当前主题专用页面 ├── layouts/ # 当前站点的模板和短代码 ├── themes/ # Stack 或 Blowfish 主题 └── shared-content/ # 子模块，指向内容仓库 这样拆分后，两个主题仓库仍可以独立调整外观。例如，Stack 可以使用自己的首页布局、菜单和文章卡片，Blowfish 可以保留另一套首页和主题选项。文章标题、正文、日期、分类、标签及附件则集中在内容仓库，不需要因为切换主题而复制一份。\n">
+<meta property='og:description' content="Stack 与 Blowfish两个hugo主题共用一份Content文章仓库，保留各自页面与样式的多主题构建流程。">
 <meta property='og:url' content='https://blog.aoidayo.site/blog/multi-theme-hugo-content-guide/'>
 <meta property='og:site_name' content='Aoidayo'>
 <meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Hugo' /><meta property='article:published_time' content='2026-10-02T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2026-10-02T00:00:00&#43;00:00'/><meta property='og:image' content='https://blog.aoidayo.site/blog/conda-or-mamba/feature.webp' />
 <meta name="twitter:title" content="hugo切换多主题构建">
-<meta name="twitter:description" content="Hugo 负责把markdown文章变成网页，虽然主题可以在themes中单独设置。\n但是一个站点如果想在 Stack 和 Blowfish 之间切换，很容易遇到一些问题：\n文章、图片和配置散落在不同仓库，修一篇文章要复制两份，换主题还会产生大量重复文件变更。 即使 使用一个themes文件夹组织不同的主题，layouts、shortcode、_index.md可能不同。 本文按实际仓库结构说明如何把文章集中管理，让两个主题读取同一份内容，同时保留各自的网站样式和配置。\n1. 三个仓库 这套多主题结构由三个 Git 仓库组成。同时最后推送到github.io仓库中，实际应该算是四个。\nYourName/you-blog-content 是内容仓库，保存文章 Markdown、文章图片和附件。它是文章的唯一源头。新增文章、修改正文或更新图片，都在这里完成。 YourName/you-blog-stack 是 Stack 站点源码，保存 Stack 主题、主题配置、站点布局、菜单、自定义样式和 Stack 专属页面。 YourName/you-blog-blowfish 是 Blowfish 站点源码，保存 Blowfish 主题、主题配置、站点布局、菜单、自定义样式和 Blowfish 专属页面。 两个站点源码仓库中都有一个名为 shared-content/ 的子模块目录。它是内容仓库在当前站点中的工作副本和版本指针，不是第二份需要维护的文章。真正的文章仍以 you-blog-content 的 main 分支为准。更新内容时先推送内容仓库，两个站点的部署工作流会读取它的最新版本。\n每个仓库的目录大致如下：\nyou-blog-content/ └── content/ └── blog/ └── my-post/ ├── index.md └── assets/image.png you-blog-stack/ 或 you-blog-blowfish/ ├── config/ # 当前主题和站点设置 ├── content/ # 当前主题专用页面 ├── layouts/ # 当前站点的模板和短代码 ├── themes/ # Stack 或 Blowfish 主题 └── shared-content/ # 子模块，指向内容仓库 这样拆分后，两个主题仓库仍可以独立调整外观。例如，Stack 可以使用自己的首页布局、菜单和文章卡片，Blowfish 可以保留另一套首页和主题选项。文章标题、正文、日期、分类、标签及附件则集中在内容仓库，不需要因为切换主题而复制一份。\n"><meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:description" content="Stack 与 Blowfish两个hugo主题共用一份Content文章仓库，保留各自页面与样式的多主题构建流程。"><meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content='https://blog.aoidayo.site/blog/conda-or-mamba/feature.webp' />
     <link rel="shortcut icon" href="/img/hugo.ico" />
 
@@ -36,6 +36,8 @@
         }
       </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
 <script defer src="/js/hugo-encrypt.js"></script>
+
+<link rel="stylesheet" href="/css/article-cards.dca3642ca6538e082910cc7ae214fb2193ec468e94114c5ecd1e90d1b38d2e05.css">
 
 
     <script>
@@ -292,6 +294,10 @@
             <a href="/blog/multi-theme-hugo-content-guide/">hugo切换多主题构建</a>
         </h2>
 
+        
+        <h3 class="article-subtitle">
+            Stack 与 Blowfish两个hugo主题共用一份Content文章仓库，保留各自页面与样式的多主题构建流程。
+        </h3>
         
     </div>
 
