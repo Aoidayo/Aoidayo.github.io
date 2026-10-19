@@ -539,7 +539,10 @@
 </span></span></span><span class="line"><span class="cl"><span class="n">PARTITION</span><span class="w">  </span><span class="n">p2024</span><span class="w">  </span><span class="k">VALUES</span><span class="w">  </span><span class="k">LESS</span><span class="w"> </span><span class="k">THAN</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="mi">2025</span><span class="w"> </span><span class="p">),</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="n">PARTITION</span><span class="w">  </span><span class="n">p_future</span><span class="w">  </span><span class="k">VALUES</span><span class="w">  </span><span class="k">LESS</span><span class="w"> </span><span class="k">THAN</span><span class="w"> </span><span class="k">MAXVALUE</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="p">);</span><span class="w">
-</span></span></span></code></pre></div><p><strong><code>LIST</code>分区</strong>：按离散值列表划分，适合按状态/地区分区。 <code>HASH</code>分区：按哈希函数均匀分布，适合负载均衡。 <code>KEY</code>分区：类似HASH但使用MySQL内部哈希函数。 <code>COLUMNS</code>分区（<code>RANGE COLUMNS</code> / <code>LIST COLUMNS</code>）：支持多列和非整型列分区。</p>
+</span></span></span></code></pre></div><p><strong><code>LIST</code>分区</strong>：按离散值列表划分，适合按状态/地区分区。</p>
+<p><strong><code>HASH</code>分区</strong>：按哈希函数均匀分布，适合负载均衡。</p>
+<p><strong><code>KEY</code>分区</strong>：类似HASH但使用MySQL内部哈希函数。</p>
+<p><strong><code>COLUMNS</code>分区</strong>（<code>RANGE COLUMNS</code> / <code>LIST COLUMNS</code>）：支持多列和非整型列分区。</p>
 <p><strong>使用场景</strong>：</p>
 <ol>
 <li><strong>大表数据管理</strong>：按时间分区后，通过 <code>ALTER TABLE t DROP PARTITION p2022</code> 快速删除历史数据（比DELETE快几个数量级）。</li>
@@ -660,83 +663,170 @@
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>91、MySQL 中 utf8 和 utf8mb4 有什么区别？为什么生产环境必须使用 utf8mb4？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 的 utf8（别名 utf8mb3）是一个 阉割版 UTF-8，最多支持 3 字节字符，无法存储 4 字节的 Unicode 字符（如 emoji 表情 🎉、部分 CJK 扩展汉字）。 utf8mb4 是完整的 UTF-8 实现，支持 1-4 字节，覆盖所有 Unicode 字符。MySQL 8.0 默认字符集已改为 utf8mb4，默认排序规则为 <code>utf8mb4_0900_ai_ci</code>。 迁移方式： <code>ALTER TABLE t CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;</code> 注意大表执行此操作会重建表，建议用 <code>pt-online-schema-change</code> 在线执行。 索引影响： utf8mb4 单字符最大 4 字节， <code>VARCHAR(255)</code> 索引键长度为 1020 字节，可能超过 InnoDB 索引前缀限制（默认 767→3072 字节，需确认 <code>innodb_large_prefix=ON</code>）。 连接配置：确保客户端连接也使用 utf8mb4： <code>SET NAMES utf8mb4;</code> 或连接字符串中 characterEncoding=utf8mb4。 MySQL 8.0.28+ 已将 utf8mb3 标记为 deprecated，未来版本 utf8 将等同于 utf8mb4。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 的 utf8（别名 utf8mb3）是一个<strong>阉割版 UTF-8</strong>，最多支持 3 字节字符，无法存储 4 字节的 Unicode 字符（如 emoji 表情 🎉、部分 CJK 扩展汉字）。utf8mb4 是完整的 UTF-8 实现，支持 1-4 字节，覆盖所有 Unicode 字符。MySQL 8.0 默认字符集已改为 utf8mb4，默认排序规则为 <code>utf8mb4_0900_ai_ci</code>。</p>
+<p><strong>迁移方式</strong>：<code>ALTER TABLE t CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;</code>。注意大表执行此操作会重建表，建议用 <code>pt-online-schema-change</code> 在线执行。</p>
+<p><strong>索引影响</strong>：utf8mb4 单字符最大 4 字节，<code>VARCHAR(255)</code> 索引键长度为 1020 字节，可能超过 InnoDB 索引前缀限制（默认 767→3072 字节，需确认 <code>innodb_large_prefix=ON</code>）。</p>
+<p><strong>连接配置</strong>：确保客户端连接也使用 utf8mb4：<code>SET NAMES utf8mb4;</code> 或连接字符串中 <code>characterEncoding=utf8mb4</code>。</p>
+<p>MySQL 8.0.28+ 已将 utf8mb3 标记为 deprecated，未来版本 utf8 将等同于 utf8mb4。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>92、MySQL 的连接管理参数（max_connections、thread_cache_size、wait_timeout）如何调优？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>max_connections</code> 控制最大并发连接数（默认 151），设置过高会导致内存耗尽（每个连接约消耗 1-10MB），建议根据 <code>SHOW STATUS LIKE 'Max_used_connections';</code> 的峰值设置为 1.5 倍。 <code>thread_cache_size</code> 缓存已断开连接的线程供复用（默认 -1 即自动调节），减少频繁创建/销毁线程的开销。监控 <code>Threads_created</code> 如果持续增长，说明缓存不足。 <code>wait_timeout</code>（默认 28800 秒 = 8 小时）控制非交互式连接的空闲超时，生产建议缩短至 300-600 秒： <code>SET GLOBAL wait_timeout = 300; interactive_timeout （</code>默认 28800）控制交互式连接超时，同样建议缩短。 排查连接数不足： <code>SHOW PROCESSLIST;</code> 查看当前连接状态， <code>SELECT * FROM sys.session WHERE command='Sleep' AND time &gt; 300;</code> 找出长时间空闲连接。 结合连接池使用（如 ProxySQL、应用层 HikariCP）可显著减少实际 MySQL 连接数， <code>max_connections</code> 不需要设得过大。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>max_connections</code> 控制最大并发连接数（默认 151），设置过高会导致内存耗尽（每个连接约消耗 1-10MB），建议根据 <code>SHOW STATUS LIKE 'Max_used_connections';</code> 的峰值设置为 1.5 倍。</p>
+<p><code>thread_cache_size</code> 缓存已断开连接的线程供复用（默认 -1 即自动调节），减少频繁创建/销毁线程的开销。监控 <code>Threads_created</code> 如果持续增长，说明缓存不足。</p>
+<p><code>wait_timeout</code>（默认 28800 秒 = 8 小时）控制非交互式连接的空闲超时，生产建议缩短至 300-600 秒：<code>SET GLOBAL wait_timeout = 300;</code>。<code>interactive_timeout</code>（默认 28800）控制交互式连接超时，同样建议缩短。</p>
+<p>排查连接数不足：<code>SHOW PROCESSLIST;</code> 查看当前连接状态，<code>SELECT * FROM sys.session WHERE command='Sleep' AND time &gt; 300;</code> 找出长时间空闲连接。</p>
+<p>结合连接池使用（如 ProxySQL、应用层 HikariCP）可显著减少实际 MySQL 连接数，<code>max_connections</code> 不需要设得过大。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>93、InnoDB 的 I/O 调优参数（innodb_io_capacity、innodb_flush_method）如何配置？不同存储介质的建议值是什么？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>innodb_io_capacity</code> 告诉 InnoDB 后台任务（脏页刷新、change buffer 合并）可以使用的 IOPS 上限，默认 200（适合传统 HDD）。 SSD 建议值： <code>innodb_io_capacity</code> = 2000-5000， <code>innodb_io_capacity_max</code> = 4000-10000（突发刷新上限），NVMe SSD 可设更高。 <code>innodb_flush_method</code> 控制数据文件和日志文件的刷写方式：Linux 推荐 <code>O_DIRECT</code>（绕过 OS 文件缓存，避免双缓存），这是 MySQL 8.0.26+ 的默认值。 HDD 环境： <code>innodb_io_capacity</code> = 200， <code>innodb_flush_method=O_DIRECT</code>， <code>innodb_flush_neighbors</code> = 1（合并相邻脏页刷新减少随机写）。 SSD 环境： <code>innodb_flush_neighbors</code> = 0（SSD 无需合并相邻页）， <code>innodb_io_capacity</code> 根据 fio 测试结果设置。 监控 I/O 压力： <code>SHOW ENGINE INNODB STATUS\G</code> 的 BUFFER POOL AND MEMORY 段查看脏页比例， <code>SHOW STATUS LIKE 'Innodb_buffer_pool_pages_dirty';</code>。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>innodb_io_capacity</code> 告诉 InnoDB 后台任务（脏页刷新、change buffer 合并）可以使用的 IOPS 上限，默认 200（适合传统 HDD）。SSD 建议值：<code>innodb_io_capacity</code> = 2000-5000，<code>innodb_io_capacity_max</code> = 4000-10000（突发刷新上限），NVMe SSD 可设更高。</p>
+<p><code>innodb_flush_method</code> 控制数据文件和日志文件的刷写方式：Linux 推荐 <code>O_DIRECT</code>（绕过 OS 文件缓存，避免双缓存），这是 MySQL 8.0.26+ 的默认值。</p>
+<p><strong>不同存储介质的建议值</strong>：</p>
+<p><strong>HDD 环境</strong>：<code>innodb_io_capacity</code> = 200，<code>innodb_flush_method=O_DIRECT</code>，<code>innodb_flush_neighbors</code> = 1（合并相邻脏页刷新减少随机写）。</p>
+<p><strong>SSD 环境</strong>：<code>innodb_flush_neighbors</code> = 0（SSD 无需合并相邻页），<code>innodb_io_capacity</code> 根据 fio 测试结果设置。</p>
+<p><strong>监控 I/O 压力</strong>：<code>SHOW ENGINE INNODB STATUS\G</code> 的 BUFFER POOL AND MEMORY 段查看脏页比例，<code>SHOW STATUS LIKE 'Innodb_buffer_pool_pages_dirty';</code>。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>94、MySQL Router 的作用是什么？它如何与 InnoDB Cluster 配合实现透明故障转移？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL Router 是轻量级中间件代理，部署在应用和 MySQL 集群之间，提供透明的连接路由和故障转移。 与 InnoDB Cluster 集成时，Router 通过 <code>mysqlrouter --bootstrap master:3306 --user=mysqlrouter</code> 自动获取集群拓扑信息并生成配置。 默认端口：6446（读写，路由到 Primary）、6447（只读，轮询路由到 Secondary 节点），应用只需连接 Router 地址。 故障转移过程：Group Replication 检测到 Primary 宕机 → 选举新 Primary → Router 通过元数据缓存（<code>metadata_cache</code>）自动感知拓扑变化 → 将新连接路由到新 Primary。 Router 支持多种路由策略： round-robin（默认只读）、 first-available（读写首选）、 round-robin-with-fallback。 生产部署建议：将 Router 部署在应用服务器本地（localhost），避免额外网络跳转；每台应用服务器一个 Router 实例，避免 Router 成为单点。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL Router 是轻量级中间件代理，部署在应用和 MySQL 集群之间，提供透明的连接路由和故障转移。</p>
+<p>与 InnoDB Cluster 集成时，Router 通过 <code>mysqlrouter --bootstrap master:3306 --user=mysqlrouter</code> 自动获取集群拓扑信息并生成配置。</p>
+<p><strong>默认端口</strong>：6446（读写，路由到 Primary）、6447（只读，轮询路由到 Secondary 节点），应用只需连接 Router 地址。</p>
+<p><strong>故障转移过程</strong>：</p>
+<ol>
+<li>Group Replication 检测到 Primary 宕机</li>
+<li>选举新 Primary</li>
+<li>Router 通过元数据缓存（<code>metadata_cache</code>）自动感知拓扑变化</li>
+<li>将新连接路由到新 Primary</li>
+</ol>
+<p>Router 支持多种路由策略：round-robin（默认只读）、first-available（读写首选）、round-robin-with-fallback。</p>
+<p><strong>生产部署建议</strong>：将 Router 部署在应用服务器本地（localhost），避免额外网络跳转；每台应用服务器一个 Router 实例，避免 Router 成为单点。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>95、MySQL 8.4 LTS 版本有哪些值得关注的新特性和变化？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.4 是首个 长期支持版本（LTS），于 2024 年 4 月发布，提供 5 年 Premier Support + 3 年 Extended Support。 重要变化：1） <code>mysql_native_password</code> 认证插件 默认禁用（8.4 中移除了该默认加载），强制使用 <code>caching_sha2_password</code>。 2）复制相关参数全面重命名： <code>SHOW SLAVE STATUS  →  SHOW REPLICA STATUS</code>， <code>CHANGE MASTER TO  →  CHANGE REPLICATION SOURCE TO</code>，旧语法被移除。 3） <code>binlog_transaction_dependency_tracking</code> 被移除，并行复制默认使用 WRITESET 依赖追踪。 4）系统变量 <code>group_replication_recovery_get_public_key</code> 默认改为 <code>ON</code>，简化 Group Replication 配置。 5）移除了 utf8mb3 和 utf8 的别名映射， utf8mb4 成为唯一推荐字符集。 升级注意：从 8.0 升级到 8.4 前需使用 mysql-shell 的 <code>util.checkForServerUpgrade()</code> 检查兼容性问题。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 是首个<strong>长期支持版本（LTS）</strong>，于 2024 年 4 月发布，提供 5 年 Premier Support + 3 年 Extended Support。</p>
+<p><strong>重要变化</strong>：</p>
+<p><strong>认证插件</strong>：<code>mysql_native_password</code> 认证插件<strong>默认禁用</strong>（8.4 中移除了该默认加载），强制使用 <code>caching_sha2_password</code>。</p>
+<p><strong>复制相关参数全面重命名</strong>：<code>SHOW SLAVE STATUS → SHOW REPLICA STATUS</code>，<code>CHANGE MASTER TO → CHANGE REPLICATION SOURCE TO</code>，旧语法被移除。</p>
+<p><strong>并行复制</strong>：<code>binlog_transaction_dependency_tracking</code> 被移除，并行复制默认使用 WRITESET 依赖追踪。</p>
+<p><strong>Group Replication</strong>：系统变量 <code>group_replication_recovery_get_public_key</code> 默认改为 <code>ON</code>，简化配置。</p>
+<p><strong>字符集</strong>：移除了 utf8mb3 和 utf8 的别名映射，utf8mb4 成为唯一推荐字符集。</p>
+<p><strong>升级注意</strong>：从 8.0 升级到 8.4 前需使用 mysql-shell 的 <code>util.checkForServerUpgrade()</code> 检查兼容性问题。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>96、MySQL 服务器出现 OOM Kill 时如何排查和预防？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 被 OOM Killer 杀死时，Linux 内核日志会记录： <code>dmesg | grep -i &quot;oom\|mysqld&quot;</code> 或 <code>journalctl -k | grep -i oom</code> 查看。 常见原因：1） <code>innodb_buffer_pool_size</code> 设置过大（建议不超过物理内存的 70-75%）；2）连接数过多导致 per-thread 内存累积（<code>max_connections</code> * (<code>sort_buffer</code> + <code>join_buffer</code> + <code>read_buffer</code> + &hellip;)）。 计算 MySQL 理论最大内存占用： <code>innodb_buffer_pool_size</code> + <code>max_connections</code> × (<code>sort_buffer_size</code> + <code>join_buffer_size</code> + <code>read_buffer_size</code> + <code>read_rnd_buffer_size</code> + <code>thread_stack</code>) + <code>innodb_log_buffer_size</code> + <code>key_buffer_size</code>。 预防措施：1）设置 <code>performance_schema_max_memory_classes</code> 监控内存分配；2）使用 <code>sys.memory_global_total</code> 和 <code>sys.memory_by_thread_by_current_bytes</code> 定位内存大户。 Linux 层面： <code>echo -1000 &gt; /proc/$(pidof mysqld)/oom_score_adj</code> 降低 mysqld 被 OOM Kill 的优先级；或使用 cgroup 限制 MySQL 内存上限。 紧急处理：添加 swap 空间作为缓冲 <code>fallocate -l 4G /swapfile &amp;&amp; mkswap /swapfile &amp;&amp; swapon /swapfile</code>，但 swap 不能替代根本性的内存配置优化。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 被 OOM Killer 杀死时，Linux 内核日志会记录：<code>dmesg | grep -i &quot;oom\|mysqld&quot;</code> 或 <code>journalctl -k | grep -i oom</code> 查看。</p>
+<p><strong>常见原因</strong>：</p>
+<p><strong>Buffer Pool 过大</strong>：<code>innodb_buffer_pool_size</code> 设置过大（建议不超过物理内存的 70-75%）。</p>
+<p><strong>连接数过多导致 per-thread 内存累积</strong>（<code>max_connections</code> × (<code>sort_buffer</code> + <code>join_buffer</code> + <code>read_buffer</code> + &hellip;)）。</p>
+<p><strong>计算 MySQL 理论最大内存占用</strong>：</p>
+<p><code>innodb_buffer_pool_size</code> + <code>max_connections</code> × (<code>sort_buffer_size</code> + <code>join_buffer_size</code> + <code>read_buffer_size</code> + <code>read_rnd_buffer_size</code> + <code>thread_stack</code>) + <code>innodb_log_buffer_size</code> + <code>key_buffer_size</code>。</p>
+<p><strong>预防措施</strong>：</p>
+<p>设置 <code>performance_schema_max_memory_classes</code> 监控内存分配；使用 <code>sys.memory_global_total</code> 和 <code>sys.memory_by_thread_by_current_bytes</code> 定位内存大户。</p>
+<p>Linux 层面：<code>echo -1000 &gt; /proc/$(pidof mysqld)/oom_score_adj</code> 降低 mysqld 被 OOM Kill 的优先级；或使用 cgroup 限制 MySQL 内存上限。</p>
+<p><strong>紧急处理</strong>：添加 swap 空间作为缓冲 <code>fallocate -l 4G /swapfile &amp;&amp; mkswap /swapfile &amp;&amp; swapon /swapfile</code>，但 swap 不能替代根本性的内存配置优化。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>97、MySQL 的 ibdata1 文件持续增长如何处理？共享表空间与独立表空间有什么区别？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>ibdata1</code> 是 InnoDB 的 共享系统表空间 文件，存储数据字典、undo logs（5.7 以前）、change buffer、double write buffer 等。 持续增长的原因：1） <code>innodb_file_per_table=OFF</code> 时所有表数据都存在 <code>ibdata1</code> 中（MySQL 5.6+ 默认已开启独立表空间）；2）长事务导致 undo log 无法回收。 <code>ibdata1</code> 不能缩小，即使删除了大量数据。唯一缩小方法：全库逻辑备份 → 停机 → 删除所有 InnoDB 数据文件 → 重新初始化 → 导入数据。 操作步骤： <code>mysqldump</code> <code>--all-databases</code> <code>--routines</code> <code>--triggers</code> &gt; <code>full_dump.sql</code> → 停止 MySQL → 删除 <code>ibdata1</code>、 <code>ib_logfile</code>* → 确认 <code>innodb_file_per_table=ON</code> → 启动 MySQL → 导入。 MySQL 8.0 改进：undo tablespace 默认独立存储在 <code>undo_001</code>、 <code>undo_002</code> 文件中，支持 <code>ALTER UNDO TABLESPACE</code> 在线收缩，大幅减少 <code>ibdata1</code> 增长。 预防：确保 <code>innodb_file_per_table=ON</code>、避免超长事务、监控 <code>SHOW STATUS LIKE 'Innodb_history_list_length';</code>（值过大说明 undo 回收受阻）。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>ibdata1</code> 是 InnoDB 的<strong>共享系统表空间</strong>文件，存储数据字典、undo logs（5.7 以前）、change buffer、double write buffer 等。</p>
+<p><strong>持续增长的原因</strong>：</p>
+<p><code>innodb_file_per_table=OFF</code> 时所有表数据都存在 <code>ibdata1</code> 中（MySQL 5.6+ 默认已开启独立表空间）；长事务导致 undo log 无法回收。</p>
+<p><code>ibdata1</code> 不能缩小，即使删除了大量数据。唯一缩小方法：全库逻辑备份 → 停机 → 删除所有 InnoDB 数据文件 → 重新初始化 → 导入数据。</p>
+<p><strong>操作步骤</strong>：</p>
+<p><code>mysqldump --all-databases --routines --triggers &gt; full_dump.sql</code> → 停止 MySQL → 删除 <code>ibdata1</code>、<code>ib_logfile*</code> → 确认 <code>innodb_file_per_table=ON</code> → 启动 MySQL → 导入。</p>
+<p><strong>MySQL 8.0 改进</strong>：undo tablespace 默认独立存储在 <code>undo_001</code>、<code>undo_002</code> 文件中，支持 <code>ALTER UNDO TABLESPACE</code> 在线收缩，大幅减少 <code>ibdata1</code> 增长。</p>
+<p><strong>预防</strong>：确保 <code>innodb_file_per_table=ON</code>、避免超长事务、监控 <code>SHOW STATUS LIKE 'Innodb_history_list_length';</code>（值过大说明 undo 回收受阻）。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>98、什么是 MySQL 的元数据锁（Metadata Lock）等待？如何排查和解决 DDL 被阻塞的问题？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">元数据锁（MDL）保护表结构在 DDL 和 DML 之间的一致性。当 DDL（如 <code>ALTER TABLE</code>）需要获取排他 MDL 锁时，如果有未提交的长事务持有共享 MDL 锁，DDL 会被阻塞。 更严重的是，DDL 的排他锁请求会 阻塞后续所有新的 DML 查询（排队等待共享锁），导致表完全不可用。 排查步骤：1） <code>SELECT * FROM performance_schema.metadata_locks WHERE OBJECT_NAME='table_name';</code> 查看谁持有 MDL 锁。 2） <code>SELECT * FROM sys.schema_table_lock_waits;</code>（MySQL 8.0 sys schema）直接显示等待链：谁阻塞了谁。 3）找到阻塞源的线程 ID 后： <code>SELECT * FROM information_schema.PROCESSLIST WHERE ID=xxx;</code> 确认是哪个长事务。 解决方法： KILL &lt;<code>thread_id</code>&gt;; 杀掉阻塞源长事务（需评估业务影响），或等待事务自然结束。 预防：缩短事务持有时间、避免在业务高峰执行 DDL、使用 <code>lock_wait_timeout</code>（默认 31536000 秒 = 1 年，建议改为 60 秒）让 DDL 快速失败而非无限等待。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>元数据锁（MDL）保护表结构在 DDL 和 DML 之间的一致性。当 DDL（如 <code>ALTER TABLE</code>）需要获取排他 MDL 锁时，如果有未提交的长事务持有共享 MDL 锁，DDL 会被阻塞。</p>
+<p>更严重的是，DDL 的排他锁请求会<strong>阻塞后续所有新的 DML 查询</strong>（排队等待共享锁），导致表完全不可用。</p>
+<p><strong>排查步骤</strong>：</p>
+<ol>
+<li><code>SELECT * FROM performance_schema.metadata_locks WHERE OBJECT_NAME='table_name';</code> 查看谁持有 MDL 锁。</li>
+<li><code>SELECT * FROM sys.schema_table_lock_waits;</code>（MySQL 8.0 sys schema）直接显示等待链：谁阻塞了谁。</li>
+<li>找到阻塞源的线程 ID 后：<code>SELECT * FROM information_schema.PROCESSLIST WHERE ID=xxx;</code> 确认是哪个长事务。</li>
+</ol>
+<p><strong>解决方法</strong>：<code>KILL &lt;thread_id&gt;;</code> 杀掉阻塞源长事务（需评估业务影响），或等待事务自然结束。</p>
+<p><strong>预防</strong>：缩短事务持有时间、避免在业务高峰执行 DDL、使用 <code>lock_wait_timeout</code>（默认 31536000 秒 = 1 年，建议改为 60 秒）让 DDL 快速失败而非无限等待。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>99、对数十亿行的大表执行 DDL 有哪些策略？如何避免长时间锁表？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">大表 DDL 的核心挑战是避免长时间阻塞 DML 和消耗过多资源，常用策略： 1） Instant DDL（MySQL 8.0.12+）：对支持的操作（如末尾加列）瞬间完成： <code>ALTER TABLE t ADD COLUMN c INT, ALGORITHM=INSTANT;  2） Online DDL（INPLACE）</code>： <code>ALTER TABLE t ADD INDEX idx(col), ALGORITHM=INPLACE, LOCK=NONE;</code> 允许并发 DML，但大表可能持续数小时。 3） <code>pt-online-schema-change</code>（Percona）：创建影子表 → 复制数据 → 通过触发器同步增量 → 原子重命名，整个过程对业务几乎透明。 4） <code>gh-ost</code>（GitHub）：基于 binlog 同步增量数据，不使用触发器，对主库写入性能影响更小： <code>gh-ost</code> <code>--alter</code>=&ldquo;ADD COLUMN c INT&rdquo; <code>--database=mydb</code> <code>--table=t</code> <code>--execute</code>。 5）大表添加索引可在从库先执行，验证后切换主从角色。 选择建议：优先 Instant DDL → Online DDL <code>INPLACE</code> → <code>gh-ost</code>/<code>pt-osc</code> → 最后才考虑维护窗口停机操作。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>大表 DDL 的核心挑战是避免长时间阻塞 DML 和消耗过多资源，常用策略如下。</p>
+<p><strong>Instant DDL</strong>（MySQL 8.0.12+）：对支持的操作（如末尾加列）瞬间完成：<code>ALTER TABLE t ADD COLUMN c INT, ALGORITHM=INSTANT;</code></p>
+<p><strong>Online DDL（INPLACE）</strong>：<code>ALTER TABLE t ADD INDEX idx(col), ALGORITHM=INPLACE, LOCK=NONE;</code> 允许并发 DML，但大表可能持续数小时。</p>
+<p><strong><code>pt-online-schema-change</code>（Percona）</strong>：创建影子表 → 复制数据 → 通过触发器同步增量 → 原子重命名，整个过程对业务几乎透明。</p>
+<p><strong><code>gh-ost</code>（GitHub）</strong>：基于 binlog 同步增量数据，不使用触发器，对主库写入性能影响更小：<code>gh-ost --alter=&quot;ADD COLUMN c INT&quot; --database=mydb --table=t --execute</code>。</p>
+<p>大表添加索引可在从库先执行，验证后切换主从角色。</p>
+<p><strong>选择建议</strong>：优先 Instant DDL → Online DDL <code>INPLACE</code> → <code>gh-ost</code>/<code>pt-osc</code> → 最后才考虑维护窗口停机操作。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>100、如何在 Kubernetes 上部署和管理 MySQL？MySQL Operator for Kubernetes 的核心功能有哪些？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL Operator for Kubernetes 是 Oracle 官方的 Kubernetes Operator，通过自定义资源（CRD）声明式管理 MySQL InnoDB Cluster。 部署方式： <code>kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/trunk/deploy/deploy-crds.yaml</code> 安装 CRD 和 Operator。 创建集群 YAML 示例：定义 InnoDBCluster 资源，指定 replicas: 3、 router.instances: 2，Operator 自动创建 StatefulSet、PVC、Service 和 MySQL Router。 核心功能：1） 自动故障恢复：Pod 异常时 Operator 重建并重新加入 Group Replication；2） 自动备份：配置 MySQLBackup CRD 定期备份到 S3/PVC。 3） 滚动升级：修改 CRD 的 version 字段触发滚动升级，逐个替换 Pod。 生产注意事项：存储建议使用高性能 StorageClass（SSD/NVMe CSI）；MySQL 对网络延迟敏感，避免跨可用区部署 Group Replication 成员；合理配置 resources.requests 和 resources.limits 避免资源争抢。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL Operator for Kubernetes 是 Oracle 官方的 Kubernetes Operator，通过自定义资源（CRD）声明式管理 MySQL InnoDB Cluster。</p>
+<p><strong>部署方式</strong>：<code>kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/trunk/deploy/deploy-crds.yaml</code> 安装 CRD 和 Operator。</p>
+<p><strong>创建集群 YAML 示例</strong>：定义 InnoDBCluster 资源，指定 replicas: 3、router.instances: 2，Operator 自动创建 StatefulSet、PVC、Service 和 MySQL Router。</p>
+<p><strong>核心功能</strong>：</p>
+<p><strong>自动故障恢复</strong>：Pod 异常时 Operator 重建并重新加入 Group Replication。</p>
+<p><strong>自动备份</strong>：配置 MySQLBackup CRD 定期备份到 S3/PVC。</p>
+<p><strong>滚动升级</strong>：修改 CRD 的 version 字段触发滚动升级，逐个替换 Pod。</p>
+<p><strong>生产注意事项</strong>：存储建议使用高性能 StorageClass（SSD/NVMe CSI）；MySQL 对网络延迟敏感，避免跨可用区部署 Group Replication 成员；合理配置 resources.requests 和 resources.limits 避免资源争抢。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>101、MySQL 8.4 LTS 的发布模型与 Innovation 版本有何不同？DBA 应如何规划迁移策略？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>从 MySQL 8.4 开始，Oracle 正式引入 LTS（Long-Term Support） 和 Innovation 双轨发布模型。 MySQL 8.4 是首个 LTS 版本，提供 5 年标准支持 + 3 年扩展支持，适合生产环境长期运行。Innovation 版本（如 9.0、9.1）每季度发布，包含最新特性但仅支持到下一个版本发布。</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>从 MySQL 8.4 开始，Oracle 正式引入 <strong>LTS（Long-Term Support）</strong> 和 <strong>Innovation</strong> 双轨发布模型。</p>
+<p>MySQL 8.4 是首个 LTS 版本，提供 5 年标准支持 + 3 年扩展支持，适合生产环境长期运行。</p>
+<p>Innovation 版本（如 9.0、9.1）每季度发布，包含最新特性但仅支持到下一个版本发布。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># 查看当前版本和支持类型</span>
 </span></span><span class="line"><span class="cl">mysql &gt;  SELECT VERSION <span class="o">()</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">-- 8.4.0 <span class="o">=</span> LTS，9.0.0 <span class="o">=</span> Innovation
 </span></span><span class="line"><span class="cl"><span class="c1"># 升级路径：8.0.x → 8.4 LTS（推荐），或 8.0.x → 9.x Innovation</span>
 </span></span><span class="line"><span class="cl">mysql_upgrade --force <span class="c1"># 8.4 中 mysql_upgrade 逻辑已内置到 mysqld 启动过程</span>
-</span></span></code></pre></div><p>LTS 版本只接收 bugfix 和安全补丁，不引入新功能变更，保证稳定性。 迁移策略：生产库升级到 8.4 LTS；测试/开发环境可用 9.x 提前验证新特性。 注意：MySQL 8.0 将于 2026 年 4 月结束 Premier Support，应尽快规划升级到 8.4 LTS。</p>
+</span></span></code></pre></div><p>LTS 版本只接收 bugfix 和安全补丁，不引入新功能变更，保证稳定性。</p>
+<p><strong>迁移策略</strong>：生产库升级到 8.4 LTS；测试/开发环境可用 9.x 提前验证新特性。</p>
+<p><strong>注意</strong>：MySQL 8.0 将于 2026 年 4 月结束 Premier Support，应尽快规划升级到 8.4 LTS。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>108、MySQL 8.4 中 InnoDB Buffer Pool 在线调整（Online Resize）的行为有何变化？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 改进了 InnoDB Buffer Pool 在线调整 的行为，使其在生产环境中更加安全和可预测。 在之前版本中，大幅缩小 Buffer Pool 可能导致长时间阻塞或 OOM。8.4 中的改进包括：</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 改进了 InnoDB Buffer Pool 在线调整 的行为，使其在生产环境中更加安全和可预测。在之前版本中，大幅缩小 Buffer Pool 可能导致长时间阻塞或 OOM。</p>
+<p>8.4 中的改进包括：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 在线调整 Buffer Pool 大小（以 chunk_size 为粒度，默认 128MB）
 </span></span></span><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">innodb_buffer_pool_size</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">8589934592</span><span class="w"> </span><span class="p">;</span><span class="w">   </span><span class="c1">-- 8GB
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 监控调整进度
 </span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w">  </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Innodb_buffer_pool_resize_status%&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 查看详细进度
 </span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="k">FROM</span><span class="w">  </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">innodb_buffer_pool_resize_status</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p><strong>8.4 关键变化</strong>： 缩小操作采用更渐进的页面淘汰策略，避免突发的大量磁盘 I/O；调整进度信息更详细，新增完成百分比和预计剩余时间。 如果调整过程中检测到内存压力过大，会自动暂停并报告状态，而不是强制继续。 适用场景：动态伸缩环境（如云数据库）中根据负载自动调整内存分配。 最佳实践：调整幅度不超过当前大小的 50%，分多次进行；调整期间监控 <code>Innodb_buffer_pool_wait_free</code> 指标。</p>
+</span></span></span></code></pre></div><p><strong>8.4 关键变化</strong>：缩小操作采用更渐进的页面淘汰策略，避免突发的大量磁盘 I/O；调整进度信息更详细，新增完成百分比和预计剩余时间。如果调整过程中检测到内存压力过大，会自动暂停并报告状态，而不是强制继续。</p>
+<p><strong>适用场景</strong>：动态伸缩环境（如云数据库）中根据负载自动调整内存分配。</p>
+<p><strong>最佳实践</strong>：调整幅度不超过当前大小的 50%，分多次进行；调整期间监控 <code>Innodb_buffer_pool_wait_free</code> 指标。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>109、MySQL 8.4 中有哪些功能被废弃或移除？DBA 升级时需要注意什么？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 LTS 移除和废弃了多项旧功能，升级前必须检查兼容性： 已移除的功能：</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 LTS 移除和废弃了多项旧功能，升级前必须检查兼容性。</p>
+<p><strong>已移除的功能</strong>：</p>
 <ul>
 <li><code>mysql_native_password</code> 认证插件被降级为默认禁用，推荐使用 <code>caching_sha2_password</code></li>
 <li><code>CHANGE MASTER TO</code> 语法已移除，必须使用 <code>CHANGE REPLICATION SOURCE TO</code></li>
@@ -750,7 +840,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 检查 my.cnf 中是否有已废弃参数
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 移除: slave-parallel-workers → replica-parallel-workers
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 移除: log_slave_updates → log_replica_updates
-</span></span></span></code></pre></div><p><strong>已废弃（未来移除）</strong>： <code>binlog_format</code> 参数（8.4 默认且仅支持 <code>ROW</code> 格式）、 <code>sync_master_info</code>（改为 <code>sync_source_info</code>）。 迁移清单：1) 更新所有用户认证插件；2) 搜索替换所有 slave/master 相关配置和 SQL；3) 检查应用连接器是否支持 <code>caching_sha2_password</code>。</p>
+</span></span></span></code></pre></div><p><strong>已废弃（未来移除）</strong>：<code>binlog_format</code> 参数（8.4 默认且仅支持 <code>ROW</code> 格式）、<code>sync_master_info</code>（改为 <code>sync_source_info</code>）。</p>
+<p><strong>迁移清单</strong>：1) 更新所有用户认证插件；2) 搜索替换所有 slave/master 相关配置和 SQL；3) 检查应用连接器是否支持 <code>caching_sha2_password</code>。</p>
 </div></div>
 </details>
 
@@ -928,8 +1019,8 @@
 </h2><details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>1、请描述InnoDB存储引擎的整体架构，包括内存结构和磁盘结构的主要组件。</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>InnoDB架构分为 内存结构 和 磁盘结构 两大部分。</p>
-<p>内存结构 包括： Buffer Pool（缓冲池）用于缓存数据页和索引页，是InnoDB最重要的内存区域； Change Buffer（变更缓冲）用于缓存对非唯一二级索引的修改； Adaptive Hash Index（自适应哈希索引）由InnoDB自动为热点页构建； Log Buffer（日志缓冲）用于暂存redo log写入磁盘前的数据。</p>
-<p>磁盘结构 包括： 系统表空间（<code>ibdata1</code>）存储数据字典、Undo Log等； 独立表空间（<code>.ibd</code>文件）存储每张表的数据和索引； Redo Log（<code>ib_logfile0/1</code>）用于崩溃恢复； Undo Tablespaces 在8.0中独立管理回滚段； Doublewrite Buffer 防止部分写入导致的页损坏。</p>
+<p><strong>内存结构</strong>包括：Buffer Pool（缓冲池）用于缓存数据页和索引页，是InnoDB最重要的内存区域；Change Buffer（变更缓冲）用于缓存对非唯一二级索引的修改；Adaptive Hash Index（自适应哈希索引）由InnoDB自动为热点页构建；Log Buffer（日志缓冲）用于暂存redo log写入磁盘前的数据。</p>
+<p><strong>磁盘结构</strong>包括：系统表空间（<code>ibdata1</code>）存储数据字典、Undo Log等；独立表空间（<code>.ibd</code>文件）存储每张表的数据和索引；Redo Log（<code>ib_logfile0/1</code>）用于崩溃恢复；Undo Tablespaces 在8.0中独立管理回滚段；Doublewrite Buffer 防止部分写入导致的页损坏。</p>
 <p>可通过 <code>SHOW ENGINE INNODB STATUS\G</code> 查看运行时各组件的状态信息。Buffer Pool大小由 <code>innodb_buffer_pool_size</code> 控制，通常设置为物理内存的50%-75%。</p>
 </div></div>
 </details>
@@ -937,9 +1028,7 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>2、InnoDB的Buffer Pool工作原理是什么？LRU链表中的young区和old区有什么作用？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Buffer Pool 是InnoDB在内存中缓存表数据和索引的区域，以页（Page，默认16KB）为单位管理。当读取数据时，InnoDB首先检查Buffer Pool，未命中则从磁盘读取并放入缓冲池。</p>
-<p>Buffer Pool使用改进的 LRU（Least Recently Used）</p>
-<p>算法管理页面。链表被分为两段： young区（热数据，占链表前5/8）和</p>
-<p>old区（冷数据，占后3/8）。新读入的页首先放入 old区头部 而非链表头部，只有在old区停留超过 <code>innodb_old_blocks_time</code>（默认1000ms）后再次被访问时，才会移到young区。</p>
+<p>Buffer Pool使用改进的 LRU（Least Recently Used）算法管理页面。链表被分为两段：young区（热数据，占链表前5/8）和old区（冷数据，占后3/8）。新读入的页首先放入old区头部而非链表头部，只有在old区停留超过 <code>innodb_old_blocks_time</code>（默认1000ms）后再次被访问时，才会移到young区。</p>
 <p>这种 midpoint insertion 策略有效防止了全表扫描等一次性大量读取操作将热点数据从Buffer Pool中冲刷出去。可通过 <code>SHOW ENGINE INNODB STATUS</code> 查看Buffer Pool命中率，理想值应大于99%。多实例场景可设置 <code>innodb_buffer_pool_instances</code> 减少互斥锁争用。</p>
 </div></div>
 </details>
@@ -948,7 +1037,8 @@
     <summary class="qa-question"><strong>Q：</strong>3、InnoDB的MVCC（多版本并发控制）是如何实现的？Read View的作用是什么？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>InnoDB通过 MVCC 实现非锁定一致性读，核心机制依赖三个隐藏字段和 Undo Log。</p>
 <p><strong>每行数据包含隐藏列</strong>： <code>DB_TRX_ID</code>（最后修改该行的事务ID）、 <code>DB_ROLL_PTR</code>（回滚指针，指向Undo Log中的旧版本）、 <code>DB_ROW_ID</code>（行ID，无主键时自动生成）。当事务修改数据时，旧版本通过Undo Log形成 版本链。</p>
-<p>Read View 是事务执行快照读时创建的一致性视图，包含： <code>m_ids</code>（活跃事务ID列表）、 <code>min_trx_id</code>（最小活跃事务ID）、 <code>max_trx_id</code>（下一个将分配的事务ID）、 <code>creator_trx_id</code>（创建该视图的事务ID）。通过比较行的<code>DB_TRX_ID</code>与Read View的边界值，判断该版本对当前事务是否可见。</p>
+<p>Read View 是事务执行快照读时创建的一致性视图，包含：<code>m_ids</code>（活跃事务ID列表）、<code>min_trx_id</code>（最小活跃事务ID）、<code>max_trx_id</code>（下一个将分配的事务ID）、<code>creator_trx_id</code>（创建该视图的事务ID）。</p>
+<p>通过比较行的 <code>DB_TRX_ID</code> 与 Read View 的边界值，判断该版本对当前事务是否可见。</p>
 <p>在 <code>READ COMMITTED</code> 隔离级别下，每次SELECT都创建新的Read View；在 <code>REPEATABLE READ</code> 下，只在事务第一次SELECT时创建，后续复用同一Read View，从而保证可重复读。</p>
 </div></div>
 </details>
@@ -956,7 +1046,8 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>4、请解释InnoDB中Redo Log、Undo Log和Binlog的区别及各自作用。</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>三种日志分属不同层次，各司其职：</p>
-<p>Redo Log（重做日志）属于 InnoDB存储引擎层，记录的是物理级别的页修改（如&quot;某页某偏移写入了某值&quot;）。采用 WAL（Write-Ahead Logging） 机制，事务提交时先写Redo Log再刷数据页，实现 crash-safe 崩溃恢复。Redo Log是循环写入的固定大小文件，由 <code>innodb_log_file_size</code> 和 <code>innodb_log_files_in_group</code> 控制。</p>
+<p>Redo Log（重做日志）属于 InnoDB存储引擎层，记录的是物理级别的页修改（如&quot;某页某偏移写入了某值&quot;）。采用 WAL（Write-Ahead Logging）机制，事务提交时先写Redo Log再刷数据页，实现 crash-safe 崩溃恢复。</p>
+<p>Redo Log是循环写入的固定大小文件，由 <code>innodb_log_file_size</code> 和 <code>innodb_log_files_in_group</code> 控制。</p>
 <p>Undo Log（回滚日志）同属 InnoDB层，记录数据修改前的逻辑旧值。用于 事务回滚（ROLLBACK时恢复旧数据）和 MVCC（为一致性读提供历史版本）。Undo Log存储在Undo Tablespace中，8.0支持独立的Undo表空间并可自动truncate。</p>
 <p>Binlog（二进制日志）属于 MySQL Server层，记录所有引擎的逻辑变更（SQL语句或行变更）。用于 主从复制 和 基于时间点的恢复（PITR）。Binlog有三种格式： <code>STATEMENT</code>、 <code>ROW</code>、 <code>MIXED</code>，由 <code>binlog_format</code> 控制。</p>
 <p>事务提交时通过两阶段提交（2PC）保证Redo Log和Binlog的一致性：先写Redo Log（prepare阶段）→ 写Binlog → 写Redo Log（commit阶段）。</p>
@@ -977,7 +1068,13 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>6、InnoDB数据页（Page）的内部结构是怎样的？为什么默认页大小是16KB？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>InnoDB的数据页（默认 16KB）是磁盘和内存之间I/O的最小单位。一个数据页的内部结构从上到下包含：</p>
-<p>File Header（38字节）：页号、页类型、前后页指针（构成双向链表）、LSN、所属表空间等。 Page Header（56字节）：页内记录数、空闲空间起始位置、页目录槽数等。 Infimum和Supremum：页中虚拟的最小和最大记录，作为记录链表的边界。 User Records：实际的行数据，按主键顺序通过<code>next_record</code>指针构成单向链表。 Free Space：尚未使用的空间。 Page Directory：存储槽（Slot），每个槽指向一组记录，支持在页内进行 二分查找。 File Trailer（8字节）：校验和，用于验证页的完整性。</p>
+<p>File Header（38字节）：页号、页类型、前后页指针（构成双向链表）、LSN、所属表空间等。</p>
+<p>Page Header（56字节）：页内记录数、空闲空间起始位置、页目录槽数等。</p>
+<p>Infimum和Supremum：页中虚拟的最小和最大记录，作为记录链表的边界。</p>
+<p>User Records：实际的行数据，按主键顺序通过<code>next_record</code>指针构成单向链表。</p>
+<p>Free Space：尚未使用的空间。</p>
+<p>Page Directory：存储槽（Slot），每个槽指向一组记录，支持在页内进行二分查找。</p>
+<p>File Trailer（8字节）：校验和，用于验证页的完整性。</p>
 <p>默认16KB是在磁盘I/O效率和内存利用率之间的平衡：太小会增加I/O次数，太大会浪费内存和带宽。对于SSD场景，可通过 <code>innodb_page_size</code> 在建库时设为4KB/8KB/32KB/64KB，但 建库后不可更改。</p>
 </div></div>
 </details>
@@ -985,8 +1082,9 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>7、MySQL的线程模型是怎样的？与PostgreSQL的进程模型有什么本质区别？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL采用 单进程多线程 模型。每个客户端连接对应一个 用户线程，所有线程共享同一进程的地址空间和全局资源（如Buffer Pool）。</p>
-<p>核心线程类型包括： 连接线程（处理客户端请求）、 Master Thread（负责刷脏页、合并Change Buffer、purge Undo等后台调度）、 IO Thread（包括read/write IO线程处理异步I/O请求）、 Purge Thread（清理不再需要的Undo Log记录）、 Page Cleaner Thread（负责脏页刷盘）。</p>
-<p>与PostgreSQL的 多进程 模型相比：MySQL线程间通信通过共享内存，开销更小、上下文切换更快；但存在 全局锁 争用问题（如早期的buffer pool mutex）。PostgreSQL每个连接是独立进程，隔离性更好但fork开销更大。MySQL通过 线程池（Thread Pool，企业版或Percona版）优化高并发场景，避免大量线程同时运行导致的上下文切换开销，配置参数为 <code>thread_pool_size</code>。</p>
+<p>核心线程类型包括：连接线程（处理客户端请求）、Master Thread（负责刷脏页、合并Change Buffer、purge Undo等后台调度）、IO Thread（包括read/write IO线程处理异步I/O请求）、Purge Thread（清理不再需要的Undo Log记录）、Page Cleaner Thread（负责脏页刷盘）。</p>
+<p>与PostgreSQL的 多进程 模型相比：MySQL线程间通信通过共享内存，开销更小、上下文切换更快；但存在 全局锁 争用问题（如早期的buffer pool mutex）。PostgreSQL每个连接是独立进程，隔离性更好但fork开销更大。</p>
+<p>MySQL通过 线程池（Thread Pool，企业版或Percona版）优化高并发场景，避免大量线程同时运行导致的上下文切换开销，配置参数为 <code>thread_pool_size</code>。</p>
 <p>可通过 <code>SHOW PROCESSLIST</code> 或 <code>SELECT * FROM performance_schema.threads</code> 查看当前线程状态。</p>
 </div></div>
 </details>
@@ -994,48 +1092,80 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>8、什么是InnoDB的Doublewrite Buffer？它如何防止部分写入（partial write）问题？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Doublewrite Buffer 是InnoDB用来防止部分写入（Partial Write / Torn Page）的数据完整性保护机制。操作系统的文件系统通常以4KB为单位写入，而InnoDB页为16KB，如果在刷盘过程中发生掉电或崩溃，可能只写入了部分数据（如8KB），导致页损坏且无法通过Redo Log恢复（因为Redo Log是基于完整页的物理日志）。</p>
-<p><strong>工作流程</strong>：InnoDB在刷脏页到数据文件之前，先将脏页 顺序写入 Doublewrite Buffer区域（在系统表空间ibdata中的连续128页，共2MB）。写入完成后再将页刷到各自的表空间文件。如果在第二步刷盘时发生崩溃，恢复时InnoDB从Doublewrite Buffer中找到完整的页副本，先恢复损坏的页，再应用Redo Log。</p>
+<p><strong>工作流程</strong>：InnoDB在刷脏页到数据文件之前，先将脏页顺序写入 Doublewrite Buffer区域（在系统表空间ibdata中的连续128页，共2MB）。</p>
+<p>写入完成后再将页刷到各自的表空间文件。如果在第二步刷盘时发生崩溃，恢复时InnoDB从Doublewrite Buffer中找到完整的页副本，先恢复损坏的页，再应用Redo Log。</p>
 <p>MySQL 8.0.20后Doublewrite Buffer可独立存放在单独文件中，由 <code>innodb_doublewrite_dir</code> 和 <code>innodb_doublewrite_files</code> 控制。在使用支持原子写入的存储设备（如FusionIO）时，可通过 <code>innodb_doublewrite=OFF</code> 关闭以提升写入性能。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>9、InnoDB的Change Buffer是什么？它适用于什么场景？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Change Buffer（变更缓冲）是InnoDB用来优化 非唯一二级索引 DML操作的缓存机制。当对二级索引页执行INSERT、UPDATE、DELETE时，如果目标页不在Buffer Pool中，InnoDB不会立即从磁盘读取该页，而是将变更操作缓存到Change Buffer中，后续当该页被读取到Buffer Pool时，再合并（merge）这些变更。</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Change Buffer（变更缓冲）是InnoDB用来优化 非唯一二级索引 DML操作的缓存机制。</p>
+<p>当对二级索引页执行INSERT、UPDATE、DELETE时，如果目标页不在Buffer Pool中，InnoDB不会立即从磁盘读取该页，而是将变更操作缓存到Change Buffer中，后续当该页被读取到Buffer Pool时，再合并（merge）这些变更。</p>
 <p><strong>适用场景</strong>：适合写多读少且二级索引较多的场景，如日志表、订单流水表。Change Buffer可以显著减少随机I/O，因为多次修改可以合并为一次磁盘操作。</p>
 <p><strong>不适用场景</strong>： 唯一索引 不能使用Change Buffer（需要读取页来检查唯一性约束）；读操作频繁的表效果有限（页经常在Buffer Pool中，直接修改即可）。</p>
-<p>配置参数 <code>innodb_change_buffering</code> 控制缓冲哪些操作（all/none/inserts/deletes/changes/purges）， <code>innodb_change_buffer_max_size</code> 控制Change Buffer占Buffer Pool的最大比例（默认25%）。可通过 <code>SHOW ENGINE INNODB STATUS</code> 的<code>INSERT BUFFER</code>部分监控合并频率。</p>
+<p>配置参数 <code>innodb_change_buffering</code> 控制缓冲哪些操作（all/none/inserts/deletes/changes/purges），<code>innodb_change_buffer_max_size</code> 控制Change Buffer占Buffer Pool的最大比例（默认25%）。可通过 <code>SHOW ENGINE INNODB STATUS</code> 的 <code>INSERT BUFFER</code> 部分监控合并频率。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>51、MySQL 8.0 数据字典（Data Dictionary）相比之前版本有什么变化？对 DBA 日常运维有哪些影响？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0 将原来存储在 <code>.frm</code>、 .par、 .TRG 等文件中的元数据统一迁移到 InnoDB 引擎的 mysql 系统库中，形成 事务型数据字典。 这意味着 DDL 操作具有原子性：例如 <code>DROP TABLE t1, t2</code> 要么全部成功，要么全部回滚，不再出现表文件残留的不一致情况。 DBA 可通过 <code>information_schema</code> 视图查询元数据，但底层表（<code>mysql.tables</code>、 <code>mysql.columns</code> 等）默认不可直接访问，需要在 debug 模式下查看。 升级到 8.0 后，备份工具必须支持新字典格式； <code>mysqlcheck --upgrade</code> 在首次启动时自动执行数据字典迁移。 日常影响包括：无法再通过直接复制 <code>.frm</code> 文件恢复表结构， <code>SHOW CREATE TABLE</code> 的信息全部来自 InnoDB 数据字典。 排障时可使用 <code>INFORMATION_SCHEMA.INNODB_TABLES</code> 和 <code>INNODB_COLUMNS</code> 来查看底层元数据。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0 将原来存储在 <code>.frm</code>、.par、.TRG 等文件中的元数据统一迁移到 InnoDB 引擎的 mysql 系统库中，形成<strong>事务型数据字典</strong>。</p>
+<p>这意味着 DDL 操作具有原子性：例如 <code>DROP TABLE t1, t2</code> 要么全部成功，要么全部回滚，不再出现表文件残留的不一致情况。</p>
+<p>DBA 可通过 <code>information_schema</code> 视图查询元数据，但底层表（<code>mysql.tables</code>、<code>mysql.columns</code> 等）默认不可直接访问，需要在 debug 模式下查看。</p>
+<p>升级到 8.0 后，备份工具必须支持新字典格式；<code>mysqlcheck --upgrade</code> 在首次启动时自动执行数据字典迁移。</p>
+<p>日常影响包括：无法再通过直接复制 <code>.frm</code> 文件恢复表结构，<code>SHOW CREATE TABLE</code> 的信息全部来自 InnoDB 数据字典。</p>
+<p>排障时可使用 <code>INFORMATION_SCHEMA.INNODB_TABLES</code> 和 <code>INNODB_COLUMNS</code> 来查看底层元数据。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>52、MySQL 8.0 的直方图（Histogram）统计信息是什么？如何创建和使用？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">直方图 是 MySQL 8.0 引入的列级统计信息，帮助优化器在缺少索引时更准确地估算数据分布，从而选择更优的执行计划。 使用 <code>ANALYZE TABLE t UPDATE HISTOGRAM ON col1, col2 WITH 100 BUCKETS;</code> 创建直方图，桶数量默认 100，最大 1024。 MySQL 支持两种类型： 等宽直方图（singleton，值唯一数少于桶数）和 等高直方图（equi-height，值唯一数多于桶数）。 直方图信息存储在数据字典中，可通过 <code>information_schema.COLUMN_STATISTICS</code> 查看， histogram 列以 JSON 格式返回桶分布。 适用场景包括：对未建索引的过滤列提升查询选择性估算、多表 JOIN 时优化连接顺序。 注意直方图不会自动更新，数据分布变化大时需重新执行 <code>ANALYZE TABLE ... UPDATE HISTOGRAM</code>；删除使用 <code>DROP HISTOGRAM ON col</code>。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>直方图是 MySQL 8.0 引入的列级统计信息，帮助优化器在缺少索引时更准确地估算数据分布，从而选择更优的执行计划。</p>
+<p>使用 <code>ANALYZE TABLE t UPDATE HISTOGRAM ON col1, col2 WITH 100 BUCKETS;</code> 创建直方图，桶数量默认 100，最大 1024。</p>
+<p>MySQL 支持两种类型：等宽直方图（singleton，值唯一数少于桶数）和等高直方图（equi-height，值唯一数多于桶数）。</p>
+<p>直方图信息存储在数据字典中，可通过 <code>information_schema.COLUMN_STATISTICS</code> 查看，histogram 列以 JSON 格式返回桶分布。</p>
+<p>适用场景包括：对未建索引的过滤列提升查询选择性估算、多表 JOIN 时优化连接顺序。</p>
+<p>注意直方图不会自动更新，数据分布变化大时需重新执行 <code>ANALYZE TABLE ... UPDATE HISTOGRAM</code>；删除使用 <code>DROP HISTOGRAM ON col</code>。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>53、什么是 MySQL 的不可见索引（Invisible Index）？在生产环境中有哪些实际用途？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">不可见索引（Invisible Index）是 MySQL 8.0 引入的特性，使索引对优化器不可见但仍然由 InnoDB 正常维护（DML 操作仍会更新索引）。 语法： <code>ALTER TABLE t ALTER INDEX idx_name INVISIBLE;</code> 和 <code>ALTER TABLE t ALTER INDEX idx_name VISIBLE;</code>。 最典型的用途是 安全评估删除索引的影响：先将索引设为不可见，观察慢查询日志和业务性能，确认无影响后再真正 <code>DROP INDEX</code>。 也可用于 A/B 测试：通过 <code>SET SESSION optimizer_switch='use_invisible_indexes=on';</code> 在特定会话中启用不可见索引进行对比测试。 新建索引时也可以使用 <code>CREATE INDEX idx ON t(col) INVISIBLE;</code>，先创建但不让优化器使用，待验证数据分布后再设为可见。 注意：主键不能设为不可见；不可见索引仍占用磁盘空间和写入开销。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>不可见索引（Invisible Index）是 MySQL 8.0 引入的特性，使索引对优化器不可见但仍然由 InnoDB 正常维护（DML 操作仍会更新索引）。</p>
+<p>语法：<code>ALTER TABLE t ALTER INDEX idx_name INVISIBLE;</code> 和 <code>ALTER TABLE t ALTER INDEX idx_name VISIBLE;</code>。</p>
+<p>最典型的用途是<strong>安全评估删除索引的影响</strong>：先将索引设为不可见，观察慢查询日志和业务性能，确认无影响后再真正 <code>DROP INDEX</code>。</p>
+<p>也可用于 A/B 测试：通过 <code>SET SESSION optimizer_switch='use_invisible_indexes=on';</code> 在特定会话中启用不可见索引进行对比测试。</p>
+<p>新建索引时也可以使用 <code>CREATE INDEX idx ON t(col) INVISIBLE;</code>，先创建但不让优化器使用，待验证数据分布后再设为可见。</p>
+<p>注意：主键不能设为不可见；不可见索引仍占用磁盘空间和写入开销。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>54、MySQL 8.0 支持降序索引（Descending Index）和函数索引（Functional Index），请分别说明其用法和适用场景。</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">降序索引：MySQL 8.0 之前， DESC 在索引定义中被忽略，所有 B+Tree 索引均按升序存储。8.0 开始真正支持降序扫描。 创建方式： <code>CREATE INDEX idx ON t(col1 ASC, col2 DESC);</code>，适用于 ORDER BY col1 ASC, col2 DESC 的混合排序查询，避免 filesort。 验证方式： EXPLAIN 中若无 Using filesort 且使用了该索引，即表示降序索引生效。 函数索引：本质是基于表达式的虚拟生成列上的索引，语法为 <code>CREATE INDEX idx ON t((LOWER(email)));</code>，注意双括号。 适用于 WHERE LOWER(email) = &rsquo;<a class="link" href="mailto:test@example.com" >test@example.com</a>&rsquo; 类查询，避免因列上使用函数导致索引失效。 也支持 JSON 提取： <code>CREATE INDEX idx ON t((CAST(doc-&gt;&gt;'$.age' AS UNSIGNED)));</code> 可加速 JSON 字段的精确查找。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>降序索引**：MySQL 8.0 之前，DESC 在索引定义中被忽略，所有 B+Tree 索引均按升序存储。8.0 开始真正支持降序扫描。</p>
+<p>创建方式：<code>CREATE INDEX idx ON t(col1 ASC, col2 DESC);</code>，适用于 ORDER BY col1 ASC, col2 DESC 的混合排序查询，避免 filesort。</p>
+<p>验证方式：EXPLAIN 中若无 Using filesort 且使用了该索引，即表示降序索引生效。</p>
+<p><strong>函数索引</strong>：本质是基于表达式的虚拟生成列上的索引，语法为 <code>CREATE INDEX idx ON t((LOWER(email)));</code>，注意双括号。</p>
+<p>适用于 WHERE LOWER(email) = &rsquo;<a class="link" href="mailto:test@example.com" >test@example.com</a>&rsquo; 类查询，避免因列上使用函数导致索引失效。</p>
+<p>也支持 JSON 提取：<code>CREATE INDEX idx ON t((CAST(doc-&gt;&gt;'$.age' AS UNSIGNED)));</code> 可加速 JSON 字段的精确查找。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>55、MySQL 8.0 的 Instant DDL 是什么？支持哪些操作？与 Online DDL 有何区别？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Instant DDL 是 MySQL 8.0.12 引入的 DDL 算法，通过仅修改数据字典元数据来完成表结构变更，无需重建表或复制数据，操作近乎瞬时完成。 语法： <code>ALTER TABLE t ADD COLUMN new_col INT DEFAULT 0, ALGORITHM=INSTANT;</code>。MySQL 8.0.12 仅支持在表末尾添加列。 MySQL 8.0.29 扩展了支持范围：可在任意位置添加列、删除列、修改 <code>ENUM/SET</code> 值等，但仍有限制（如不支持更改列类型、添加索引）。 与 Online DDL（<code>ALGORITHM=INPLACE</code>/<code>COPY</code>）的区别：Online DDL 可能需要重建表（如 <code>OPTIMIZE TABLE</code>），期间需要短暂的元数据锁；Instant DDL 几乎不阻塞并发 DML。 注意事项：频繁使用 Instant ADD/<code>DROP COLUMN</code> 会导致行格式中出现版本标记，可能影响读性能，建议定期 <code>OPTIMIZE TABLE</code> 整理。 查看表是否有 Instant 列： <code>SELECT * FROM information_schema.INNODB_TABLES WHERE NAME='schema/table'\G</code> 检查 <code>INSTANT_COLS</code> 字段。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Instant DDL 是 MySQL 8.0.12 引入的 DDL 算法，通过仅修改数据字典元数据来完成表结构变更，无需重建表或复制数据，操作近乎瞬时完成。</p>
+<p>语法：<code>ALTER TABLE t ADD COLUMN new_col INT DEFAULT 0, ALGORITHM=INSTANT;</code>。MySQL 8.0.12 仅支持在表末尾添加列。</p>
+<p>MySQL 8.0.29 扩展了支持范围：可在任意位置添加列、删除列、修改 <code>ENUM/SET</code> 值等，但仍有限制（如不支持更改列类型、添加索引）。</p>
+<p>与 Online DDL（<code>ALGORITHM=INPLACE</code>/<code>COPY</code>）的区别：Online DDL 可能需要重建表（如 <code>OPTIMIZE TABLE</code>），期间需要短暂的元数据锁；Instant DDL 几乎不阻塞并发 DML。</p>
+<p>注意事项：频繁使用 Instant ADD/<code>DROP COLUMN</code> 会导致行格式中出现版本标记，可能影响读性能，建议定期 <code>OPTIMIZE TABLE</code> 整理。</p>
+<p>查看表是否有 Instant 列：<code>SELECT * FROM information_schema.INNODB_TABLES WHERE NAME='schema/table'\G</code> 检查 <code>INSTANT_COLS</code> 字段。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>102、MySQL 9.0 中的 JavaScript 存储程序（component_language_js）是什么？它如何工作？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 9.0 Innovation 版本引入了 JavaScript 存储程序，通过 <code>component_language_js</code> 组件支持使用 JavaScript 编写存储函数和存储过程。 底层基于 GraalVM JavaScript 引擎，在数据库内安全沙箱中执行 JS 代码，支持 ES2023 语法。</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 9.0 Innovation 版本引入了 JavaScript 存储程序，通过 <code>component_language_js</code> 组件支持使用 JavaScript 编写存储函数和存储过程。底层基于 GraalVM JavaScript 引擎，在数据库内安全沙箱中执行 JS 代码，支持 ES2023 语法。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 安装 JS 语言组件
 </span></span></span><span class="line"><span class="cl"><span class="n">INSTALL</span><span class="w"> </span><span class="n">COMPONENT</span><span class="w">  </span><span class="s1">&#39;file://component_language_js&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 创建 JavaScript 存储函数
@@ -1047,22 +1177,26 @@
 </span></span></span><span class="line"><span class="cl"><span class="err">$$</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 调用
 </span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w">  </span><span class="n">calculate_discount</span><span class="p">(</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="p">.</span><span class="w"> </span><span class="mi">00</span><span class="w"> </span><span class="p">,</span><span class="w">  </span><span class="s1">&#39;VIP&#39;</span><span class="w"> </span><span class="p">);</span><span class="w">   </span><span class="c1">-- 返回 80.00
-</span></span></span></code></pre></div><p>JS 存储程序可以访问 SQL 结果集，但不能直接执行文件系统或网络操作（安全限制）。 适用场景：复杂业务逻辑、JSON 数据处理。对于熟悉 JavaScript 的全栈团队，降低了存储过程开发门槛。 注意：此功能在 9.0 Innovation 版本中首发，尚未进入 LTS，生产使用需谨慎。</p>
+</span></span></span></code></pre></div><p>JS 存储程序可以访问 SQL 结果集，但不能直接执行文件系统或网络操作（安全限制）。</p>
+<p><strong>适用场景</strong>：复杂业务逻辑、JSON 数据处理。对于熟悉 JavaScript 的全栈团队，降低了存储过程开发门槛。</p>
+<p><strong>注意</strong>：此功能在 9.0 Innovation 版本中首发，尚未进入 LTS，生产使用需谨慎。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>105、MySQL 8.4 中 InnoDB redo log 归档和写前日志优化有哪些改进？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 对 InnoDB 的 redo log 管理进行了重要改进，提升了高写入负载下的性能和可管理性。 Redo Log 动态调整： 8.4 中 <code>innodb_redo_log_capacity</code> 完全替代了旧的 <code>innodb_log_file_size</code> + <code>innodb_log_files_in_group</code> 参数，支持在线动态调整。</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 对 InnoDB 的 redo log 管理进行了重要改进，提升了高写入负载下的性能和可管理性。</p>
+<p><strong>Redo Log 动态调整</strong>：8.4 中 <code>innodb_redo_log_capacity</code> 完全替代了旧的 <code>innodb_log_file_size</code> + <code>innodb_log_files_in_group</code> 参数，支持在线动态调整。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 查看和调整 redo log 容量（无需重启）
 </span></span></span><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">innodb_redo_log_capacity</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">4294967296</span><span class="w"> </span><span class="p">;</span><span class="w">   </span><span class="c1">-- 4GB
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 查看 redo log 状态
 </span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="k">FROM</span><span class="w">  </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">innodb_redo_log_files</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w">  </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Innodb_redo_log%&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p><strong>Redo Log 归档</strong>： 通过 <code>innodb_redo_log_archive_dirs</code> 配置归档目录，备份工具（如 XtraBackup）在热备期间可从归档读取，避免 redo log 被覆盖。</p>
+</span></span></span></code></pre></div><p><strong>Redo Log 归档</strong>：通过 <code>innodb_redo_log_archive_dirs</code> 配置归档目录，备份工具（如 XtraBackup）在热备期间可从归档读取，避免 redo log 被覆盖。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">innodb_redo_log_archive_dirs</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s1">&#39;label:/backup/redo_archive&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 由备份工具自动调用 innodb_redo_log_archive_start()
-</span></span></span></code></pre></div><p><strong>WAL 优化</strong>： 8.4 优化了 log writer 和 log flusher 线程的协作，减少了 <code>log_sys</code> mutex 竞争，提升了高并发写入的吞吐量。 迁移注意：从 8.0 升级时，旧的 <code>innodb_log_file_size</code> 参数会被自动忽略，需设置 <code>innodb_redo_log_capacity</code>。</p>
+</span></span></span></code></pre></div><p><strong>WAL 优化</strong>：8.4 优化了 log writer 和 log flusher 线程的协作，减少了 <code>log_sys</code> mutex 竞争，提升了高并发写入的吞吐量。</p>
+<p><strong>迁移注意</strong>：从 8.0 升级时，旧的 <code>innodb_log_file_size</code> 参数会被自动忽略，需设置 <code>innodb_redo_log_capacity</code>。</p>
 </div></div>
 </details>
 
@@ -1138,8 +1272,10 @@
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>mysqldump</code> 和 mysqlpump 都是MySQL官方的逻辑备份工具，但设计理念不同：</p>
 <p><code>mysqldump</code>：经典的单线程逻辑备份工具。按表逐个导出SQL语句（<code>CREATE TABLE + INSERT</code>）。优点是稳定可靠、兼容性好、可通过管道直接导入。缺点是 单线程，大数据量时速度慢。常用参数：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mysqldump -u root -p --single-transaction --master-data<span class="o">=</span><span class="m">2</span> --routines --triggers --events --databases db1 db2  &gt;  backup.sql
-</span></span></code></pre></div><p><code>--single-transaction</code> 利用MVCC获取一致性快照（仅InnoDB），不锁表。 <code>--master-data=2</code> 在备份中记录Binlog位点信息（用于搭建从库）。</p>
-<p>mysqlpump：MySQL 5.7引入的增强版，支持 多线程并行导出。可按数据库或表级别并行，使用 <code>--default-parallelism=N</code> 设置线程数。额外支持进度显示、用户和权限导出、压缩输出。但存在一些已知问题：不保证表之间的一致性快照（不同线程在不同时间点读取），不适合需要严格一致性的场景。</p>
+</span></span></code></pre></div><p><code>--single-transaction</code> 利用MVCC获取一致性快照（仅InnoDB），不锁表。</p>
+<p><code>--master-data=2</code> 在备份中记录Binlog位点信息（用于搭建从库）。</p>
+<p>mysqlpump：MySQL 5.7引入的增强版，支持 多线程并行导出。可按数据库或表级别并行，使用 <code>--default-parallelism=N</code> 设置线程数。</p>
+<p>额外支持进度显示、用户和权限导出、压缩输出。但存在一些已知问题：不保证表之间的一致性快照（不同线程在不同时间点读取），不适合需要严格一致性的场景。</p>
 <p><strong>生产建议</strong>：需要一致性备份用 <code>mysqldump</code> <code>--single-transaction</code>；大库需要并行速度用 mydumper/myloader（第三方开源工具，支持多线程+一致性快照），或使用 XtraBackup 物理备份。</p>
 </div></div>
 </details>
@@ -1314,7 +1450,7 @@
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>一个完善的生产备份恢复策略应包含以下要素：</p>
 <p><strong>备份计划</strong>：</p>
 <ol>
-<li><strong>物理全量备份</strong>：每天凌晨使用XtraBackup，保留7天。 xtrabackup <code>--backup</code> <code>--compress</code> <code>--compress-threads=4</code> <code>--target-dir=/backup/full/</code>$(date +%Y%m%d)。</li>
+<li><strong>物理全量备份</strong>：每天凌晨使用XtraBackup，保留7天：<code>xtrabackup --backup --compress --compress-threads=4 --target-dir=/backup/full/$(date +%Y%m%d)</code></li>
 <li><strong>Binlog实时归档</strong>：使用 <code>mysqlbinlog</code> <code>--read-from-remote-server</code> <code>--raw</code> <code>--stop-never</code> 实时同步Binlog到备份服务器，或配置 <code>binlog_expire_logs_seconds</code>=604800（7天自动清理本地）。</li>
 <li>逻辑备份：每周日使用<code>mysqldump</code>进行一次逻辑备份，用于跨版本恢复验证。</li>
 <li><strong>备份存储</strong>：本地保留最近7天 + 异地（对象存储如S3/OSS）保留30天 + 重要备份归档保留1年。</li>
@@ -1333,27 +1469,61 @@
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>81、MySQL Enterprise Backup（MEB）与 XtraBackup 相比有哪些差异和优势？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL Enterprise Backup（MEB）是 Oracle 官方的企业级热备工具，需要商业许可证，而 XtraBackup 由 Percona 开源免费。 MEB 核心优势：原生支持 MySQL 8.0 新特性（数据字典、Instant DDL 列）、支持备份加密（<code>--encrypt</code>）、压缩（<code>--compress</code>）和云存储直传（S3/Oracle Cloud）。 备份命令： mysqlbackup <code>--user=root</code> <code>--password=xxx</code> <code>--backup-dir=/backup</code> <code>--with-timestamp</code> backup-and-apply-log，一步完成备份和日志应用。 增量备份： mysqlbackup <code>--incremental</code> <code>--incremental-base=dir:/backup/full</code> <code>--backup-dir=/backup/inc1</code> backup。 MEB 支持 TTS（Transportable Tablespace） 备份，可单独备份和恢复特定表空间，XtraBackup 也支持但配置更复杂。 选择建议：已购买 MySQL Enterprise 许可的企业用 MEB 获得官方支持；开源社区版用户选择 XtraBackup，功能对日常 DBA 已足够。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL Enterprise Backup（MEB）是 Oracle 官方的企业级热备工具，需要商业许可证，而 XtraBackup 由 Percona 开源免费。</p>
+<p><strong>MEB 核心优势</strong>：原生支持 MySQL 8.0 新特性（数据字典、Instant DDL 列）、支持备份加密（<code>--encrypt</code>）、压缩（<code>--compress</code>）和云存储直传（S3/Oracle Cloud）。</p>
+<p><strong>备份命令</strong>：<code>mysqlbackup --user=root --password=xxx --backup-dir=/backup --with-timestamp backup-and-apply-log</code>，一步完成备份和日志应用。</p>
+<p><strong>增量备份</strong>：<code>mysqlbackup --incremental --incremental-base=dir:/backup/full --backup-dir=/backup/inc1 backup</code>。</p>
+<p>MEB 支持 TTS（Transportable Tablespace）备份，可单独备份和恢复特定表空间，XtraBackup 也支持但配置更复杂。</p>
+<p><strong>选择建议</strong>：已购买 MySQL Enterprise 许可的企业用 MEB 获得官方支持；开源社区版用户选择 XtraBackup，功能对日常 DBA 已足够。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>82、mydumper 和 myloader 如何实现 MySQL 的并行备份和恢复？相比 mysqldump 有哪些优势？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">mydumper 是多线程逻辑备份工具，通过 <code>--threads</code> 参数并行导出多张表，每张表导出为独立文件，显著优于 <code>mysqldump</code> 的单线程串行。 备份命令： mydumper -h 127.0.0.1 -u root -p xxx -B mydb -t 8 -o /backup/mydb/ 使用 8 个线程并行导出。 myloader 是对应的并行恢复工具： myloader -h 127.0.0.1 -u root -p xxx -B mydb -t 8 -d /backup/mydb/ 多线程并行导入。 核心优势：1）对大表支持 按行分片导出（<code>--rows</code>），例如 <code>--rows</code> 100000 每 10 万行一个文件，恢复时可并行加载。 2）一致性快照通过 <code>FLUSH TABLES WITH READ LOCK</code> + <code>START TRANSACTION WITH CONSISTENT SNAPSHOT</code> 实现（与 <code>mysqldump</code> <code>--single-transaction</code> 类似）。 3）支持 <code>--regex</code> 过滤表、 <code>--compress</code> 压缩、 <code>--triggers</code> / <code>--events</code> / <code>--routines</code> 导出存储程序。 注意：mydumper 需单独安装（不在 MySQL 发行版中）， apt install mydumper 或从 GitHub 编译。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>mydumper 是多线程逻辑备份工具，通过 <code>--threads</code> 参数并行导出多张表，每张表导出为独立文件，显著优于 <code>mysqldump</code> 的单线程串行。</p>
+<p><strong>备份命令</strong>：<code>mydumper -h 127.0.0.1 -u root -p xxx -B mydb -t 8 -o /backup/mydb/</code> 使用 8 个线程并行导出。</p>
+<p>myloader 是对应的并行恢复工具：<code>myloader -h 127.0.0.1 -u root -p xxx -B mydb -t 8 -d /backup/mydb/</code> 多线程并行导入。</p>
+<p><strong>核心优势</strong>：</p>
+<p>对大表支持按行分片导出（<code>--rows</code>），例如 <code>--rows 100000</code> 每 10 万行一个文件，恢复时可并行加载。</p>
+<p>一致性快照通过 <code>FLUSH TABLES WITH READ LOCK</code> + <code>START TRANSACTION WITH CONSISTENT SNAPSHOT</code> 实现（与 <code>mysqldump --single-transaction</code> 类似）。</p>
+<p>支持 <code>--regex</code> 过滤表、<code>--compress</code> 压缩、<code>--triggers</code> / <code>--events</code> / <code>--routines</code> 导出存储程序。</p>
+<p><strong>注意</strong>：mydumper 需单独安装（不在 MySQL 发行版中），<code>apt install mydumper</code> 或从 GitHub 编译。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>83、如何使用 crontab 和脚本实现 MySQL 备份自动化？请给出一个完整的生产级备份方案示例。</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">生产级备份自动化方案通常结合全量备份 + 增量备份 + binlog 归档，示例使用 XtraBackup。 每周日全量备份脚本： xtrabackup <code>--backup</code> <code>--target-dir=/backup/full/</code>$(date +%Y%m%d) <code>--user=root</code> <code>--password=xxx</code> 2&gt;/var/log/<code>xtrabackup_full.log</code> 每天增量备份： xtrabackup <code>--backup</code> <code>--target-dir=/backup/inc/</code>$(date +%Y%m%d) <code>--incremental-basedir=/backup/full/latest</code> <code>--user=root</code> <code>--password=xxx</code> crontab 配置： 0 2 * * 0 /opt/scripts/<code>full_backup.sh</code> 和 0 2 * * 1-6 /opt/scripts/<code>inc_backup.sh</code>（每天凌晨 2 点执行）。 备份后验证：脚本中加入 xtrabackup <code>--prepare</code> 验证备份完整性，并检查退出码 if [ $? -ne 0 ]; then echo &ldquo;BACKUP FAILED&rdquo; | mail -s &ldquo;Alert&rdquo; <a class="link" href="mailto:dba@company.com" >dba@company.com</a>; fi。 binlog 实时归档： <code>mysqlbinlog</code> <code>--raw</code> <code>--read-from-remote-server</code> <code>--host=master</code> <code>--user=repl</code> <code>--stop-never</code> binlog.000001 &amp; 持续拉取 binlog 到备份服务器。 清理策略：保留最近 4 周全量 + 对应增量 + 7 天 binlog， find /backup -type d -mtime +28 -exec rm -rf {} ;</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>生产级备份自动化方案通常结合全量备份 + 增量备份 + binlog 归档，示例使用 XtraBackup。</p>
+<p><strong>每周日全量备份脚本</strong>：<code>xtrabackup --backup --target-dir=/backup/full/$(date +%Y%m%d) --user=root --password=xxx 2&gt;/var/log/xtrabackup_full.log</code></p>
+<p><strong>每天增量备份</strong>：<code>xtrabackup --backup --target-dir=/backup/inc/$(date +%Y%m%d) --incremental-basedir=/backup/full/latest --user=root --password=xxx</code></p>
+<p><strong>crontab 配置</strong>：<code>0 2 * * 0 /opt/scripts/full_backup.sh</code> 和 <code>0 2 * * 1-6 /opt/scripts/inc_backup.sh</code>（每天凌晨 2 点执行）。</p>
+<p><strong>备份后验证</strong>：脚本中加入 xtrabackup <code>--prepare</code> 验证备份完整性，并检查退出码 <code>if [ $? -ne 0 ]; then echo &quot;BACKUP FAILED&quot; | mail -s &quot;Alert&quot; dba@company.com; fi</code>。</p>
+<p><strong>binlog 实时归档</strong>：<code>mysqlbinlog --raw --read-from-remote-server --host=master --user=repl --stop-never binlog.000001 &amp;</code> 持续拉取 binlog 到备份服务器。</p>
+<p><strong>清理策略</strong>：保留最近 4 周全量 + 对应增量 + 7 天 binlog，<code>find /backup -type d -mtime +28 -exec rm -rf {} \;</code></p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>84、如何使用 mysqlbinlog &ndash;read-from-remote-server 搭建远程 binlog 备份服务器？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">远程 binlog 备份服务器通过 <code>mysqlbinlog</code> 的远程拉取模式，将主库的 binlog 实时复制到独立备份机器，提供额外的时间点恢复能力。 启动命令： <code>mysqlbinlog</code> <code>--raw</code> <code>--read-from-remote-server</code> <code>--host=10.0.0.1</code> <code>--port=3306</code> <code>--user=repl</code> <code>--password=xxx</code> <code>--stop-never</code> <code>--result-file=/backup/binlog/</code> binlog.000100 关键参数： <code>--raw</code> 以二进制格式保存（非 SQL 文本）； <code>--stop-never</code> 持续运行不断开； <code>--result-file</code> 指定输出目录。 需要在主库创建复制权限用户： <code>CREATE USER 'repl'@'%' IDENTIFIED BY 'xxx'; GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';</code> 生产部署建议：使用 systemd 管理进程确保宕机自动重启，配置 <code>--stop-never-slave-server-id=999</code> 避免与其他从库冲突。 恢复时： <code>mysqlbinlog /backup/binlog/binlog.000100 binlog.000101 ...</code> | mysql -u root -p 按顺序回放到目标实例。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>远程 binlog 备份服务器通过 <code>mysqlbinlog</code> 的远程拉取模式，将主库的 binlog 实时复制到独立备份机器，提供额外的时间点恢复能力。</p>
+<p><strong>启动命令</strong>：<code>mysqlbinlog --raw --read-from-remote-server --host=10.0.0.1 --port=3306 --user=repl --password=xxx --stop-never --result-file=/backup/binlog/ binlog.000100</code></p>
+<p><strong>关键参数</strong>：<code>--raw</code> 以二进制格式保存（非 SQL 文本）；<code>--stop-never</code> 持续运行不断开；<code>--result-file</code> 指定输出目录。</p>
+<p>需要在主库创建复制权限用户：<code>CREATE USER 'repl'@'%' IDENTIFIED BY 'xxx'; GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%';</code></p>
+<p><strong>生产部署建议</strong>：使用 systemd 管理进程确保宕机自动重启，配置 <code>--stop-never-slave-server-id=999</code> 避免与其他从库冲突。</p>
+<p><strong>恢复时</strong>：<code>mysqlbinlog /backup/binlog/binlog.000100 binlog.000101 ... | mysql -u root -p</code> 按顺序回放到目标实例。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>85、MySQL 跨版本恢复备份（如 5.7 备份恢复到 8.0）有哪些常见陷阱和注意事项？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">跨版本恢复是 DBA 升级迁移中的常见需求，以下是核心注意事项： 1） 物理备份不可直接跨大版本恢复：XtraBackup 5.7 的备份不能直接恢复到 MySQL 8.0，因为 InnoDB 数据字典格式不兼容。需先恢复到 5.7，再用逻辑备份导出后导入 8.0。 2） 字符集变化：MySQL 8.0 默认 utf8mb4，5.7 默认 utf8（utf8mb3），恢复时需确认 <code>CREATE TABLE</code> 中的字符集定义是否兼容。 3） 保留字冲突：8.0 新增了 GROUPS、 RANK、 WINDOW 等保留字，如果表名或列名使用了这些词，导入时会报语法错误，需加反引号。 4） <code>sql_mode</code> 差异：8.0 默认更严格的 <code>sql_mode</code>（如 <code>ONLY_FULL_GROUP_BY</code>），旧版备份中的 SQL 可能执行失败，临时设置 <code>SET SESSION sql_mode='';</code> 导入。 5） 用户认证插件：5.7 默认 <code>mysql_native_password</code>，8.0 默认 <code>caching_sha2_password</code>，恢复用户表后需确认认证插件兼容性。 推荐流程：逻辑备份（<code>mysqldump</code>）→ 在目标版本空实例导入 → <code>mysql_upgrade</code>（8.0.16 前）或自动升级 → 验证数据完整性。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>跨版本恢复是 DBA 升级迁移中的常见需求，以下是核心注意事项：</p>
+<p><strong>物理备份不可直接跨大版本恢复</strong>：XtraBackup 5.7 的备份不能直接恢复到 MySQL 8.0，因为 InnoDB 数据字典格式不兼容。需先恢复到 5.7，再用逻辑备份导出后导入 8.0。</p>
+<p><strong>字符集变化</strong>：MySQL 8.0 默认 utf8mb4，5.7 默认 utf8（utf8mb3），恢复时需确认 <code>CREATE TABLE</code> 中的字符集定义是否兼容。</p>
+<p><strong>保留字冲突</strong>：8.0 新增了 GROUPS、RANK、WINDOW 等保留字，如果表名或列名使用了这些词，导入时会报语法错误，需加反引号。</p>
+<p><strong><code>sql_mode</code> 差异</strong>：8.0 默认更严格的 <code>sql_mode</code>（如 <code>ONLY_FULL_GROUP_BY</code>），旧版备份中的 SQL 可能执行失败，临时设置 <code>SET SESSION sql_mode='';</code> 导入。</p>
+<p><strong>用户认证插件</strong>：5.7 默认 <code>mysql_native_password</code>，8.0 默认 <code>caching_sha2_password</code>，恢复用户表后需确认认证插件兼容性。</p>
+<p><strong>推荐流程</strong>：逻辑备份（<code>mysqldump</code>）→ 在目标版本空实例导入 → <code>mysql_upgrade</code>（8.0.16 前）或自动升级 → 验证数据完整性。</p>
+</div></div>
 </details>
 
 <h2 id="mysql-性能">MySQL 性能
@@ -1365,11 +1535,12 @@
 <li><strong>type（访问类型）</strong>：从优到劣排列为 system &gt; const &gt; <code>eq_ref</code> &gt; ref &gt; range &gt; index &gt; ALL。ALL表示全表扫描，应优先优化。</li>
 <li>key：实际使用的索引名称，NULL表示未使用索引。</li>
 <li>rows：预估需要扫描的行数，值越小越好。</li>
-<li><code>Extra</code>：重要附加信息。 Using index（覆盖索引）最优； Using filesort（额外排序）和 Using temporary（临时表）需要优化； Using where 表示存储引擎返回后还需Server层过滤。</li>
+<li><code>Extra</code>：重要附加信息。Using index（覆盖索引）最优；Using filesort（额外排序）和 Using temporary（临时表）需要优化；Using where 表示存储引擎返回后还需Server层过滤。</li>
 <li><code>filtered</code>：经过WHERE条件过滤后剩余的行百分比。</li>
 <li>ref：与索引比较的列或常量。</li>
 </ul>
-<p><code>EXPLAIN FORMAT=JSON</code> 提供更详细的成本估算： <code>SELECT * FROM information_schema.OPTIMIZER_TRACE</code> 可查看优化器完整的决策过程。 <code>EXPLAIN ANALYZE</code> 显示实际执行时间和行数，是8.0最推荐的分析方式。</p>
+<p><code>EXPLAIN FORMAT=JSON</code> 提供更详细的成本估算：<code>SELECT * FROM information_schema.OPTIMIZER_TRACE</code> 可查看优化器完整的决策过程。</p>
+<p><code>EXPLAIN ANALYZE</code> 显示实际执行时间和行数，是8.0最推荐的分析方式。</p>
 </div></div>
 </details>
 
@@ -1418,7 +1589,8 @@
 <li><strong>优化SQL写法</strong>：避免 <code>SELECT *</code>、减少子查询改用JOIN、分页优化（深分页用延迟关联）。</li>
 <li><strong>验证优化效果</strong>：比较优化前后的EXPLAIN和实际查询时间。</li>
 </ol>
-<p><strong>第四步</strong>：持续监控 使用 <code>performance_schema</code> 或 PMM（Percona Monitoring and Management） 持续跟踪查询性能，设置告警阈值。 <code>sys.statements_with_full_table_scans</code> 视图可快速找到全表扫描的查询。</p>
+<p><strong>第四步</strong>：持续监控 使用 <code>performance_schema</code> 或 PMM（Percona Monitoring and Management）持续跟踪查询性能，设置告警阈值。</p>
+<p><code>sys.statements_with_full_table_scans</code> 视图可快速找到全表扫描的查询。</p>
 </div></div>
 </details>
 
@@ -1444,7 +1616,8 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>24、如何调优InnoDB Buffer Pool以获得最佳性能？在线调整大小的注意事项是什么？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Buffer Pool调优 是MySQL性能优化中最重要的环节：</p>
-<p><strong>大小设置</strong>： <code>innodb_buffer_pool_size</code> 通常设为物理内存的 50%-75%。专用数据库服务器可设更高（80%），需预留内存给OS、连接线程（每个约1-10MB）和其他缓冲区。计算公式参考： 总内存 - OS预留(1-2GB) - 连接内存(<code>max_connections</code> × 线程内存) - 其他Buffer。</p>
+<p><strong>大小设置</strong>：<code>innodb_buffer_pool_size</code> 通常设为物理内存的 50%-75%。专用数据库服务器可设更高（80%），需预留内存给OS、连接线程（每个约1-10MB）和其他缓冲区。</p>
+<p>计算公式参考：总内存 - OS预留(1-2GB) - 连接内存(<code>max_connections</code> × 线程内存) - 其他Buffer。</p>
 <p><strong>多实例配置</strong>： <code>innodb_buffer_pool_instances</code> 建议设置为CPU核数或Buffer Pool大小/1GB（8-16个为佳），每个实例独立管理LRU链表和Free List，减少mutex争用。Buffer Pool ≥ 1GB时才有效。</p>
 <p><strong>在线调整（8.0支持）</strong>：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">innodb_buffer_pool_size</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">8</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="mi">1024</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="mi">1024</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="mi">1024</span><span class="w"> </span><span class="p">;</span><span class="w">   </span><span class="c1">-- 8GB
@@ -1472,7 +1645,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="k">COUNT</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="k">DISTINCT</span><span class="w"> </span><span class="k">LEFT</span><span class="w"> </span><span class="p">(</span><span class="n">email</span><span class="p">,</span><span class="w">  </span><span class="mi">15</span><span class="w"> </span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w">  </span><span class="k">COUNT</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">  </span><span class="k">AS</span><span class="w">  </span><span class="n">sel_15</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="w">  </span><span class="n">users</span><span class="p">;</span><span class="w">
 </span></span></span></code></pre></div><p>选择区分度接近完整列值（如达到90%以上）的最短前缀长度。</p>
-<p><strong>限制</strong>：前缀索引 不能用作覆盖索引（因为索引中没有完整的列值）；不能用于ORDER BY和GROUP BY优化。如果需要对长字符串做等值查询且不需要范围查询，可考虑额外添加一个 哈希列： <code>ALTER TABLE t ADD COLUMN email_hash INT AS (CRC32(email)) STORED, ADD INDEX(email_hash)</code>。</p>
+<p><strong>限制</strong>：前缀索引 不能用作覆盖索引（因为索引中没有完整的列值）；不能用于ORDER BY和GROUP BY优化。</p>
+<p>如果需要对长字符串做等值查询且不需要范围查询，可考虑额外添加一个 哈希列：<code>ALTER TABLE t ADD COLUMN email_hash INT AS (CRC32(email)) STORED, ADD INDEX(email_hash)</code>。</p>
 </div></div>
 </details>
 
@@ -1525,82 +1699,175 @@
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>66、MySQL 8.0 窗口函数（Window Functions）的执行性能如何优化？常见的性能陷阱有哪些？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0 引入窗口函数（<code>ROW_NUMBER()</code> , <code>RANK()</code> , <code>LAG()</code> , <code>SUM()</code> <code>OVER()</code> 等），执行时需要对分区内数据排序， 缺少合适索引会导致全表排序。 优化核心：为 PARTITION BY 和 ORDER BY 列建立复合索引。例如 <code>SELECT ROW_NUMBER() OVER(PARTITION BY dept_id ORDER BY salary DESC)</code> 应建 INDEX(<code>dept_id</code>, salary)。 常见陷阱：在大表上同时使用多个不同排序方向的窗口函数，会产生多次 filesort；可通过 <code>EXPLAIN FORMAT=JSON</code> 检查 <code>used_tmp_table</code> 和 filesort 开销。 避免在 WHERE 子句中直接过滤窗口函数结果，需用子查询或 CTE 包装： <code>SELECT * FROM (SELECT *, ROW_NUMBER() OVER(...) AS rn FROM t) sub WHERE rn &lt;= 10;</code> 对于仅需 <code>ROW_NUMBER()</code> 做 Top-N 查询，考虑用 LIMIT + 子查询替代，性能可能更优。 通过 <code>optimizer_trace</code> 分析窗口函数的执行计划细节： <code>SET optimizer_trace='enabled=on'; SELECT ...; SELECT * FROM information_schema.OPTIMIZER_TRACE;</code></div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0 引入窗口函数（<code>ROW_NUMBER()</code>、<code>RANK()</code>、<code>LAG()</code>、<code>SUM() OVER()</code> 等），执行时需要对分区内数据排序，缺少合适索引会导致全表排序。</p>
+<p><strong>优化核心</strong>：为 PARTITION BY 和 ORDER BY 列建立复合索引。例如 <code>SELECT ROW_NUMBER() OVER(PARTITION BY dept_id ORDER BY salary DESC)</code> 应建 INDEX(<code>dept_id</code>, salary)。</p>
+<p><strong>常见陷阱</strong>：在大表上同时使用多个不同排序方向的窗口函数，会产生多次 filesort；可通过 <code>EXPLAIN FORMAT=JSON</code> 检查 <code>used_tmp_table</code> 和 filesort 开销。</p>
+<p>避免在 WHERE 子句中直接过滤窗口函数结果，需用子查询或 CTE 包装：<code>SELECT * FROM (SELECT *, ROW_NUMBER() OVER(...) AS rn FROM t) sub WHERE rn &lt;= 10;</code></p>
+<p>对于仅需 <code>ROW_NUMBER()</code> 做 Top-N 查询，考虑用 LIMIT + 子查询替代，性能可能更优。</p>
+<p>通过 <code>optimizer_trace</code> 分析窗口函数的执行计划细节：<code>SET optimizer_trace='enabled=on'; SELECT ...; SELECT * FROM information_schema.OPTIMIZER_TRACE;</code></p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>67、MySQL 8.0 的多值索引（Multi-Valued Index）是什么？如何对 JSON 数组列建立索引？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">多值索引（Multi-Valued Index）是 MySQL 8.0.17 引入的功能，允许对 JSON 数组中的每个元素建立索引条目，加速 MEMBER <code>OF()</code>、 <code>JSON_CONTAINS()</code>、 <code>JSON_OVERLAPS()</code> 查询。 创建语法： <code>ALTER TABLE t ADD INDEX idx_tags ((CAST(doc-&gt;'$.tags' AS UNSIGNED ARRAY)));</code> 注意 ARRAY 关键字是多值索引的标志。 示例查询： <code>SELECT * FROM t WHERE 'mysql' MEMBER OF(doc-&gt;'$.tags');</code> 或 <code>SELECT * FROM t WHERE JSON_CONTAINS(doc-&gt;'$.tags', '&quot;mysql&quot;'); EXPLAIN</code> 中多值索引命中时显示 Using index for filtering 或直接作为 ref 访问。 支持的数组元素类型： UNSIGNED ARRAY、 SIGNED ARRAY、 CHAR(N) ARRAY、 DATE ARRAY 等。 限制：多值索引不能作为主键或唯一索引；不能与普通列组合成复合索引；每张表可有多个多值索引。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>多值索引（Multi-Valued Index）是 MySQL 8.0.17 引入的功能，允许对 JSON 数组中的每个元素建立索引条目，加速 MEMBER <code>OF()</code>、<code>JSON_CONTAINS()</code>、<code>JSON_OVERLAPS()</code> 查询。</p>
+<p><strong>创建语法</strong>：<code>ALTER TABLE t ADD INDEX idx_tags ((CAST(doc-&gt;'$.tags' AS UNSIGNED ARRAY)));</code> 注意 ARRAY 关键字是多值索引的标志。</p>
+<p><strong>示例查询</strong>：<code>SELECT * FROM t WHERE 'mysql' MEMBER OF(doc-&gt;'$.tags');</code> 或 <code>SELECT * FROM t WHERE JSON_CONTAINS(doc-&gt;'$.tags', '&quot;mysql&quot;');</code></p>
+<p><code>EXPLAIN</code> 中多值索引命中时显示 Using index for filtering 或直接作为 ref 访问。</p>
+<p><strong>支持的数组元素类型</strong>：UNSIGNED ARRAY、SIGNED ARRAY、CHAR(N) ARRAY、DATE ARRAY 等。</p>
+<p><strong>限制</strong>：多值索引不能作为主键或唯一索引；不能与普通列组合成复合索引；每张表可有多个多值索引。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>68、MySQL 的 CTE（公用表表达式）在性能方面有哪些注意事项？与子查询相比有何差异？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0 的 CTE 分为 非递归 CTE 和 递归 CTE。非递归 CTE 在 MySQL 8.0 中默认会被 合并（merge） 到外层查询中优化，与派生表行为一致。 验证合并行为： EXPLAIN 中如果 CTE 没有作为独立的 <derived> 表出现，说明已被优化器合并。 使用 WITH 定义的 CTE 被多次引用时，MySQL 8.0.14+ 会 物化（materialize） 为临时表避免重复计算，与 <code>CREATE TEMPORARY TABLE</code> 类似。 递归 CTE 性能陷阱： WITH RECURSIVE 每次迭代都会执行一次查询，深度过大（如组织架构树上千层）会严重影响性能，应使用 <code>cte_max_recursion_depth</code>（默认 1000）限制。 对比子查询：CTE 可读性更好，支持自引用递归；但对于单次使用的简单查询，子查询和 CTE 性能几乎一致。 优化建议：递归 CTE 的锚点查询和递归部分都应有索引支持，避免每次迭代全表扫描。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0 的 CTE 分为 非递归 CTE 和 递归 CTE。非递归 CTE 在 MySQL 8.0 中默认会被合并（merge）到外层查询中优化，与派生表行为一致。</p>
+<p><strong>验证合并行为</strong>：EXPLAIN 中如果 CTE 没有作为独立的 <derived> 表出现，说明已被优化器合并。</p>
+<p>使用 WITH 定义的 CTE 被多次引用时，MySQL 8.0.14+ 会物化（materialize）为临时表避免重复计算，与 <code>CREATE TEMPORARY TABLE</code> 类似。</p>
+<p><strong>递归 CTE 性能陷阱</strong>：WITH RECURSIVE 每次迭代都会执行一次查询，深度过大（如组织架构树上千层）会严重影响性能，应使用 <code>cte_max_recursion_depth</code>（默认 1000）限制。</p>
+<p><strong>对比子查询</strong>：CTE 可读性更好，支持自引用递归；但对于单次使用的简单查询，子查询和 CTE 性能几乎一致。</p>
+<p><strong>优化建议</strong>：递归 CTE 的锚点查询和递归部分都应有索引支持，避免每次迭代全表扫描。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>69、MySQL 的优化器提示（Optimizer Hints）有哪些常用类型？请举例说明 USE INDEX、FORCE INDEX 和 SET_VAR 的用法。</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 优化器提示分为 传统提示（USE INDEX / FORCE INDEX / IGNORE INDEX，放在表名后）和 8.0 新增提示（/*+ &hellip; */ 语法，放在 SELECT 后）。 传统提示： <code>SELECT * FROM orders USE INDEX(idx_date) WHERE order_date &gt; '2024-01-01';</code> 建议优化器使用指定索引。 FORCE INDEX 比 USE INDEX 更强制： <code>SELECT * FROM orders FORCE INDEX(idx_date) WHERE ...;</code> 除非索引完全不可用，否则必须使用。 8.0 提示语法： <code>SELECT /*+ NO_INDEX_MERGE(t1) BNL(t1,t2) */ * FROM t1 JOIN t2 ...;</code> 可控制 index merge、join 策略等。 <code>SET_VAR</code> 提示可在语句级别临时修改系统变量： <code>SELECT /*+ SET_VAR(sort_buffer_size=16M) SET_VAR(max_execution_time=5000) */ * FROM large_table ORDER BY col;</code> 生产建议：优化器提示是最后手段，优先通过建立正确索引、更新统计信息（<code>ANALYZE TABLE ）</code>让优化器自行选择最优计划。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 优化器提示分为 传统提示（USE INDEX / FORCE INDEX / IGNORE INDEX，放在表名后）和 8.0 新增提示（/*+ &hellip; */ 语法，放在 SELECT 后）。</p>
+<p><strong>传统提示</strong>：<code>SELECT * FROM orders USE INDEX(idx_date) WHERE order_date &gt; '2024-01-01';</code> 建议优化器使用指定索引。</p>
+<p>FORCE INDEX 比 USE INDEX 更强制：<code>SELECT * FROM orders FORCE INDEX(idx_date) WHERE ...;</code> 除非索引完全不可用，否则必须使用。</p>
+<p><strong>8.0 提示语法</strong>：<code>SELECT /*+ NO_INDEX_MERGE(t1) BNL(t1,t2) */ * FROM t1 JOIN t2 ...;</code> 可控制 index merge、join 策略等。</p>
+<p><code>SET_VAR</code> 提示可在语句级别临时修改系统变量：<code>SELECT /*+ SET_VAR(sort_buffer_size=16M) SET_VAR(max_execution_time=5000) */ * FROM large_table ORDER BY col;</code></p>
+<p><strong>生产建议</strong>：优化器提示是最后手段，优先通过建立正确索引、更新统计信息（<code>ANALYZE TABLE</code>）让优化器自行选择最优计划。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>70、什么是 MySQL 的 Index Merge 优化？它有哪些类型？什么情况下需要禁用？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Index Merge 允许优化器对一个表同时使用多个索引，然后合并结果，适用于单个索引无法高效满足 WHERE 条件的场景。 三种类型： Intersection（交集，AND 条件）、 Union（并集，OR 条件）、 Sort-Union（排序后合并，OR 条件但需排序去重）。 <code>EXPLAIN</code> 中表现为 type: <code>index_merge</code>， <code>Extra</code> 显示 Using intersect(idx1,idx2) 或 Using union(idx1,idx2)。 需要禁用的场景：Index Merge 可能比单个复合索引慢，因为需要读取多个索引再合并。如果发现 <code>index_merge</code> 执行计划性能差，优先建立复合索引替代。 禁用方式： <code>SELECT /*+ NO_INDEX_MERGE(t1) */ ...</code> 或 <code>SET SESSION optimizer_switch='index_merge=off';</code> 最佳实践：对于频繁的 WHERE a=1 AND b=2 查询，建立 INDEX(a, b) 复合索引远优于依赖 INDEX(a) 和 INDEX(b) 的 Index Merge。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Index Merge 允许优化器对一个表同时使用多个索引，然后合并结果，适用于单个索引无法高效满足 WHERE 条件的场景。</p>
+<p><strong>三种类型</strong>：Intersection（交集，AND 条件）、Union（并集，OR 条件）、Sort-Union（排序后合并，OR 条件但需排序去重）。</p>
+<p><code>EXPLAIN</code> 中表现为 type: <code>index_merge</code>，<code>Extra</code> 显示 Using intersect(idx1,idx2) 或 Using union(idx1,idx2)。</p>
+<p><strong>需要禁用的场景</strong>：Index Merge 可能比单个复合索引慢，因为需要读取多个索引再合并。如果发现 <code>index_merge</code> 执行计划性能差，优先建立复合索引替代。</p>
+<p><strong>禁用方式</strong>：<code>SELECT /*+ NO_INDEX_MERGE(t1) */ ...</code> 或 <code>SET SESSION optimizer_switch='index_merge=off';</code></p>
+<p><strong>最佳实践</strong>：对于频繁的 WHERE a=1 AND b=2 查询，建立 INDEX(a, b) 复合索引远优于依赖 INDEX(a) 和 INDEX(b) 的 Index Merge。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>71、什么是 InnoDB 的索引条件下推（Index Condition Pushdown，ICP）？如何验证其是否生效？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">ICP（Index Condition Pushdown）是 MySQL 5.6 引入的优化，将 WHERE 条件中 索引覆盖但不在索引前缀中的列 的过滤下推到存储引擎层，减少回表次数。 示例：复合索引 INDEX(a, b, c)，查询 WHERE a=1 AND c &gt; 100。没有 ICP 时，存储引擎只用 a=1 定位行后全部回表；有 ICP 时，存储引擎在索引层直接过滤 c &gt; 100。 <code>EXPLAIN</code> 中 <code>Extra</code> 列显示 Using index condition 即表示 ICP 生效。 启用控制： <code>SET optimizer_switch='index_condition_pushdown=on'; （MySQL 5.6+</code> 默认开启）。 ICP 对 范围查询后的附加条件 效果最明显，例如 WHERE a BETWEEN 1 AND 100 AND b LIKE &lsquo;prefix%&rsquo;，复合索引 (a, b) 下 ICP 可在索引层过滤 b 列。 注意：ICP 不适用于覆盖索引查询（无需回表），也不适用于子查询中的引用。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>ICP（Index Condition Pushdown）是 MySQL 5.6 引入的优化，将 WHERE 条件中<strong>索引覆盖但不在索引前缀中的列</strong>的过滤下推到存储引擎层，减少回表次数。</p>
+<p><strong>示例</strong>：复合索引 INDEX(a, b, c)，查询 WHERE a=1 AND c &gt; 100。没有 ICP 时，存储引擎只用 a=1 定位行后全部回表；有 ICP 时，存储引擎在索引层直接过滤 c &gt; 100。</p>
+<p><code>EXPLAIN</code> 中 <code>Extra</code> 列显示 Using index condition 即表示 ICP 生效。</p>
+<p><strong>启用控制</strong>：<code>SET optimizer_switch='index_condition_pushdown=on';</code>（MySQL 5.6+ 默认开启）。</p>
+<p>ICP 对<strong>范围查询后的附加条件</strong>效果最明显，例如 WHERE a BETWEEN 1 AND 100 AND b LIKE &lsquo;prefix%&rsquo;，复合索引 (a, b) 下 ICP 可在索引层过滤 b 列。</p>
+<p>注意：ICP 不适用于覆盖索引查询（无需回表），也不适用于子查询中的引用。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>72、MySQL 的 MRR（Multi-Range Read）优化是什么？如何启用和验证？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MRR（Multi-Range Read）优化将随机磁盘 I/O 转换为顺序 I/O：先收集二级索引匹配的主键 ID，按主键排序后再批量回表查询，减少随机读。 启用方式： <code>SET optimizer_switch='mrr=on,mrr_cost_based=on';</code>（默认已开启，但 <code>mrr_cost_based=on</code> 让优化器决定是否使用）。 强制使用： <code>SET optimizer_switch='mrr=on,mrr_cost_based=off';</code> 跳过成本评估，始终启用 MRR。 <code>EXPLAIN</code> 中 <code>Extra</code> 列显示 Using MRR 即表示生效。 <code>read_rnd_buffer_size</code> 控制 MRR 排序缓冲区大小，默认 256KB，大范围查询可调至 4-8MB： <code>SET SESSION read_rnd_buffer_size = 8388608;  MRR</code> 对 HDD 磁盘效果显著（随机 I/O 开销大），对 SSD 提升较小但仍有一定收益（减少读放大）。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MRR（Multi-Range Read）优化将随机磁盘 I/O 转换为顺序 I/O：先收集二级索引匹配的主键 ID，按主键排序后再批量回表查询，减少随机读。</p>
+<p><strong>启用方式</strong>：<code>SET optimizer_switch='mrr=on,mrr_cost_based=on';</code>（默认已开启，但 <code>mrr_cost_based=on</code> 让优化器决定是否使用）。</p>
+<p><strong>强制使用</strong>：<code>SET optimizer_switch='mrr=on,mrr_cost_based=off';</code> 跳过成本评估，始终启用 MRR。</p>
+<p><code>EXPLAIN</code> 中 <code>Extra</code> 列显示 Using MRR 即表示生效。</p>
+<p><code>read_rnd_buffer_size</code> 控制 MRR 排序缓冲区大小，默认 256KB，大范围查询可调至 4-8MB：<code>SET SESSION read_rnd_buffer_size = 8388608;</code></p>
+<p>MRR 对 HDD 磁盘效果显著（随机 I/O 开销大），对 SSD 提升较小但仍有一定收益（减少读放大）。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>73、MySQL 8.0.18+ 的 Hash Join 是什么？它在什么场景下替代了旧的 BNL（Block Nested Loop）算法？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0.18 引入 Hash Join 算法，用于处理 等值 JOIN 且无可用索引 的场景，替代了旧的 BNL（Block Nested Loop）算法。 Hash Join 工作原理：将较小的表（build 表）按 JOIN 列构建哈希表存于内存，然后逐行扫描较大的表（probe 表）进行哈希匹配。 MySQL 8.0.20 进一步扩展：Hash Join 支持所有无索引的 JOIN 类型（包括外连接、半连接、反连接），BNL 算法被完全移除。 <code>EXPLAIN FORMAT=TREE</code> 或 <code>EXPLAIN ANALYZE</code> 中可以看到 Hash 关键字，确认使用了 Hash Join。 <code>join_buffer_size</code> 控制 Hash Join 的内存上限，默认 256KB，大表 JOIN 应调大至 4-64MB。超出内存时 MySQL 会溢出到磁盘（on-disk hash join）。 最佳实践：Hash Join 是无索引情况下的兜底策略，对频繁执行的 JOIN 查询仍应建立适当索引。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0.18 引入 Hash Join 算法，用于处理<strong>等值 JOIN 且无可用索引</strong>的场景，替代了旧的 BNL（Block Nested Loop）算法。</p>
+<p><strong>工作原理</strong>：将较小的表（build 表）按 JOIN 列构建哈希表存于内存，然后逐行扫描较大的表（probe 表）进行哈希匹配。</p>
+<p>MySQL 8.0.20 进一步扩展：Hash Join 支持所有无索引的 JOIN 类型（包括外连接、半连接、反连接），BNL 算法被完全移除。</p>
+<p><code>EXPLAIN FORMAT=TREE</code> 或 <code>EXPLAIN ANALYZE</code> 中可以看到 Hash 关键字，确认使用了 Hash Join。</p>
+<p><code>join_buffer_size</code> 控制 Hash Join 的内存上限，默认 256KB，大表 JOIN 应调大至 4-64MB。超出内存时 MySQL 会溢出到磁盘（on-disk hash join）。</p>
+<p><strong>最佳实践</strong>：Hash Join 是无索引情况下的兜底策略，对频繁执行的 JOIN 查询仍应建立适当索引。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>74、MySQL 的查询重写插件（Query Rewrite Plugin）有什么用途？如何配置？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">查询重写插件（Rewriter Plugin）可以在 SQL 到达优化器前自动重写匹配的查询模式，无需修改应用代码即可修复低效查询。 安装： <code>SOURCE /usr/share/mysql/install_rewriter.sql;</code> 或 MySQL 8.0 中 <code>INSTALL PLUGIN rewriter SONAME 'rewriter.so';</code> 添加重写规则： <code>INSERT INTO query_rewrite.rewrite_rules(pattern, replacement) VALUES ('SELECT * FROM orders WHERE status = ?', 'SELECT order_id, amount FROM orders WHERE status = ? LIMIT 1000');</code> 激活规则： <code>CALL query_rewrite.flush_rewrite_rules();</code> 每次修改规则后必须执行。 验证规则命中： <code>SELECT * FROM query_rewrite.rewrite_rules;</code> 查看 hits 列，或检查 <code>Rewriter_number_rewritten_queries</code> 状态变量。 适用场景：ORM 生成的 <code>SELECT *</code> 查询优化、旧应用 SQL 无法修改时的临时补丁、添加 LIMIT 防止全表扫描；但不建议长期依赖，应从根本上修复应用 SQL。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>查询重写插件（Rewriter Plugin）可以在 SQL 到达优化器前自动重写匹配的查询模式，无需修改应用代码即可修复低效查询。</p>
+<p><strong>安装</strong>：<code>SOURCE /usr/share/mysql/install_rewriter.sql;</code> 或 MySQL 8.0 中 <code>INSTALL PLUGIN rewriter SONAME 'rewriter.so';</code></p>
+<p><strong>添加重写规则</strong>：<code>INSERT INTO query_rewrite.rewrite_rules(pattern, replacement) VALUES ('SELECT * FROM orders WHERE status = ?', 'SELECT order_id, amount FROM orders WHERE status = ? LIMIT 1000');</code></p>
+<p><strong>激活规则</strong>：<code>CALL query_rewrite.flush_rewrite_rules();</code> 每次修改规则后必须执行。</p>
+<p><strong>验证规则命中</strong>：<code>SELECT * FROM query_rewrite.rewrite_rules;</code> 查看 hits 列，或检查 <code>Rewriter_number_rewritten_queries</code> 状态变量。</p>
+<p><strong>适用场景</strong>：ORM 生成的 <code>SELECT *</code> 查询优化、旧应用 SQL 无法修改时的临时补丁、添加 LIMIT 防止全表扫描；但不建议长期依赖，应从根本上修复应用 SQL。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>75、如何通过 SHOW ENGINE INNODB STATUS 和 information_schema 表分析 MySQL 死锁？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">死锁分析 首选 <code>SHOW ENGINE INNODB STATUS\G</code>，其中 LATEST DETECTED DEADLOCK 部分显示最近一次死锁的详细信息：涉及的事务、等待的锁类型、持有的锁以及被回滚的事务。 开启全量死锁日志： <code>SET GLOBAL innodb_print_all_deadlocks = ON;</code> 将所有死锁信息写入 error log，便于事后分析。 实时监控当前锁等待： <code>SELECT * FROM information_schema.INNODB_TRX WHERE trx_state='LOCK WAIT'\G</code> 查看正在等待锁的事务。 查看锁持有关系： <code>SELECT * FROM performance_schema.data_lock_waits;</code>（MySQL 8.0）显示阻塞者和等待者的对应关系。 结合 <code>performance_schema.data_locks</code> 可看到具体的锁对象（表、行、间隙锁）： <code>SELECT * FROM performance_schema.data_locks WHERE LOCK_STATUS='WAITING';</code> 预防死锁的最佳实践：保持事务短小、按固定顺序访问表和行、使用合适的索引避免锁升级、避免大事务内的用户交互等待。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>死锁分析**首选 <code>SHOW ENGINE INNODB STATUS\G</code>，其中 LATEST DETECTED DEADLOCK 部分显示最近一次死锁的详细信息：涉及的事务、等待的锁类型、持有的锁以及被回滚的事务。</p>
+<p><strong>开启全量死锁日志</strong>：<code>SET GLOBAL innodb_print_all_deadlocks = ON;</code> 将所有死锁信息写入 error log，便于事后分析。</p>
+<p><strong>实时监控当前锁等待</strong>：<code>SELECT * FROM information_schema.INNODB_TRX WHERE trx_state='LOCK WAIT'\G</code> 查看正在等待锁的事务。</p>
+<p><strong>查看锁持有关系</strong>：<code>SELECT * FROM performance_schema.data_lock_waits;</code>（MySQL 8.0）显示阻塞者和等待者的对应关系。</p>
+<p>结合 <code>performance_schema.data_locks</code> 可看到具体的锁对象（表、行、间隙锁）：<code>SELECT * FROM performance_schema.data_locks WHERE LOCK_STATUS='WAITING';</code></p>
+<p><strong>预防死锁的最佳实践</strong>：保持事务短小、按固定顺序访问表和行、使用合适的索引避免锁升级、避免大事务内的用户交互等待。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>76、MySQL 的 innodb_lock_wait_timeout 参数有什么作用？锁等待超时和死锁有什么区别？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>innodb_lock_wait_timeout</code> 控制事务等待行级锁的最长时间（默认 50 秒），超时后返回错误 ERROR 1205: Lock wait timeout exceeded; try restarting transaction。 区别：死锁是两个事务互相持有对方需要的锁形成循环等待，InnoDB 死锁检测器（<code>innodb_deadlock_detect=ON</code>）会 立即 回滚代价较小的事务。锁等待超时是单方面的等待，不涉及循环依赖。 调优建议：OLTP 系统可缩短至 5-10 秒： <code>SET GLOBAL innodb_lock_wait_timeout = 10;</code>，快速失败让应用层重试比长时间阻塞更好。 排查锁等待源头： <code>SELECT * FROM sys.innodb_lock_waits\G</code>（MySQL 8.0 sys schema）直接显示谁在等谁、等什么锁。 注意：锁等待超时只回滚 当前语句 而非整个事务（除非 <code>innodb_rollback_on_timeout=ON</code>），这可能导致部分提交的数据不一致，应用需捕获错误后显式 ROLLBACK。 高并发场景下大量锁等待超时可能是缺少索引导致锁范围过大（全表锁），需检查 SQL 是否走了全表扫描。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>innodb_lock_wait_timeout</code> 控制事务等待行级锁的最长时间（默认 50 秒），超时后返回错误 ERROR 1205: Lock wait timeout exceeded; try restarting transaction。</p>
+<p><strong>区别</strong>：死锁是两个事务互相持有对方需要的锁形成循环等待，InnoDB 死锁检测器（<code>innodb_deadlock_detect=ON</code>）会立即回滚代价较小的事务。锁等待超时是单方面的等待，不涉及循环依赖。</p>
+<p><strong>调优建议</strong>：OLTP 系统可缩短至 5-10 秒：<code>SET GLOBAL innodb_lock_wait_timeout = 10;</code>，快速失败让应用层重试比长时间阻塞更好。</p>
+<p><strong>排查锁等待源头</strong>：<code>SELECT * FROM sys.innodb_lock_waits\G</code>（MySQL 8.0 sys schema）直接显示谁在等谁、等什么锁。</p>
+<p>注意：锁等待超时只回滚<strong>当前语句</strong>而非整个事务（除非 <code>innodb_rollback_on_timeout=ON</code>），这可能导致部分提交的数据不一致，应用需捕获错误后显式 ROLLBACK。</p>
+<p>高并发场景下大量锁等待超时可能是缺少索引导致锁范围过大（全表锁），需检查 SQL 是否走了全表扫描。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>77、请解释 InnoDB 的间隙锁（Gap Lock）和 Next-Key Lock 的原理。在哪些隔离级别下生效？如何减少间隙锁冲突？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Gap Lock 锁定索引记录之间的间隙，防止其他事务在该间隙中插入新行； Next-Key Lock = Record Lock + Gap Lock，锁定记录本身及其前面的间隙。 它们仅在 <code>REPEATABLE READ</code>（MySQL 默认）隔离级别下生效，用于防止幻读。在 <code>READ COMMITTED</code> 下，间隙锁被禁用（仅保留 Record Lock）。 间隙锁冲突的典型场景： <code>SELECT ... WHERE id BETWEEN 10 AND 20 FOR UPDATE</code> 会锁定 10 到 20 之间所有间隙，阻塞在此范围内的 INSERT。 减少间隙锁冲突的方法：1）使用唯一索引的精确匹配查询（唯一索引等值查询退化为 Record Lock，无 Gap Lock）。 2）在可接受的场景下将隔离级别改为 <code>READ COMMITTED</code>： <code>SET SESSION transaction_isolation='READ-COMMITTED';  3）</code>缩小 WHERE 范围、拆分大事务，减少一次持有的间隙锁范围和持有时间。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Gap Lock 锁定索引记录之间的间隙，防止其他事务在该间隙中插入新行；Next-Key Lock = Record Lock + Gap Lock，锁定记录本身及其前面的间隙。</p>
+<p>它们仅在 <code>REPEATABLE READ</code>（MySQL 默认）隔离级别下生效，用于防止幻读。在 <code>READ COMMITTED</code> 下，间隙锁被禁用（仅保留 Record Lock）。</p>
+<p><strong>间隙锁冲突的典型场景</strong>：<code>SELECT ... WHERE id BETWEEN 10 AND 20 FOR UPDATE</code> 会锁定 10 到 20 之间所有间隙，阻塞在此范围内的 INSERT。</p>
+<p><strong>减少间隙锁冲突的方法</strong>：使用唯一索引的精确匹配查询（唯一索引等值查询退化为 Record Lock，无 Gap Lock）。</p>
+<p>在可接受的场景下将隔离级别改为 <code>READ COMMITTED</code>：<code>SET SESSION transaction_isolation='READ-COMMITTED';</code></p>
+<p>缩小 WHERE 范围、拆分大事务，减少一次持有的间隙锁范围和持有时间。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>78、MySQL 内部临时表使用什么存储引擎？如何通过 internal_tmp_mem_storage_engine 和 tmp_table_size 优化临时表性能？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0 默认使用 TempTable 引擎存储内部临时表（<code>internal_tmp_mem_storage_engine</code>=TempTable），相比旧的 MEMORY 引擎支持变长字段，内存利用率更高。 TempTable 内存上限由 <code>temptable_max_ram</code> 控制（默认 1GB），超出后溢出到磁盘（<code>temptable_use_mmap</code> 控制溢出方式，8.0.16+ 支持 mmap）。 旧版配置参考：MEMORY 引擎由 <code>tmp_table_size</code> 和 <code>max_heap_table_size</code> 中的较小值限制。 监控临时表使用： <code>SHOW STATUS LIKE 'Created_tmp%';</code> 关注 <code>Created_tmp_disk_tables</code> / <code>Created_tmp_tables</code> 比值，若磁盘临时表占比超 10% 需调优。 导致临时表落盘的常见原因： GROUP BY 列含 TEXT/BLOB 类型、 UNION（非 UNION ALL）、 ORDER BY 与 GROUP BY 列不同。 优化方向：避免 <code>SELECT *</code>（减少临时表宽度）、对 GROUP BY 列建索引避免创建临时表、适当增大 <code>temptable_max_ram</code>。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0 默认使用 TempTable 引擎存储内部临时表（<code>internal_tmp_mem_storage_engine</code>=TempTable），相比旧的 MEMORY 引擎支持变长字段，内存利用率更高。</p>
+<p>TempTable 内存上限由 <code>temptable_max_ram</code> 控制（默认 1GB），超出后溢出到磁盘（<code>temptable_use_mmap</code> 控制溢出方式，8.0.16+ 支持 mmap）。</p>
+<p><strong>旧版配置参考</strong>：MEMORY 引擎由 <code>tmp_table_size</code> 和 <code>max_heap_table_size</code> 中的较小值限制。</p>
+<p><strong>监控临时表使用</strong>：<code>SHOW STATUS LIKE 'Created_tmp%';</code> 关注 <code>Created_tmp_disk_tables</code> / <code>Created_tmp_tables</code> 比值，若磁盘临时表占比超 10% 需调优。</p>
+<p><strong>导致临时表落盘的常见原因</strong>：GROUP BY 列含 TEXT/BLOB 类型、UNION（非 UNION ALL）、ORDER BY 与 GROUP BY 列不同。</p>
+<p><strong>优化方向</strong>：避免 <code>SELECT *</code>（减少临时表宽度）、对 GROUP BY 列建索引避免创建临时表、适当增大 <code>temptable_max_ram</code>。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>79、MySQL 的 sort_buffer_size 参数如何调优？filesort 有哪两种排序算法？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>sort_buffer_size</code> 是每个需要排序的会话分配的内存缓冲区（默认 256KB），用于 ORDER BY、 GROUP BY、 DISTINCT 等操作的内存排序。 两种 filesort 算法：1） 双路排序（旧版）：先按排序键排序，再根据 row pointer 回表取完整行数据，产生两次 I/O。 2） 单路排序（<code>max_length_for_sort_data</code> 内）：将排序键和查询所需列一次性读入 sort buffer 排序，避免回表，但内存占用更大。 MySQL 8.0.20 移除了 <code>max_length_for_sort_data</code> 参数，优化器自动选择排序策略。 调优建议： <code>sort_buffer_size</code> 设为 1-4MB 通常足够，过大（如 256MB）反而因 glibc 内存分配策略（mmap 转 brk）导致性能下降。 通过 <code>EXPLAIN</code> 的 <code>Extra</code>: Using filesort 识别排序操作，优先通过建立合适的有序索引消除 filesort，而非一味增大 sort buffer。 监控： <code>SHOW STATUS LIKE 'Sort_merge_passes';</code> 值持续增长说明 sort buffer 不足以完成内存排序，需适当增大。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>sort_buffer_size</code> 是每个需要排序的会话分配的内存缓冲区（默认 256KB），用于 ORDER BY、GROUP BY、DISTINCT 等操作的内存排序。</p>
+<p><strong>两种 filesort 算法</strong>：</p>
+<p>双路排序（旧版）：先按排序键排序，再根据 row pointer 回表取完整行数据，产生两次 I/O。</p>
+<p>单路排序（<code>max_length_for_sort_data</code> 内）：将排序键和查询所需列一次性读入 sort buffer 排序，避免回表，但内存占用更大。</p>
+<p>MySQL 8.0.20 移除了 <code>max_length_for_sort_data</code> 参数，优化器自动选择排序策略。</p>
+<p><strong>调优建议</strong>：<code>sort_buffer_size</code> 设为 1-4MB 通常足够，过大（如 256MB）反而因 glibc 内存分配策略（mmap 转 brk）导致性能下降。</p>
+<p>通过 <code>EXPLAIN</code> 的 <code>Extra</code>: Using filesort 识别排序操作，优先通过建立合适的有序索引消除 filesort，而非一味增大 sort buffer。</p>
+<p><strong>监控</strong>：<code>SHOW STATUS LIKE 'Sort_merge_passes';</code> 值持续增长说明 sort buffer 不足以完成内存排序，需适当增大。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>80、MySQL 中如何优化 filesort？除了增大 sort_buffer_size 还有哪些方法？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">最根本的优化是 建立覆盖排序需求的索引： ORDER BY a, b 可建 INDEX(a, b)，让 MySQL 按索引顺序直接读取，完全避免 filesort。 对于 WHERE col1 = ? ORDER BY col2 查询，建立 INDEX(col1, col2) 复合索引可同时满足过滤和排序。 减少排序数据量：避免 <code>SELECT *</code>，只查询需要的列，减少单路排序时 sort buffer 中每行的宽度。 对于 LIMIT N 查询，MySQL 优化器使用 优先队列排序（Priority Queue Filesort），只维护 Top-N 行， EXPLAIN 显示 Using filesort 但实际内存消耗很低。 分页优化： ORDER BY id LIMIT 1000000, 10 性能极差，改用 延迟关联： <code>SELECT * FROM t INNER JOIN (SELECT id FROM t ORDER BY col LIMIT 1000000, 10) AS sub ON t.id = sub.id;</code> 最后才考虑调大 <code>sort_buffer_size</code>（1-4MB），并监控 <code>Sort_merge_passes</code> 确认效果。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>最根本的优化是<strong>建立覆盖排序需求的索引</strong>：ORDER BY a, b 可建 INDEX(a, b)，让 MySQL 按索引顺序直接读取，完全避免 filesort。</p>
+<p>对于 WHERE col1 = ? ORDER BY col2 查询，建立 INDEX(col1, col2) 复合索引可同时满足过滤和排序。</p>
+<p><strong>减少排序数据量</strong>：避免 <code>SELECT *</code>，只查询需要的列，减少单路排序时 sort buffer 中每行的宽度。</p>
+<p>对于 LIMIT N 查询，MySQL 优化器使用优先队列排序（Priority Queue Filesort），只维护 Top-N 行，EXPLAIN 显示 Using filesort 但实际内存消耗很低。</p>
+<p><strong>分页优化</strong>：ORDER BY id LIMIT 1000000, 10 性能极差，改用延迟关联：<code>SELECT * FROM t INNER JOIN (SELECT id FROM t ORDER BY col LIMIT 1000000, 10) AS sub ON t.id = sub.id;</code></p>
+<p>最后才考虑调大 <code>sort_buffer_size</code>（1-4MB），并监控 <code>Sort_merge_passes</code> 确认效果。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>104、MySQL 8.0.32+ 中 EXPLAIN ANALYZE 的 FORMAT=TREE 输出有哪些改进？如何用于性能调优？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0.32+ 对 <code>EXPLAIN ANALYZE</code> 的 FORMAT=TREE 输出进行了增强，提供了更精确的实际执行统计信息，成为 DBA 调优的利器。 关键改进包括：每个迭代器节点显示实际行数、循环次数、首行时间和总时间，便于定位瓶颈。</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0.32+ 对 <code>EXPLAIN ANALYZE</code> 的 FORMAT=TREE 输出进行了增强，提供了更精确的实际执行统计信息，成为 DBA 调优的利器。</p>
+<p><strong>关键改进</strong>包括：每个迭代器节点显示实际行数、循环次数、首行时间和总时间，便于定位瓶颈。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">ANALYZE</span><span class="w"> </span><span class="n">FORMAT</span><span class="o">=</span><span class="n">TREE</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w">  </span><span class="k">c</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w">  </span><span class="k">COUNT</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">id</span><span class="p">)</span><span class="w">  </span><span class="k">FROM</span><span class="w">  </span><span class="n">customers</span><span class="w"> </span><span class="k">c</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">JOIN</span><span class="w">  </span><span class="n">orders</span><span class="w"> </span><span class="n">o</span><span class="w">  </span><span class="k">ON</span><span class="w">  </span><span class="k">c</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">customer_id</span><span class="w">
@@ -1613,23 +1880,28 @@
 </span></span></span><span class="line"><span class="cl"><span class="cm">-&gt; Index lookup on o using idx_customer_id (customer_id=c.id)
 </span></span></span><span class="line"><span class="cl"><span class="cm">(actual time=0.1..0.2 rows=35 loops=150)
 </span></span></span><span class="line"><span class="cl"><span class="cm">*/</span><span class="w">
-</span></span></span></code></pre></div><p><strong>重点关注</strong>： actual time 中首行时间过大表示启动成本高； rows 与估计值差异大说明统计信息不准确； loops 表示迭代次数。 调优流程：执行 <code>EXPLAIN ANALYZE →</code> 对比估计行数与实际行数 → 更新统计信息或添加索引 → 重新验证。 注意：<code>EXPLAIN ANALYZE</code> 会实际执行查询，对生产库使用时需注意对写操作用事务包裹后回滚。</p>
+</span></span></span></code></pre></div><p><strong>重点关注</strong>：actual time 中首行时间过大表示启动成本高；rows 与估计值差异大说明统计信息不准确；loops 表示迭代次数。</p>
+<p><strong>调优流程</strong>：执行 <code>EXPLAIN ANALYZE</code> → 对比估计行数与实际行数 → 更新统计信息或添加索引 → 重新验证。</p>
+<p><strong>注意</strong>：<code>EXPLAIN ANALYZE</code> 会实际执行查询，对生产库使用时需注意对写操作用事务包裹后回滚。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>110、MySQL 8.4 中 CATS 调度和并行扫描等性能改进有哪些？对高并发场景有何影响？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 包含多项关键性能改进，显著提升高并发和大表扫描场景下的表现： CATS（Contention-Aware Transaction Scheduling）： 改进了 InnoDB 锁等待队列的调度策略，优先调度阻塞链最长的事务，减少整体等待时间。</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 包含多项关键性能改进，显著提升高并发和大表扫描场景下的表现。</p>
+<p><strong>CATS（Contention-Aware Transaction Scheduling）</strong>：改进了 InnoDB 锁等待队列的调度策略，优先调度阻塞链最长的事务，减少整体等待时间。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- CATS 在 8.4 中默认启用，无需额外配置
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 通过以下指标观察效果
 </span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w">  </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Innodb_row_lock_waits&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w">  </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Innodb_row_lock_time_avg&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 对比升级前后的锁等待时间和死锁次数
-</span></span></span></code></pre></div><p>并行读线程（Parallel Read Threads）： InnoDB 全表扫描和索引扫描可利用多线程并行读取：</p>
+</span></span></span></code></pre></div><p><strong>并行读线程（Parallel Read Threads）</strong>：InnoDB 全表扫描和索引扫描可利用多线程并行读取。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w">  </span><span class="n">innodb_parallel_read_threads</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">4</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 对大表 COUNT(*)、CHECK TABLE 等操作显著加速
 </span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w">  </span><span class="k">FROM</span><span class="w">  </span><span class="n">large_table</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 可提升 2-4 倍
-</span></span></span></code></pre></div><p><strong>其他改进</strong>： Adaptive Hash Index 的分区锁竞争降低；优化器的 Hypergraph 优化器（实验性）支持更复杂的连接顺序搜索。 适用场景：OLTP 高并发写入（CATS 受益最大）、数据仓库全表扫描（并行读线程）。 调优建议：<code>parallel_read_threads</code> 设置为 CPU 核心数的 1/4 到 1/2，避免与在线事务争抢 CPU。</p>
+</span></span></span></code></pre></div><p><strong>其他改进</strong>：Adaptive Hash Index 的分区锁竞争降低；优化器的 Hypergraph 优化器（实验性）支持更复杂的连接顺序搜索。</p>
+<p><strong>适用场景</strong>：OLTP 高并发写入（CATS 受益最大）、数据仓库全表扫描（并行读线程）。</p>
+<p><strong>调优建议</strong>：<code>parallel_read_threads</code> 设置为 CPU 核心数的 1/4 到 1/2，避免与在线事务争抢 CPU。</p>
 </div></div>
 </details>
 
@@ -1742,11 +2014,10 @@
 </h2><details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>10、MySQL主从复制的基本原理是什么？涉及哪些关键线程？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL主从复制基于 Binlog 实现，采用异步复制模型，涉及三个关键线程：</p>
-<p>主库（Master）端： Binlog Dump Thread（也称IO线程），当从库连接主库请求复制时创建。该线程负责读取主库的Binlog事件并发送给从库。每个从库连接对应一个Dump线程，可通过 <code>SHOW PROCESSLIST</code> 查看。</p>
-<p>从库（Slave）</p>
-<p><strong>端有两个线程</strong>： IO Thread 负责连接主库并接收Binlog事件，写入本地的</p>
-<p>Relay Log（中继日志）； SQL Thread 负责读取Relay Log并在从库上重放（replay）SQL事件，完成数据同步。</p>
-<p><strong>复制流程</strong>：主库执行事务 → 写入Binlog → Dump Thread发送事件 → 从库IO Thread接收并写Relay Log → SQL Thread重放Relay Log。可通过 <code>SHOW SLAVE STATUS\G （8.0.22+</code>用 <code>SHOW REPLICA STATUS\G ）</code>查看复制状态，关键字段包括 <code>Seconds_Behind_Master</code>、 <code>Slave_IO_Running</code>、 <code>Slave_SQL_Running</code>。</p>
+<p>主库（Master）端：Binlog Dump Thread（也称IO线程），当从库连接主库请求复制时创建。该线程负责读取主库的Binlog事件并发送给从库。每个从库连接对应一个Dump线程，可通过 <code>SHOW PROCESSLIST</code> 查看。</p>
+<p>从库（Slave）端有两个线程：IO Thread 负责连接主库并接收Binlog事件，写入本地的 Relay Log（中继日志）；SQL Thread 负责读取Relay Log并在从库上重放（replay）SQL事件，完成数据同步。</p>
+<p><strong>复制流程</strong>：主库执行事务 → 写入Binlog → Dump Thread发送事件 → 从库IO Thread接收并写Relay Log → SQL Thread重放Relay Log。</p>
+<p>可通过 <code>SHOW SLAVE STATUS\G</code>（8.0.22+ 用 <code>SHOW REPLICA STATUS\G</code>）查看复制状态，关键字段包括 <code>Seconds_Behind_Master</code>、<code>Slave_IO_Running</code>、<code>Slave_SQL_Running</code>。</p>
 </div></div>
 </details>
 
@@ -1759,7 +2030,9 @@
 <li><strong>一致性保证</strong>：同一事务在所有节点上拥有相同的GTID，避免重复执行。</li>
 <li><strong>复制拓扑变更灵活</strong>：级联复制、多源复制的拓扑调整更方便。</li>
 </ol>
-<p>启用GTID需设置 <code>gtid_mode=ON</code> 和 <code>enforce_gtid_consistency=ON</code>。8.0支持在线开启GTID而无需停机。查看已执行的GTID集合： <code>SELECT @@gtid_executed</code>。注意GTID模式下禁止使用 <code>CREATE TABLE ... SELECT</code> 等不安全语句（8.0.21+已解除此限制）。</p>
+<p>启用GTID需设置 <code>gtid_mode=ON</code> 和 <code>enforce_gtid_consistency=ON</code>。8.0支持在线开启GTID而无需停机。</p>
+<p>查看已执行的GTID集合：<code>SELECT @@gtid_executed</code>。</p>
+<p>注意GTID模式下禁止使用 <code>CREATE TABLE ... SELECT</code> 等不安全语句（8.0.21+已解除此限制）。</p>
 </div></div>
 </details>
 
@@ -1767,7 +2040,7 @@
     <summary class="qa-question"><strong>Q：</strong>12、半同步复制（Semi-Synchronous Replication）的工作原理是什么？AFTER_SYNC和AFTER_COMMIT有什么区别？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>半同步复制 是介于异步复制和全同步复制之间的方案。主库在提交事务时，需要等待 至少一个从库 确认已接收并写入Relay Log后，才向客户端返回成功。</p>
 <p>MySQL 5.7引入了增强半同步，通过 <code>rpl_semi_sync_master_wait_point</code> 控制等待时机：</p>
-<p><code>AFTER_SYNC</code>（默认，也称&quot;无损复制&quot;）：主库将事务写入Binlog并sync到磁盘后， 等待从库ACK，然后再提交事务到存储引擎。这保证了主库崩溃时，任何已提交的事务一定已传输到从库，实现 零数据丢失。</p>
+<p><code>AFTER_SYNC</code>（默认，也称&quot;无损复制&quot;）：主库将事务写入Binlog并sync到磁盘后，等待从库ACK，然后再提交事务到存储引擎。这保证了主库崩溃时，任何已提交的事务一定已传输到从库，实现 零数据丢失。</p>
 <p><code>AFTER_COMMIT</code>（5.5/5.6的旧行为）：主库先提交事务到存储引擎，再等待从库ACK。如果主库在提交后、收到ACK前崩溃，已提交的事务可能未传输到从库，存在 数据丢失风险，且其他会话可能已读到该事务（幻读问题）。</p>
 <p><strong>安装插件</strong>： <code>INSTALL PLUGIN rpl_semi_sync_master SONAME 'semisync_master.so'</code>。关键参数包括 <code>rpl_semi_sync_master_timeout</code>（超时后降级为异步，默认10000ms）。</p>
 </div></div>
@@ -1807,7 +2080,8 @@
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>15、Binlog的三种格式（STATEMENT、ROW、MIXED）分别有什么特点？生产环境推荐使用哪种？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>STATEMENT</code>格式：记录原始SQL语句。优点是日志量小；缺点是某些函数（如 <code>UUID()</code>、 <code>NOW()</code>、 <code>RAND()</code>）和非确定性查询可能导致主从数据不一致。</p>
-<p><code>ROW</code>格式：记录每行数据的变更前后值（Before Image / After Image）。优点是精确可靠，不存在主从不一致问题；缺点是对于批量操作（如 <code>UPDATE t SET status=1 WHERE id&gt;1000</code>）日志量极大。可通过 <code>binlog_row_image=MINIMAL</code> 仅记录变更列来减少日志量。</p>
+<p><code>ROW</code>格式：记录每行数据的变更前后值（Before Image / After Image）。优点是精确可靠，不存在主从不一致问题；缺点是对于批量操作（如 <code>UPDATE t SET status=1 WHERE id&gt;1000</code>）日志量极大。</p>
+<p>可通过 <code>binlog_row_image=MINIMAL</code> 仅记录变更列来减少日志量。</p>
 <p><code>MIXED</code>格式：默认使用<code>STATEMENT</code>，当检测到不安全的SQL时自动切换为<code>ROW</code>。折中方案，但在某些边界情况下仍可能不安全。</p>
 <p>生产环境推荐使用<code>ROW</code>格式，原因：</p>
 <ol>
@@ -1815,7 +2089,7 @@
 <li>配合 <code>binlog_row_image=FULL</code> 可用于数据恢复和审计。</li>
 <li>支持 binlog2sql 等工具进行闪回操作（从<code>ROW</code>日志生成反向SQL）。</li>
 </ol>
-<p><strong>设置</strong>： <code>SET GLOBAL binlog_format='ROW' （</code>动态生效）或配置文件 <code>binlog_format=ROW</code>。</p>
+<p><strong>设置</strong>：<code>SET GLOBAL binlog_format='ROW'</code>（动态生效）或配置文件 <code>binlog_format=ROW</code>。</p>
 </div></div>
 </details>
 
@@ -1823,14 +2097,15 @@
     <summary class="qa-question"><strong>Q：</strong>16、MySQL 8.0的并行复制机制是如何工作的？与5.7的并行复制有什么改进？</summary>
     <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL的并行复制经历了多个版本的演进：</p>
 <p>MySQL 5.6：基于 数据库级别 的并行（<code>slave_parallel_type</code>=DATABASE），不同数据库的事务可以并行回放，同一数据库内仍串行。适用于多库场景，单库无效。</p>
-<p>MySQL 5.7：引入 <code>LOGICAL_CLOCK</code>（逻辑时钟）并行策略。基于主库的 组提交（Group Commit）：在同一组提交中的事务在主库上通过了冲突检测（prepare阶段时间重叠），因此可以在从库上安全并行回放。通过 <code>binlog_group_commit_sync_delay</code> 和 <code>binlog_group_commit_sync_no_delay_count</code> 人为增大组提交批次。</p>
+<p>MySQL 5.7：引入 <code>LOGICAL_CLOCK</code>（逻辑时钟）并行策略。基于主库的 组提交（Group Commit）：在同一组提交中的事务在主库上通过了冲突检测（prepare阶段时间重叠），因此可以在从库上安全并行回放。</p>
+<p>通过 <code>binlog_group_commit_sync_delay</code> 和 <code>binlog_group_commit_sync_no_delay_count</code> 人为增大组提交批次。</p>
 <p><strong>MySQL 8.0的改进</strong>：</p>
 <ol>
 <li>基于WriteSet的依赖跟踪（<code>binlog_transaction_dependency_tracking</code>=WRITESET）：通过比较事务修改的行集合（主键/唯一键hash），即使不在同一组提交中，只要修改的行不重叠，也可以并行回放。大幅提升并行度。</li>
 <li>配合 <code>transaction_write_set_extraction=XXHASH64</code> 使用。</li>
 <li><code>slave_preserve_commit_order=ON</code> 确保从库的提交顺序与主库一致。</li>
 </ol>
-<p><strong>推荐配置</strong>： <code>slave_parallel_workers</code>=4-16（根据CPU核数）， <code>slave_parallel_type=LOGICAL_CLOCK</code>， <code>binlog_transaction_dependency_tracking</code>=WRITESET。</p>
+<p><strong>推荐配置</strong>：<code>slave_parallel_workers</code>=4-16（根据CPU核数），<code>slave_parallel_type=LOGICAL_CLOCK</code>，<code>binlog_transaction_dependency_tracking</code>=WRITESET。</p>
 </div></div>
 </details>
 
@@ -1880,57 +2155,122 @@
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>56、MHA（Master High Availability）的架构原理是什么？它如何实现 MySQL 主库故障自动切换？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MHA 由 Manager 节点和多个 Node 节点组成，Manager 监控主库心跳，Node 部署在每台 MySQL 服务器上负责日志处理。 故障切换流程：Manager 检测主库宕机 → 从所有从库中识别拥有最新 relay log 的节点 → 将差异日志补齐到所有从库 → 选举新主库 → 其余从库 <code>CHANGE MASTER TO</code> 指向新主库。 MHA 的核心优势是 数据零丢失（在半同步复制配合下），故障切换通常在 10-30 秒完成。 关键配置文件示例： <code>masterha_check_repl</code> <code>--conf=/etc/mha/app1.cnf</code> 验证复制拓扑健康。 常用命令： <code>masterha_check_ssh</code> 验证 SSH 互信、 <code>masterha_manager</code> 启动监控、 <code>masterha_check_status</code> 检查运行状态。 注意 MHA 是一次性切换工具，切换完成后 Manager 进程退出，需配合 VIP 漂移脚本（<code>master_ip_failover</code>）实现应用透明切换。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MHA 由 Manager 节点和多个 Node 节点组成，Manager 监控主库心跳，Node 部署在每台 MySQL 服务器上负责日志处理。</p>
+<p><strong>故障切换流程</strong>：Manager 检测主库宕机 → 从所有从库中识别拥有最新 relay log 的节点 → 将差异日志补齐到所有从库 → 选举新主库 → 其余从库 <code>CHANGE MASTER TO</code> 指向新主库。</p>
+<p>MHA 的核心优势是 数据零丢失（在半同步复制配合下），故障切换通常在 10-30 秒完成。</p>
+<p><strong>关键配置文件示例</strong>：<code>masterha_check_repl --conf=/etc/mha/app1.cnf</code> 验证复制拓扑健康。</p>
+<p><strong>常用命令</strong>：<code>masterha_check_ssh</code> 验证 SSH 互信、<code>masterha_manager</code> 启动监控、<code>masterha_check_status</code> 检查运行状态。</p>
+<p>注意 MHA 是一次性切换工具，切换完成后 Manager 进程退出，需配合 VIP 漂移脚本（<code>master_ip_failover</code>）实现应用透明切换。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>57、Orchestrator 是什么？与 MHA 相比有哪些优势？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">Orchestrator 是 GitHub 开源的 MySQL 高可用和复制拓扑管理工具，提供 Web UI 可视化拓扑图、自动故障检测和故障转移。 与 MHA 相比的优势：支持 持续监控（非一次性），内置拓扑发现、refactoring（在线调整复制链路）、支持 GTID 和传统位点模式。 Orchestrator 可配置多种故障检测策略，如 DeadMaster、 DeadMasterAndSlaves，通过 hook 脚本实现 VIP 漂移或 DNS 切换。 部署方式： orchestrator -c discover -i <code>master_host</code>:3306 发现拓扑，Web UI 默认端口 3000。 支持 raft 共识协议实现 Orchestrator 自身高可用（3 节点部署），避免单点故障。 常见配置： &ldquo;RecoverMasterClusterFilters&rdquo;: [&quot;*&quot;] 允许所有集群自动恢复， &ldquo;PromotionIgnoreHostnameFilters&rdquo; 排除特定主机。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>Orchestrator 是 GitHub 开源的 MySQL 高可用和复制拓扑管理工具，提供 Web UI 可视化拓扑图、自动故障检测和故障转移。</p>
+<p><strong>与 MHA 相比的优势</strong>：支持持续监控（非一次性），内置拓扑发现、refactoring（在线调整复制链路）、支持 GTID 和传统位点模式。</p>
+<p>Orchestrator 可配置多种故障检测策略，如 DeadMaster、DeadMasterAndSlaves，通过 hook 脚本实现 VIP 漂移或 DNS 切换。</p>
+<p><strong>部署方式</strong>：<code>orchestrator -c discover -i master_host:3306</code> 发现拓扑，Web UI 默认端口 3000。</p>
+<p>支持 raft 共识协议实现 Orchestrator 自身高可用（3 节点部署），避免单点故障。</p>
+<p><strong>常见配置</strong>：&ldquo;RecoverMasterClusterFilters&rdquo;: [&quot;*&quot;] 允许所有集群自动恢复，&ldquo;PromotionIgnoreHostnameFilters&rdquo; 排除特定主机。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>58、如何使用 ProxySQL 实现 MySQL 的读写分离？请说明核心配置步骤。</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">ProxySQL 是一款高性能 MySQL 代理，通过查询规则实现透明的读写分离，应用无需修改连接方式。 核心配置步骤：1）定义后端服务器组： <code>INSERT INTO mysql_servers(hostgroup_id, hostname, port) VALUES (10,'master',3306),(20,'slave1',3306);  2）</code>配置查询路由规则： <code>INSERT INTO mysql_query_rules(rule_id,active,match_pattern,destination_hostgroup) VALUES (1,1,'^SELECT.*FOR UPDATE',10),(2,1,'^SELECT',20);  3）</code>配置用户映射： <code>INSERT INTO mysql_users(username,password,default_hostgroup) VALUES ('app','password',10);  4）</code>加载生效： <code>LOAD MYSQL SERVERS TO RUNTIME; LOAD MYSQL QUERY RULES TO RUNTIME; LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;</code> ProxySQL 管理接口默认在 6032 端口，应用连接端口为 6033。通过 <code>stats_mysql_query_digest</code> 表可监控各规则的命中率和延迟。 生产建议：配置 <code>mysql_server_ping_interval</code>（默认 10s）和健康检查，自动剔除故障从库。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>ProxySQL 是一款高性能 MySQL 代理，通过查询规则实现透明的读写分离，应用无需修改连接方式。</p>
+<p><strong>核心配置步骤</strong>：</p>
+<ol>
+<li>定义后端服务器组：<code>INSERT INTO mysql_servers(hostgroup_id, hostname, port) VALUES (10,'master',3306),(20,'slave1',3306);</code></li>
+<li>配置查询路由规则：<code>INSERT INTO mysql_query_rules(rule_id,active,match_pattern,destination_hostgroup) VALUES (1,1,'^SELECT.*FOR UPDATE',10),(2,1,'^SELECT',20);</code></li>
+<li>配置用户映射：<code>INSERT INTO mysql_users(username,password,default_hostgroup) VALUES ('app','password',10);</code></li>
+<li>加载生效：<code>LOAD MYSQL SERVERS TO RUNTIME; LOAD MYSQL QUERY RULES TO RUNTIME; LOAD MYSQL USERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;</code></li>
+</ol>
+<p>ProxySQL 管理接口默认在 6032 端口，应用连接端口为 6033。通过 <code>stats_mysql_query_digest</code> 表可监控各规则的命中率和延迟。</p>
+<p><strong>生产建议</strong>：配置 <code>mysql_server_ping_interval</code>（默认 10s）和健康检查，自动剔除故障从库。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>59、MySQL 的复制过滤器（Replication Filters）有哪些？使用时需要注意什么陷阱？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 复制过滤器分两类： 主库端（<code>binlog-do-db</code> / <code>binlog-ignore-db</code>）和 从库端（<code>replicate-do-db</code> / <code>replicate-ignore-db</code> / <code>replicate-do-table</code> / <code>replicate-wild-do-table</code> 等）。 关键陷阱： binlog-do-db 基于 当前默认数据库（USE db）过滤，而非 SQL 中实际操作的库。例如 USE db1; <code>UPDATE db2.t1 SET ...</code> 在 binlog-do-db=db2 时不会被记录。 生产推荐使用从库端过滤器 replicate-wild-do-table=&lsquo;db1.%&rsquo;，它基于实际表名过滤，更加精确。 在 MySQL 8.0 中可通过 <code>CHANGE REPLICATION FILTER</code> 动态修改过滤规则，无需重启从库。 跨库事务场景下过滤器可能导致数据不一致：一个事务修改 db1 和 db2，但从库只复制 db1，会导致部分提交。 监控：通过 <code>SHOW SLAVE STATUS\G</code> 的 <code>Replicate_Do_DB</code>、 <code>Replicate_Wild_Do_Table</code> 字段确认生效规则。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 复制过滤器分两类：主库端（<code>binlog-do-db</code> / <code>binlog-ignore-db</code>）和从库端（<code>replicate-do-db</code> / <code>replicate-ignore-db</code> / <code>replicate-do-table</code> / <code>replicate-wild-do-table</code> 等）。</p>
+<p><strong>关键陷阱</strong>：binlog-do-db 基于当前默认数据库（USE db）过滤，而非 SQL 中实际操作的库。例如 <code>USE db1; UPDATE db2.t1 SET ...</code> 在 binlog-do-db=db2 时不会被记录。</p>
+<p>生产推荐使用从库端过滤器 <code>replicate-wild-do-table='db1.%'</code>，它基于实际表名过滤，更加精确。</p>
+<p>在 MySQL 8.0 中可通过 <code>CHANGE REPLICATION FILTER</code> 动态修改过滤规则，无需重启从库。</p>
+<p>跨库事务场景下过滤器可能导致数据不一致：一个事务修改 db1 和 db2，但从库只复制 db1，会导致部分提交。</p>
+<p><strong>监控</strong>：通过 <code>SHOW SLAVE STATUS\G</code> 的 <code>Replicate_Do_DB</code>、<code>Replicate_Wild_Do_Table</code> 字段确认生效规则。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>60、什么是 MySQL 延迟复制（Delayed Replication）？有哪些实际应用场景？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">延迟复制 让从库故意延迟指定秒数应用主库事件，通过 <code>CHANGE MASTER TO MASTER_DELAY = 3600;</code> 设置延迟 1 小时。 MySQL 8.0.22+ 语法更新为 <code>CHANGE REPLICATION SOURCE TO SOURCE_DELAY = 3600;</code>。 最常见的用途是 误操作恢复：当主库执行了错误的 <code>DROP TABLE</code> 或 DELETE 后，可在延迟从库上停止复制，跳过错误事件，快速恢复数据。 恢复操作步骤： <code>STOP SLAVE; SET GLOBAL sql_slave_skip_counter=1; START SLAVE UNTIL MASTER_LOG_FILE='...',MASTER_LOG_POS=...;</code> 也可用于时间点审计查询：在延迟从库上查看&quot;1 小时前&quot;的数据快照，用于报表或对比分析。 通过 <code>SHOW SLAVE STATUS\G</code> 的 <code>SQL_Delay</code> 和 <code>SQL_Remaining_Delay</code> 字段监控延迟状态。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>延迟复制让从库故意延迟指定秒数应用主库事件，通过 <code>CHANGE MASTER TO MASTER_DELAY = 3600;</code> 设置延迟 1 小时。MySQL 8.0.22+ 语法更新为 <code>CHANGE REPLICATION SOURCE TO SOURCE_DELAY = 3600;</code>。</p>
+<p>最常见的用途是<strong>误操作恢复</strong>：当主库执行了错误的 <code>DROP TABLE</code> 或 DELETE 后，可在延迟从库上停止复制，跳过错误事件，快速恢复数据。</p>
+<p><strong>恢复操作步骤</strong>：<code>STOP SLAVE; SET GLOBAL sql_slave_skip_counter=1; START SLAVE UNTIL MASTER_LOG_FILE='...',MASTER_LOG_POS=...;</code></p>
+<p>也可用于时间点审计查询：在延迟从库上查看&quot;1 小时前&quot;的数据快照，用于报表或对比分析。</p>
+<p>通过 <code>SHOW SLAVE STATUS\G</code> 的 <code>SQL_Delay</code> 和 <code>SQL_Remaining_Delay</code> 字段监控延迟状态。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>61、如何使用 performance_schema.replication_* 表监控 MySQL 复制状态？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 5.7+ 引入了一组 <code>performance_schema.replication_*</code> 表，提供比 <code>SHOW SLAVE STATUS</code> 更结构化和详细的复制监控。 核心表包括： <code>replication_connection_status</code>（IO 线程状态、最后接收的 GTID）、 <code>replication_applier_status_by_worker</code>（每个 SQL 工作线程的应用进度和错误信息）。 查看复制延迟： <code>SELECT * FROM replication_applier_status_by_coordinator\G</code> 显示协调器线程状态。 多源复制场景下，通过 <code>CHANNEL_NAME</code> 列区分不同复制通道： <code>SELECT * FROM replication_connection_status WHERE CHANNEL_NAME='channel1';</code> 结合 <code>replication_applier_status_by_worker</code> 可定位并行复制中哪个 worker 线程出现错误： <code>SELECT WORKER_ID, LAST_ERROR_NUMBER, LAST_ERROR_MESSAGE FROM replication_applier_status_by_worker WHERE LAST_ERROR_NUMBER != 0;</code> 相比 <code>SHOW SLAVE STATUS</code>，<code>performance_schema</code> 表支持 SQL 聚合查询、JOIN 其他表，更适合自动化监控脚本。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 5.7+ 引入了一组 <code>performance_schema.replication_*</code> 表，提供比 <code>SHOW SLAVE STATUS</code> 更结构化和详细的复制监控。</p>
+<p><strong>核心表</strong>包括：<code>replication_connection_status</code>（IO 线程状态、最后接收的 GTID）、<code>replication_applier_status_by_worker</code>（每个 SQL 工作线程的应用进度和错误信息）。</p>
+<p><strong>查看复制延迟</strong>：<code>SELECT * FROM replication_applier_status_by_coordinator\G</code> 显示协调器线程状态。</p>
+<p>多源复制场景下，通过 <code>CHANNEL_NAME</code> 列区分不同复制通道：<code>SELECT * FROM replication_connection_status WHERE CHANNEL_NAME='channel1';</code></p>
+<p>结合 <code>replication_applier_status_by_worker</code> 可定位并行复制中哪个 worker 线程出现错误：<code>SELECT WORKER_ID, LAST_ERROR_NUMBER, LAST_ERROR_MESSAGE FROM replication_applier_status_by_worker WHERE LAST_ERROR_NUMBER != 0;</code></p>
+<p>相比 <code>SHOW SLAVE STATUS</code>，<code>performance_schema</code> 表支持 SQL 聚合查询、JOIN 其他表，更适合自动化监控脚本。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>62、MySQL 8.0.20+ 的 binlog 压缩（binlog_transaction_compression）是什么？如何启用？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0.20 引入 binlog 事务压缩，使用 zstd 算法压缩事务负载，减少 binlog 文件大小和复制网络传输量。 启用方式： <code>SET GLOBAL binlog_transaction_compression = ON;</code> 或在 <code>my.cnf</code> 中配置 <code>binlog_transaction_compression=ON</code>。 压缩级别通过 <code>binlog_transaction_compression_level_zstd</code> 控制（默认 3，范围 1-22），级别越高压缩率越好但 CPU 开销越大。 压缩后的事件类型为 <code>Transaction_payload_event</code>，可通过 <code>mysqlbinlog</code> <code>--verbose</code> 正常解析。 实测效果：对大事务（批量 INSERT/UPDATE）压缩率可达 60-80%，对小事务效果有限。 注意：从库自动解压处理，无需额外配置；但旧版本（&lt; 8.0.20）从库无法解析压缩事件，跨版本复制需注意兼容性。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0.20 引入 binlog 事务压缩，使用 zstd 算法压缩事务负载，减少 binlog 文件大小和复制网络传输量。</p>
+<p><strong>启用方式</strong>：<code>SET GLOBAL binlog_transaction_compression = ON;</code> 或在 <code>my.cnf</code> 中配置 <code>binlog_transaction_compression=ON</code>。</p>
+<p>压缩级别通过 <code>binlog_transaction_compression_level_zstd</code> 控制（默认 3，范围 1-22），级别越高压缩率越好但 CPU 开销越大。</p>
+<p>压缩后的事件类型为 <code>Transaction_payload_event</code>，可通过 <code>mysqlbinlog --verbose</code> 正常解析。</p>
+<p><strong>实测效果</strong>：对大事务（批量 INSERT/UPDATE）压缩率可达 60-80%，对小事务效果有限。</p>
+<p><strong>注意</strong>：从库自动解压处理，无需额外配置；但旧版本（&lt; 8.0.20）从库无法解析压缩事件，跨版本复制需注意兼容性。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>63、MySQL 8.0 中 replica_preserve_commit_order 参数的作用是什么？为什么在并行复制中很重要？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>replica_preserve_commit_order=ON</code>（MySQL 8.0.27+ 更名自 <code>slave_preserve_commit_order</code>）确保从库并行复制时，事务的 提交顺序与主库一致。 在多线程复制（<code>replica_parallel_workers</code> &gt; 1）中，worker 线程并行执行事务，但提交顺序可能乱序，导致从库读到不一致的中间状态。 启用后，worker 线程完成执行后会排队等待，按照主库 binlog 中的原始顺序依次 COMMIT。 配合 <code>replica_parallel_type=LOGICAL_CLOCK</code> 使用效果最佳，后者按照主库上的并行度来调度从库的并行执行。 性能影响：会略微增加从库的提交延迟（等待排队），但保证了读一致性，对金融交易类业务尤为重要。 验证：在从库执行 <code>SHOW VARIABLES LIKE 'replica_preserve_commit_order';</code> 确认已启用。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>replica_preserve_commit_order=ON</code>（MySQL 8.0.27+ 更名自 <code>slave_preserve_commit_order</code>）确保从库并行复制时，事务的提交顺序与主库一致。</p>
+<p>在多线程复制（<code>replica_parallel_workers</code> &gt; 1）中，worker 线程并行执行事务，但提交顺序可能乱序，导致从库读到不一致的中间状态。</p>
+<p>启用后，worker 线程完成执行后会排队等待，按照主库 binlog 中的原始顺序依次 COMMIT。</p>
+<p>配合 <code>replica_parallel_type=LOGICAL_CLOCK</code> 使用效果最佳，后者按照主库上的并行度来调度从库的并行执行。</p>
+<p><strong>性能影响</strong>：会略微增加从库的提交延迟（等待排队），但保证了读一致性，对金融交易类业务尤为重要。</p>
+<p><strong>验证</strong>：在从库执行 <code>SHOW VARIABLES LIKE 'replica_preserve_commit_order';</code> 确认已启用。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>64、如何调优 MySQL 从库的并行复制 Worker 线程数以提升复制性能？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">并行复制 Worker 线程数由 <code>replica_parallel_workers</code>（旧名 <code>slave_parallel_workers</code>）控制，默认为 4（MySQL 8.0.27+）。 调优原则：Worker 数量应参考主库的 平均并行事务数，可通过 <code>SHOW STATUS LIKE 'Innodb_trx_active_transactions';</code> 或监控主库的并发 QPS 估算。 一般建议设置为 CPU 核心数的 1/2 到等于核心数，例如 8 核服务器设 4-8 个 Worker。 必须配合 <code>replica_parallel_type=LOGICAL_CLOCK</code>（MySQL 8.0 默认）使用， DATABASE 模式仅按库级别并行，效果有限。 监控 Worker 效率： <code>SELECT * FROM performance_schema.replication_applier_status_by_worker;</code> 检查每个 Worker 的 <code>APPLYING_TRANSACTION</code> 和空闲时间。 如果所有 Worker 经常空闲而只有 1-2 个繁忙，说明主库写入串行度高，增加 Worker 数量无效，需从主库优化事务并行度。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>并行复制 Worker 线程数由 <code>replica_parallel_workers</code>（旧名 <code>slave_parallel_workers</code>）控制，默认为 4（MySQL 8.0.27+）。</p>
+<p><strong>调优原则</strong>：Worker 数量应参考主库的平均并行事务数，可通过 <code>SHOW STATUS LIKE 'Innodb_trx_active_transactions';</code> 或监控主库的并发 QPS 估算。</p>
+<p>一般建议设置为 CPU 核心数的 1/2 到等于核心数，例如 8 核服务器设 4-8 个 Worker。</p>
+<p>必须配合 <code>replica_parallel_type=LOGICAL_CLOCK</code>（MySQL 8.0 默认）使用，DATABASE 模式仅按库级别并行，效果有限。</p>
+<p><strong>监控 Worker 效率</strong>：<code>SELECT * FROM performance_schema.replication_applier_status_by_worker;</code> 检查每个 Worker 的 <code>APPLYING_TRANSACTION</code> 和空闲时间。</p>
+<p>如果所有 Worker 经常空闲而只有 1-2 个繁忙，说明主库写入串行度高，增加 Worker 数量无效，需从主库优化事务并行度。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>65、MySQL InnoDB ReplicaSet 是什么？与 InnoDB Cluster 有什么区别？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">InnoDB ReplicaSet 是 MySQL 8.0.22+ 引入的轻量级高可用方案，基于传统异步复制（非 Group Replication），通过 MySQL Shell 统一管理。 创建方式： dba.createReplicaSet(&lsquo;myRS&rsquo;) 然后 rs.addInstance(&lsquo;slave1:3306&rsquo;) 添加从库。 与 InnoDB Cluster 的区别：Cluster 基于 Group Replication（Paxos 协议）实现多主/单主强一致性；ReplicaSet 基于异步/半同步复制，不支持自动故障转移。 ReplicaSet 需手动执行 rs.setPrimaryInstance(&lsquo;slave1:3306&rsquo;) 切换主库，或配合 MySQL Router 实现路由自动感知。 适用场景：对一致性要求不如 Cluster 严格、但需要简化复制管理的场景，如跨地域读从库、报表库。 管理命令： <code>rs.status()</code> 查看拓扑状态、 <code>rs.removeInstance()</code> 移除节点、 <code>rs.rejoinInstance()</code> 重新加入。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>InnoDB ReplicaSet 是 MySQL 8.0.22+ 引入的轻量级高可用方案，基于传统异步复制（非 Group Replication），通过 MySQL Shell 统一管理。</p>
+<p><strong>创建方式</strong>：<code>dba.createReplicaSet('myRS')</code> 然后 <code>rs.addInstance('slave1:3306')</code> 添加从库。</p>
+<p><strong>与 InnoDB Cluster 的区别</strong>：Cluster 基于 Group Replication（Paxos 协议）实现多主/单主强一致性；ReplicaSet 基于异步/半同步复制，不支持自动故障转移。</p>
+<p>ReplicaSet 需手动执行 <code>rs.setPrimaryInstance('slave1:3306')</code> 切换主库，或配合 MySQL Router 实现路由自动感知。</p>
+<p><strong>适用场景</strong>：对一致性要求不如 Cluster 严格、但需要简化复制管理的场景，如跨地域读从库、报表库。</p>
+<p><strong>管理命令</strong>：<code>rs.status()</code> 查看拓扑状态、<code>rs.removeInstance()</code> 移除节点、<code>rs.rejoinInstance()</code> 重新加入。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>103、MySQL 8.4 在复制方面有哪些新特性？GTID_NEXT 改进和复制权限模型有何变化？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 LTS 对复制功能进行了多项改进： <code>GTID_NEXT</code> 改进： 在 8.4 中， <code>ASSIGN_GTIDS_TO_ANONYMOUS_TRANSACTIONS</code> 选项的行为更加完善，支持从非 GTID 源平滑迁移到 GTID 复制。 复制权限模型变更： 8.4 引入了 <code>REPLICATION_APPLIER</code> 权限，替代之前需要 SUPER 或 <code>SESSION_VARIABLES_ADMIN</code> 的模式：</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 LTS 对复制功能进行了多项改进。</p>
+<p><strong><code>GTID_NEXT</code> 改进</strong>：在 8.4 中，<code>ASSIGN_GTIDS_TO_ANONYMOUS_TRANSACTIONS</code> 选项的行为更加完善，支持从非 GTID 源平滑迁移到 GTID 复制。</p>
+<p><strong>复制权限模型变更</strong>：8.4 引入了 <code>REPLICATION_APPLIER</code> 权限，替代之前需要 SUPER 或 <code>SESSION_VARIABLES_ADMIN</code> 的模式：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 创建专用复制用户（8.4 推荐方式）
 </span></span></span><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">USER</span><span class="w">  </span><span class="s1">&#39; repl_user &#39;</span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;%&#39;</span><span class="w">  </span><span class="n">IDENTIFIED</span><span class="w">  </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;password&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">GRANT</span><span class="w">  </span><span class="n">REPLICATION_SLAVE</span><span class="p">,</span><span class="w"> </span><span class="n">REPLICATION_APPLIER</span><span class="w">  </span><span class="k">ON</span><span class="w">  </span><span class="o">*</span><span class="p">.</span><span class="o">*</span><span class="w">  </span><span class="k">TO</span><span class="w"> </span><span class="s1">&#39;repl_user&#39;</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;%&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
@@ -1939,7 +2279,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="n">SOURCE_AUTO_POSITION</span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">START</span><span class="w"> </span><span class="n">REPLICA</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w">  </span><span class="n">REPLICA</span><span class="w"> </span><span class="n">STATUS</span><span class="w"> </span><span class="err">\</span><span class="k">G</span><span class="w">
-</span></span></span></code></pre></div><p><strong>其他改进</strong>： 多源复制的通道管理更加健壮， <code>SHOW REPLICA STATUS</code> 新增了延迟诊断字段。 迁移建议：从 8.0 升级到 8.4 时，将 <code>CHANGE MASTER</code> 语法替换为 <code>CHANGE REPLICATION SOURCE</code>，更新复制用户权限。</p>
+</span></span></span></code></pre></div><p><strong>其他改进</strong>：多源复制的通道管理更加健壮，<code>SHOW REPLICA STATUS</code> 新增了延迟诊断字段。</p>
+<p><strong>迁移建议</strong>：从 8.0 升级到 8.4 时，将 <code>CHANGE MASTER</code> 语法替换为 <code>CHANGE REPLICATION SOURCE</code>，更新复制用户权限。</p>
 </div></div>
 </details>
 
@@ -2094,7 +2435,7 @@
 <li><strong>SQL模式</strong>：启用 <code>sql_mode=STRICT_TRANS_TABLES</code> 严格模式，拒绝无效数据插入。</li>
 <li>审计日志：使用MySQL Enterprise Audit或Percona Audit Plugin记录所有SQL操作。</li>
 <li><strong>连接限制</strong>： <code>max_user_connections</code> 限制单用户最大连接数，减少攻击面。</li>
-<li><strong>网络隔离</strong>：MySQL不直接暴露公网，通过应用层或VPN访问。 bind-address=127.0.0.1 或内网IP。</li>
+<li><strong>网络隔离</strong>：MySQL不直接暴露公网，通过应用层或VPN访问。<code>bind-address=127.0.0.1</code> 或内网IP。</li>
 </ol>
 </div></div>
 </details>
@@ -2155,32 +2496,69 @@
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>86、MySQL Enterprise Firewall 的工作原理是什么？它如何防止 SQL 注入攻击？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL Enterprise Firewall 是 MySQL 企业版的 SQL 防火墙组件，通过白名单机制控制特定用户可执行的 SQL 模式。 工作流程分三个阶段：1） Recording（学习模式）： <code>CALL mysql.sp_set_firewall_mode('user@host', 'RECORDING');</code> 记录用户的正常 SQL 模式。 2） Protecting（保护模式）： <code>CALL mysql.sp_set_firewall_mode('user@host', 'PROTECTING');</code> 仅允许匹配学习到的 SQL 模式的查询执行。 3）不在白名单中的 SQL（如注入构造的异常语句）会被拒绝，返回错误并记录到日志。 查看已学习的规则： <code>SELECT * FROM information_schema.MYSQL_FIREWALL_WHITELIST WHERE USERHOST='user@host';</code> 防注入原理：攻击者构造的 &rsquo; OR 1=1 &ndash; 类注入会生成与正常 SQL 不同的 规范化模式（normalized pattern），不在白名单中因此被拦截。 注意：Firewall 仅在 MySQL Enterprise Edition 中可用，社区版需使用 <code>connection_control</code> 插件或应用层 WAF 替代。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL Enterprise Firewall 是 MySQL 企业版的 SQL 防火墙组件，通过白名单机制控制特定用户可执行的 SQL 模式。</p>
+<p><strong>工作流程分三个阶段</strong>：</p>
+<ol>
+<li><strong>Recording（学习模式）</strong>：<code>CALL mysql.sp_set_firewall_mode('user@host', 'RECORDING');</code> 记录用户的正常 SQL 模式。</li>
+<li><strong>Protecting（保护模式）</strong>：<code>CALL mysql.sp_set_firewall_mode('user@host', 'PROTECTING');</code> 仅允许匹配学习到的 SQL 模式的查询执行。</li>
+<li>不在白名单中的 SQL（如注入构造的异常语句）会被拒绝，返回错误并记录到日志。</li>
+</ol>
+<p><strong>查看已学习的规则</strong>：<code>SELECT * FROM information_schema.MYSQL_FIREWALL_WHITELIST WHERE USERHOST='user@host';</code></p>
+<p><strong>防注入原理</strong>：攻击者构造的 <code>' OR 1=1 --</code> 类注入会生成与正常 SQL 不同的规范化模式（normalized pattern），不在白名单中因此被拦截。</p>
+<p><strong>注意</strong>：Firewall 仅在 MySQL Enterprise Edition 中可用，社区版需使用 <code>connection_control</code> 插件或应用层 WAF 替代。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>87、MySQL 的 connection_control 插件有什么作用？如何配置防暴力破解？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>connection_control</code> 插件在连续登录失败后引入递增延迟，有效防止暴力破解密码攻击。 安装： <code>INSTALL PLUGIN CONNECTION_CONTROL SONAME 'connection_control.so'; INSTALL PLUGIN CONNECTION_CONTROL_FAILED_LOGIN_ATTEMPTS SONAME 'connection_control.so';</code> 核心参数： <code>connection_control_failed_connections_threshold</code> = 3（连续失败 3 次后触发延迟）， <code>connection_control_min_connection_delay</code> = 1000（最小延迟 1 秒）， <code>connection_control_max_connection_delay</code> = 86400000（最大延迟 24 小时）。 延迟公式：第 N 次失败后延迟 = <code>min_delay</code> * (N - threshold)，直到达到 <code>max_delay</code>。 监控失败次数： <code>SELECT * FROM information_schema.CONNECTION_CONTROL_FAILED_LOGIN_ATTEMPTS;</code> 查看每个账户的当前失败计数。 登录成功后计数器自动重置。建议配合 <code>validate_password</code> 组件强制复杂密码策略，双重保障账户安全。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>connection_control</code> 插件在连续登录失败后引入递增延迟，有效防止暴力破解密码攻击。</p>
+<p><strong>安装</strong>：<code>INSTALL PLUGIN CONNECTION_CONTROL SONAME 'connection_control.so'; INSTALL PLUGIN CONNECTION_CONTROL_FAILED_LOGIN_ATTEMPTS SONAME 'connection_control.so';</code></p>
+<p><strong>核心参数</strong>：<code>connection_control_failed_connections_threshold</code> = 3（连续失败 3 次后触发延迟），<code>connection_control_min_connection_delay</code> = 1000（最小延迟 1 秒），<code>connection_control_max_connection_delay</code> = 86400000（最大延迟 24 小时）。</p>
+<p><strong>延迟公式</strong>：第 N 次失败后延迟 = <code>min_delay</code> * (N - threshold)，直到达到 <code>max_delay</code>。</p>
+<p><strong>监控失败次数</strong>：<code>SELECT * FROM information_schema.CONNECTION_CONTROL_FAILED_LOGIN_ATTEMPTS;</code> 查看每个账户的当前失败计数。</p>
+<p>登录成功后计数器自动重置。建议配合 <code>validate_password</code> 组件强制复杂密码策略，双重保障账户安全。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>88、MySQL 8.0 的 validate_password 组件如何配置密码策略？与旧版插件有什么区别？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL 8.0 将密码验证从 插件（<code>validate_password</code> plugin）升级为 组件（component），使用 <code>INSTALL COMPONENT 'file://component_validate_password';</code> 安装。 核心参数： <code>validate_password.policy</code>（LOW/MEDIUM/STRONG，默认 MEDIUM）、 <code>validate_password.length</code>（最小长度，默认 8）、 <code>validate_password.mixed_case_count</code>（大小写最少各几个）。 MEDIUM 策略要求：长度 &gt;= 8 + 大写 + 小写 + 数字 + 特殊字符。STRONG 策略额外检查密码是否在字典文件中： <code>validate_password.dictionary_file</code> = &lsquo;/path/to/dict.txt&rsquo;。 测试密码强度： <code>SELECT VALIDATE_PASSWORD_STRENGTH('MyP@ss123');</code> 返回 0-100 的评分。 与旧版插件的区别：组件架构支持更灵活的扩展、配置持久化（<code>SET PERSIST</code>）、不依赖 <code>my.cnf</code> 中 plugin-load 指令。 生产建议：至少使用 MEDIUM 策略；配合 <code>password_history</code>（禁止重复使用最近 N 个密码）和 <code>password_reuse_interval</code>（密码重用间隔天数）。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0 将密码验证从 插件（<code>validate_password</code> plugin）升级为 组件（component），使用 <code>INSTALL COMPONENT 'file://component_validate_password';</code> 安装。</p>
+<p><strong>核心参数</strong>：<code>validate_password.policy</code>（LOW/MEDIUM/STRONG，默认 MEDIUM）、<code>validate_password.length</code>（最小长度，默认 8）、<code>validate_password.mixed_case_count</code>（大小写最少各几个）。</p>
+<p>MEDIUM 策略要求：长度 &gt;= 8 + 大写 + 小写 + 数字 + 特殊字符。STRONG 策略额外检查密码是否在字典文件中：<code>validate_password.dictionary_file</code> = &lsquo;/path/to/dict.txt&rsquo;。</p>
+<p><strong>测试密码强度</strong>：<code>SELECT VALIDATE_PASSWORD_STRENGTH('MyP@ss123');</code> 返回 0-100 的评分。</p>
+<p><strong>与旧版插件的区别</strong>：组件架构支持更灵活的扩展、配置持久化（<code>SET PERSIST</code>）、不依赖 <code>my.cnf</code> 中 plugin-load 指令。</p>
+<p><strong>生产建议</strong>：至少使用 MEDIUM 策略；配合 <code>password_history</code>（禁止重复使用最近 N 个密码）和 <code>password_reuse_interval</code>（密码重用间隔天数）。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>89、如何使用 mysql_config_editor 安全存储 MySQL 登录凭据？它解决了什么安全问题？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><code>mysql_config_editor</code> 将登录凭据加密存储在 ~/.mylogin.cnf 文件中，避免在脚本和命令行中明文传递密码（解决 Warning: Using a password on the command line interface can be insecure 警告）。 创建登录路径： <code>mysql_config_editor set --login-path=production --host=10.0.0.1 --user=dba --password</code>（交互式输入密码，不回显）。 使用： <code>mysql --login-path=production</code> 自动读取对应的主机、用户名和密码连接，等同于 mysql -h 10.0.0.1 -u dba -p。 查看已保存的登录路径： <code>mysql_config_editor print --all</code>（密码以 *****显示）。 删除登录路径： <code>mysql_config_editor remove --login-path=production</code>。 在备份脚本中使用： <code>mysqldump</code> <code>--login-path=production</code> mydb &gt; /backup/mydb.sql，crontab 备份脚本不再需要硬编码密码。 注意： .mylogin.cnf 使用简单的混淆加密（非强加密），权限应设为 600，不应在多用户共享主机上依赖它作为唯一安全措施。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>mysql_config_editor</code> 将登录凭据加密存储在 ~/.mylogin.cnf 文件中，避免在脚本和命令行中明文传递密码（解决 Warning: Using a password on the command line interface can be insecure 警告）。</p>
+<p><strong>创建登录路径</strong>：<code>mysql_config_editor set --login-path=production --host=10.0.0.1 --user=dba --password</code>（交互式输入密码，不回显）。</p>
+<p><strong>使用</strong>：<code>mysql --login-path=production</code> 自动读取对应的主机、用户名和密码连接，等同于 <code>mysql -h 10.0.0.1 -u dba -p</code>。</p>
+<p><strong>查看已保存的登录路径</strong>：<code>mysql_config_editor print --all</code>（密码以 ***** 显示）。</p>
+<p><strong>删除登录路径</strong>：<code>mysql_config_editor remove --login-path=production</code>。</p>
+<p><strong>在备份脚本中使用</strong>：<code>mysqldump --login-path=production mydb &gt; /backup/mydb.sql</code>，crontab 备份脚本不再需要硬编码密码。</p>
+<p><strong>注意</strong>：.mylogin.cnf 使用简单的混淆加密（非强加密），权限应设为 600，不应在多用户共享主机上依赖它作为唯一安全措施。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>90、MySQL 8.0 的审计日志组件（audit_log）如何配置和使用？它能记录哪些事件？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">MySQL Enterprise Audit 通过 <code>audit_log</code> 插件/组件记录数据库活动，满足合规审计需求（如 SOX、PCI-DSS）。 安装： <code>INSTALL PLUGIN audit_log SONAME 'audit_log.so';</code> 或 8.0.33+ 使用组件 <code>INSTALL COMPONENT 'file://component_audit_log_filter';</code> 可记录的事件类型：连接/断开（CONNECT/DISCONNECT）、查询（QUERY）、表访问（<code>TABLE_ACCESS</code>）、认证失败等。 过滤配置（基于 JSON 规则）： <code>SELECT audit_log_filter_set_filter('log_all', '{&quot;filter&quot;: {&quot;log&quot;: true}}');</code> 记录所有事件。 绑定到用户： <code>SELECT audit_log_filter_set_user('%', 'log_all');</code> 为所有用户启用审计。 审计日志默认输出到 datadir/audit.log，支持 XML 和 JSON 格式（<code>audit_log_format</code>=JSON），可通过 <code>audit_log_rotate_on_size</code> 自动轮转。 注意：审计日志对高并发 OLTP 系统有 5-10% 的性能开销，生产环境建议配置过滤规则仅记录关键操作（如 DDL、特权用户查询）。</div></div>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL Enterprise Audit 通过 <code>audit_log</code> 插件/组件记录数据库活动，满足合规审计需求（如 SOX、PCI-DSS）。</p>
+<p><strong>安装</strong>：<code>INSTALL PLUGIN audit_log SONAME 'audit_log.so';</code> 或 8.0.33+ 使用组件 <code>INSTALL COMPONENT 'file://component_audit_log_filter';</code></p>
+<p><strong>可记录的事件类型</strong>：连接/断开（CONNECT/DISCONNECT）、查询（QUERY）、表访问（<code>TABLE_ACCESS</code>）、认证失败等。</p>
+<p><strong>过滤配置（基于 JSON 规则）</strong>：<code>SELECT audit_log_filter_set_filter('log_all', '{&quot;filter&quot;: {&quot;log&quot;: true}}');</code> 记录所有事件。</p>
+<p><strong>绑定到用户</strong>：<code>SELECT audit_log_filter_set_user('%', 'log_all');</code> 为所有用户启用审计。</p>
+<p>审计日志默认输出到 datadir/audit.log，支持 XML 和 JSON 格式（<code>audit_log_format</code>=JSON），可通过 <code>audit_log_rotate_on_size</code> 自动轮转。</p>
+<p><strong>注意</strong>：审计日志对高并发 OLTP 系统有 5-10% 的性能开销，生产环境建议配置过滤规则仅记录关键操作（如 DDL、特权用户查询）。</p>
+</div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>106、MySQL 8.0 的 Enterprise Firewall 和 connection_control 插件如何配置以增强数据库安全？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0/8.4 提供了 Enterprise Firewall 和 <code>connection_control</code> 插件用于防护 SQL 注入和暴力破解。 <code>connection_control</code> 插件（社区版可用）：在连续登录失败后增加延迟，防止暴力破解：</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.0/8.4 提供了 Enterprise Firewall 和 <code>connection_control</code> 插件用于防护 SQL 注入和暴力破解。</p>
+<p><code>connection_control</code> 插件（社区版可用）：在连续登录失败后增加延迟，防止暴力破解：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">INSTALL</span><span class="w"> </span><span class="n">PLUGIN</span><span class="w"> </span><span class="n">connection_control</span><span class="w"> </span><span class="n">SONAME</span><span class="w">  </span><span class="s1">&#39;connection_control.so&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="n">INSTALL</span><span class="w"> </span><span class="n">PLUGIN</span><span class="w"> </span><span class="n">connection_control_failed_login_attempts</span><span class="w"> </span><span class="n">SONAME</span><span class="w">  </span><span class="s1">&#39;connection_control.so&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">connection_control_failed_connections_threshold</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">3</span><span class="w"> </span><span class="p">;</span><span class="w">
@@ -2194,13 +2572,15 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 运行正常业务流量后切换到保护模式
 </span></span></span><span class="line"><span class="cl"><span class="k">CALL</span><span class="w">  </span><span class="n">mysql</span><span class="p">.</span><span class="n">sp_set_firewall_mode</span><span class="p">(</span><span class="w"> </span><span class="s1">&#39;app_user@%&#39;</span><span class="w"> </span><span class="p">,</span><span class="w">  </span><span class="s1">&#39;PROTECTING&#39;</span><span class="w"> </span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 异常 SQL 将被拒绝并记录到日志
-</span></span></span></code></pre></div><p><strong>适用场景</strong>：<code>connection_control</code> 适合所有 MySQL 环境作为基础防护；Firewall 适合企业版用户防止 SQL 注入。 生产建议：先在 DETECTING 模式观察，确认无误报后再切换到 PROTECTING 模式。</p>
+</span></span></span></code></pre></div><p><strong>适用场景</strong>：<code>connection_control</code> 适合所有 MySQL 环境作为基础防护；Firewall 适合企业版用户防止 SQL 注入。</p>
+<p><strong>生产建议</strong>：先在 DETECTING 模式观察，确认无误报后再切换到 PROTECTING 模式。</p>
 </div></div>
 </details>
 
 <details class="qa-item">
     <summary class="qa-question"><strong>Q：</strong>107、mysql_migrate_keyring 工具如何用于 TDE 密钥环迁移？有哪些注意事项？</summary>
-    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 的 <code>mysql_migrate_keyring</code> 工具用于在不同密钥环（Keyring）插件之间迁移加密密钥，常见于 TDE（透明数据加密）环境的密钥管理升级。 例如从文件密钥环迁移到 HashiCorp Vault 或 Oracle Key Vault：</p>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 8.4 的 <code>mysql_migrate_keyring</code> 工具用于在不同密钥环（Keyring）插件之间迁移加密密钥，常见于 TDE（透明数据加密）环境的密钥管理升级。</p>
+<p>例如从文件密钥环迁移到 HashiCorp Vault 或 Oracle Key Vault：</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># 从 keyring_file 迁移到 keyring_hashicorp</span>
 </span></span><span class="line"><span class="cl">mysql_migrate_keyring <span class="se">\
@@ -2215,7 +2595,9 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- early-plugin-load=keyring_hashicorp.so
 </span></span></span><span class="line"><span class="cl"><span class="c1">-- 验证迁移结果
 </span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="k">FROM</span><span class="w">  </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">keyring_keys</span><span class="p">;</span><span class="w">
-</span></span></span></code></pre></div><p><strong>注意事项</strong>： 迁移前必须完整备份原密钥环文件； <code>--online-migration</code> 选项允许不停机迁移；迁移过程中新产生的密钥会写入目标密钥环。 适用场景：从开发环境的文件密钥环升级到生产环境的 KMS 集中管理。 风险提示：密钥丢失将导致加密数据不可恢复，务必确保目标密钥环配置正确并可写。</p>
+</span></span></span></code></pre></div><p><strong>注意事项</strong>：迁移前必须完整备份原密钥环文件；<code>--online-migration</code> 选项允许不停机迁移；迁移过程中新产生的密钥会写入目标密钥环。</p>
+<p><strong>适用场景</strong>：从开发环境的文件密钥环升级到生产环境的 KMS 集中管理。</p>
+<p><strong>风险提示</strong>：密钥丢失将导致加密数据不可恢复，务必确保目标密钥环配置正确并可写。</p>
 </div></div>
 </details>
 
