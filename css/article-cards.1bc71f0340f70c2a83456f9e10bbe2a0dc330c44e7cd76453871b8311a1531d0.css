@@ -1,0 +1,167 @@
+/* Homepage covers only; article pages and compact lists keep Stack's layout. */
+.article-list .article-card--pinned {
+    position: relative;
+}
+
+.article-list .article-pin {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--card-background);
+    color: var(--accent-color);
+    box-shadow: 0 1px 6px rgb(0 0 0 / 0.08);
+}
+
+.article-list .article-card--pinned:not(.has-image) .article-details {
+    padding-inline-end: max(var(--card-padding), 60px);
+}
+
+.article-list .article-pin svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    transform: rotate(35deg);
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-header {
+    position: relative;
+    isolation: isolate;
+    min-height: 240px;
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-image {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 54%;
+    height: 100%;
+    z-index: -1;
+    /* A wide, eased fade avoids a visible seam and keeps text over a quiet area.
+       Transparency reveals the actual card color in either color scheme. */
+    --cover-mask: linear-gradient(to right,
+        transparent 0%,
+        rgb(0 0 0 / 0.02) 12%,
+        rgb(0 0 0 / 0.12) 28%,
+        rgb(0 0 0 / 0.38) 46%,
+        rgb(0 0 0 / 0.72) 66%,
+        rgb(0 0 0 / 0.95) 86%,
+        #000 100%);
+    -webkit-mask-image: var(--cover-mask);
+    mask-image: var(--cover-mask);
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-image a {
+    display: block;
+    height: 100%;
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-details {
+    box-sizing: border-box;
+    position: relative;
+    width: 64%;
+    min-height: 240px;
+    padding: 28px;
+    gap: 16px;
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-title {
+    font-size: 2.2rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-subtitle {
+    font-size: 1.6rem;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+    display: block;
+}
+
+.article-list :is(.article-card--gradient, .article-card--glow) .article-tags a {
+    padding: 4px 10px;
+    font-size: 1.2rem;
+}
+
+/* A clean, single-color wash under the text, not a blurred copy of the cover. */
+.article-list .article-card--glow .article-details {
+    isolation: isolate;
+}
+
+.article-list .article-card--glow .article-details::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Retain the original bottom-left wash; brighten the hue instead of moving it. */
+    --cover-tint: color-mix(in srgb, var(--cover-color) 80%, white);
+    background: linear-gradient(to top,
+        color-mix(in srgb, var(--cover-tint) 32%, transparent) 0%,
+        color-mix(in srgb, var(--cover-tint) 11%, transparent) 24%,
+        transparent 62%);
+    -webkit-mask-image: linear-gradient(to right, #000 60%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 60%, transparent 100%);
+}
+
+@supports (color: oklch(from red l c h)) {
+    .article-list .article-card--glow .article-details::before {
+        /* Lift lightness and chroma separately, without turning blue into gray. */
+        --cover-tint: oklch(from var(--cover-color) 0.8 calc(c * 1.35) h);
+    }
+}
+
+[data-scheme="dark"] .article-list .article-card--glow .article-details::before {
+    background: linear-gradient(to top,
+        color-mix(in srgb, var(--cover-color) 30%, transparent) 0%,
+        color-mix(in srgb, var(--cover-color) 12%, transparent) 24%,
+        transparent 62%);
+}
+
+@media (max-width: 600px) {
+    .article-list .article-card--glow .article-details::before {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .article-list :is(.article-card--gradient, .article-card--glow) .article-image {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: 190px;
+        --cover-mask: linear-gradient(to bottom,
+            #000 0%,
+            rgb(0 0 0 / 0.96) 28%,
+            rgb(0 0 0 / 0.78) 48%,
+            rgb(0 0 0 / 0.44) 68%,
+            rgb(0 0 0 / 0.12) 86%,
+            transparent 100%);
+    }
+
+    .article-list :is(.article-card--gradient, .article-card--glow) .article-details {
+        width: 100%;
+        min-height: 0;
+        margin-top: -24px;
+        padding: 0 22px 24px;
+    }
+
+    .article-list :is(.article-card--gradient, .article-card--glow) .article-title {
+        font-size: 2rem;
+    }
+}
