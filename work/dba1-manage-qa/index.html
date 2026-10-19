@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="DDL MySQL 的 DDL 技术主要围绕减少表结构变更对业务读写的阻塞不断演进。\n早期mysql 的传统ddl：主要采用 COPY 算法，创建新表、复制旧表数据，最后替换原表。大表操作耗时长，通常因为使用shared或者exclusive的mdl锁获取方式，会阻塞业务写入/读写。 pt-online-schema-change（2011～2012 年逐渐成熟）：Percona 推出的外部在线 DDL 工具。创建影子表，利用 Trigger 同步原表的增量 DML，分批迁移数据后切换表，尽量避免长时间阻塞业务。 MySQL Online DDL（5.6，2013 年）：MySQL 原生支持 INPLACE 算法，可以在 InnoDB 内部完成部分结构变更，并通过 Online DDL Log 支持并发 DML，但并非所有 DDL 都支持。 更可控的 gh-ost（2016 年，GitHub 开源）：与 pt-osc 类似，同样采用影子表迁移，但使用 Binlog 捕获增量变更，替代 Trigger，支持限流、暂停、延迟切换等能力，对生产环境更加友好。 原生的 MySQL INSTANT DDL（8.0.12，2018 年）：进一步引入 INSTANT 算法，部分 DDL 只需修改元数据，无需复制数据或重建表，执行速度大幅提升；后续 8.0 版本继续扩展支持范围。 pt-osc、gh-ost 与 MySQL 原生 Online DDL 长期并存，即使是 MySQL 8.0，部分 DDL 仍需 COPY 或重建表，且原生 Online DDL 的限流、暂停与切换控制能力相对有限。\ninstant ddl的支持范围也有限，参考 MySQL :: MySQL 8.0 Reference Manual :: 17.12.1 Online DDL Operations。在mysql8.0的版本里面，使用ptosc或者ghost对表结构变更时并发业务读写DML的支持更好，阻塞更少。\n">
+<title>Mysql管理 QA </title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/dba1-manage-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Mysql管理 QA ">
+<meta property='og:description' content="DDL MySQL 的 DDL 技术主要围绕减少表结构变更对业务读写的阻塞不断演进。\n早期mysql 的传统ddl：主要采用 COPY 算法，创建新表、复制旧表数据，最后替换原表。大表操作耗时长，通常因为使用shared或者exclusive的mdl锁获取方式，会阻塞业务写入/读写。 pt-online-schema-change（2011～2012 年逐渐成熟）：Percona 推出的外部在线 DDL 工具。创建影子表，利用 Trigger 同步原表的增量 DML，分批迁移数据后切换表，尽量避免长时间阻塞业务。 MySQL Online DDL（5.6，2013 年）：MySQL 原生支持 INPLACE 算法，可以在 InnoDB 内部完成部分结构变更，并通过 Online DDL Log 支持并发 DML，但并非所有 DDL 都支持。 更可控的 gh-ost（2016 年，GitHub 开源）：与 pt-osc 类似，同样采用影子表迁移，但使用 Binlog 捕获增量变更，替代 Trigger，支持限流、暂停、延迟切换等能力，对生产环境更加友好。 原生的 MySQL INSTANT DDL（8.0.12，2018 年）：进一步引入 INSTANT 算法，部分 DDL 只需修改元数据，无需复制数据或重建表，执行速度大幅提升；后续 8.0 版本继续扩展支持范围。 pt-osc、gh-ost 与 MySQL 原生 Online DDL 长期并存，即使是 MySQL 8.0，部分 DDL 仍需 COPY 或重建表，且原生 Online DDL 的限流、暂停与切换控制能力相对有限。\ninstant ddl的支持范围也有限，参考 MySQL :: MySQL 8.0 Reference Manual :: 17.12.1 Online DDL Operations。在mysql8.0的版本里面，使用ptosc或者ghost对表结构变更时并发业务读写DML的支持更好，阻塞更少。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/dba1-manage-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-19T22:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-19T22:00:00&#43;08:00'/>
+<meta name="twitter:title" content="Mysql管理 QA ">
+<meta name="twitter:description" content="DDL MySQL 的 DDL 技术主要围绕减少表结构变更对业务读写的阻塞不断演进。\n早期mysql 的传统ddl：主要采用 COPY 算法，创建新表、复制旧表数据，最后替换原表。大表操作耗时长，通常因为使用shared或者exclusive的mdl锁获取方式，会阻塞业务写入/读写。 pt-online-schema-change（2011～2012 年逐渐成熟）：Percona 推出的外部在线 DDL 工具。创建影子表，利用 Trigger 同步原表的增量 DML，分批迁移数据后切换表，尽量避免长时间阻塞业务。 MySQL Online DDL（5.6，2013 年）：MySQL 原生支持 INPLACE 算法，可以在 InnoDB 内部完成部分结构变更，并通过 Online DDL Log 支持并发 DML，但并非所有 DDL 都支持。 更可控的 gh-ost（2016 年，GitHub 开源）：与 pt-osc 类似，同样采用影子表迁移，但使用 Binlog 捕获增量变更，替代 Trigger，支持限流、暂停、延迟切换等能力，对生产环境更加友好。 原生的 MySQL INSTANT DDL（8.0.12，2018 年）：进一步引入 INSTANT 算法，部分 DDL 只需修改元数据，无需复制数据或重建表，执行速度大幅提升；后续 8.0 版本继续扩展支持范围。 pt-osc、gh-ost 与 MySQL 原生 Online DDL 长期并存，即使是 MySQL 8.0，部分 DDL 仍需 COPY 或重建表，且原生 Online DDL 的限流、暂停与切换控制能力相对有限。\ninstant ddl的支持范围也有限，参考 MySQL :: MySQL 8.0 Reference Manual :: 17.12.1 Online DDL Operations。在mysql8.0的版本里面，使用ptosc或者ghost对表结构变更时并发业务读写DML的支持更好，阻塞更少。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#ddl">DDL</a></li>
+        <li><a href="#mysql版本变迁升级">Mysql版本变迁&amp;升级</a></li>
+        <li><a href="#主从拓扑">主从拓扑</a></li>
+        <li><a href="#慢日志分析工具">慢日志分析工具</a></li>
+        <li><a href="#监控">监控</a></li>
+        <li><a href="#配置和参数">配置和参数</a></li>
+        <li><a href="#运维相关问题">运维相关问题</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/dba1-manage-qa/">Mysql管理 QA </a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-19T22:00:00&#43;08:00'>Monday, October 19, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#ddl">DDL</a></li>
+        <li><a href="#mysql版本变迁升级">Mysql版本变迁&amp;升级</a></li>
+        <li><a href="#主从拓扑">主从拓扑</a></li>
+        <li><a href="#慢日志分析工具">慢日志分析工具</a></li>
+        <li><a href="#监控">监控</a></li>
+        <li><a href="#配置和参数">配置和参数</a></li>
+        <li><a href="#运维相关问题">运维相关问题</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <h3 id="ddl">DDL
+</h3><p>MySQL 的 DDL 技术主要围绕减少表结构变更对业务读写的阻塞不断演进。</p>
+<ul>
+<li>早期mysql 的传统ddl：主要采用 COPY 算法，创建新表、复制旧表数据，最后替换原表。大表操作耗时长，通常因为使用shared或者exclusive的mdl锁获取方式，会阻塞业务写入/读写。</li>
+<li>pt-online-schema-change（2011～2012 年逐渐成熟）：Percona 推出的外部在线 DDL 工具。创建影子表，利用 Trigger 同步原表的增量 DML，分批迁移数据后切换表，尽量避免长时间阻塞业务。</li>
+<li>MySQL Online DDL（5.6，2013 年）：MySQL 原生支持 INPLACE 算法，可以在 InnoDB 内部完成部分结构变更，并通过 Online DDL Log 支持并发 DML，但并非所有 DDL 都支持。</li>
+<li>更可控的 gh-ost（2016 年，GitHub 开源）：与 pt-osc 类似，同样采用影子表迁移，但使用 Binlog 捕获增量变更，替代 Trigger，支持限流、暂停、延迟切换等能力，对生产环境更加友好。</li>
+<li>原生的 MySQL INSTANT DDL（8.0.12，2018 年）：进一步引入 INSTANT 算法，部分 DDL 只需修改元数据，无需复制数据或重建表，执行速度大幅提升；后续 8.0 版本继续扩展支持范围。</li>
+</ul>
+<p>pt-osc、gh-ost 与 MySQL 原生 Online DDL 长期并存，即使是 MySQL 8.0，部分 DDL 仍需 COPY 或重建表，且原生 Online DDL 的限流、暂停与切换控制能力相对有限。</p>
+<p>instant ddl的支持范围也有限，参考 <a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-operations.html?utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >MySQL :: MySQL 8.0 Reference Manual :: 17.12.1 Online DDL Operations</a>。在mysql8.0的版本里面，使用ptosc或者ghost对表结构变更时并发业务读写DML的支持更好，阻塞更少。</p>
+<p><strong>43、OnlineDDL补充，关于 inplace 操作 为什么不需要创建临时表。</strong></p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q1：MySQL Online DDL 中，INPLACE 为什么不需要创建临时表？它与 COPY 有什么区别？适用于所有 DDL 吗？INPLACE+LOCK=None的时候真的不加锁吗？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">
+    <blockquote>
+        <p><code>INPLACE</code>：在InnoDB内部原地执行，不创建临时表，但可能需要重建表。支持：添加/删除索引、修改列默认值等。</p>
+
+    </blockquote>
+<p><code>INPLACE</code> 并非完全不创建临时表，也不意味着不复制数据，而是由 InnoDB 存储引擎内部完成 DDL 操作，分为两种情况：不重建的时候不需要复制原表数据，需要重建的时候和COPY类似，但是对于DDL期间的并发DML支持更好。</p>
+<ol>
+<li>
+<p>不重建表（No Rebuild）：例如添加普通二级索引，只需扫描聚簇索引，排序并构建新的二级索引 B+ 树，无需复制原表数据。</p>
+<ol>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- inplace ddl，不加锁允许并发DML
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 添加索引，inplace，不需要重建表
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name</span><span class="p">(</span><span class="n">name</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ol>
+</li>
+<li>
+<p>重建表（Rebuild）：例如修改字段的 NULL 属性，需要扫描原表数据，在 InnoDB 内部创建中间表并重建聚簇索引及二级索引，最后切换到新表。可能产生 <code>#sql-ib</code> 中间表文件，并占用接近原表大小的额外磁盘空间。</p>
+<ol>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 修改字段的null属性
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 需要创建中间表 来修改原表的聚簇索引树，以及相关二级索引，最后原子切换
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- inplace ddl， lock = none，需重建表
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ol>
+</li>
+</ol>
+<p>inplace和copy的区别，一个是innodb执行的B+树构建，可以通过online ddl log记录dml变更；一个是mysql server层执行的新表创建，读取旧表数据最后原子切换，需要阻塞并发DML。</p>
+<ul>
+<li>INPLACE：由 InnoDB 内部执行，可以采用排序、批量构建 B+ 树等优化；对于支持在线执行的操作，还可以通过 Online DDL Log 记录并应用并发 DML 变更。</li>
+<li>COPY：由 MySQL Server 层主导，创建新表，逐行读取旧表数据并插入新表，最后进行表切换。通常需要阻塞并发 DML。</li>
+</ul>
+<p>INPLACE 不适用于所有 DDL。 例如添加、删除普通索引、修改字段默认值通常支持 INPLACE 且无需重建表；添加删除普通列、修改字段null属性、添加主键支持 INPLACE 但需要重建表；修改字段类型（如 INT → BIGINT）通常只能使用 COPY。<a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-operations.html?utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >MySQL 8.0 参考手册#17.12.1 在线 DDL 操作</a> 里面列出了 instant 和 inplace支持的范围：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th></th>
+					<th>重建</th>
+					<th>remark / affected rows</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>添加/删除普通索引</td>
+					<td>✗</td>
+					<td>不修改实际表数据</td>
+			</tr>
+			<tr>
+					<td>修改字段默认值</td>
+					<td>✗</td>
+					<td>不修改实际表数据</td>
+			</tr>
+			<tr>
+					<td>添加删除普通列</td>
+					<td>✓</td>
+					<td>需要修改聚簇索引中的每一行值</td>
+			</tr>
+			<tr>
+					<td>修改字段null属性（是否运行not null / null）</td>
+					<td>✓</td>
+					<td>原因，null字段列表在一行record记录中 在记录元信息中排布（变长字段列，null值列，。。。）</td>
+			</tr>
+			<tr>
+					<td>添加主键支持（部分case）</td>
+					<td>✓*</td>
+					<td></td>
+			</tr>
+			<tr>
+					<td>修改字段类型（如 INT → BIGINT）</td>
+					<td>需要使用algorithm=COPY</td>
+					<td>修改字段类型涉及到 类型转换，每行数据的对应列的大小伸缩。<br />instant 虽然是innodb内部重建表，但是不支持类型转换，所以需要使用copy。<br />对于 涉及到 表中数据的类型转换的，需要使用copy。</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>inplace + lock=none的时候并非完全不加锁，onlioneddl在准备和提交表结构的时候会短暂的获取排他MDL锁，如果存在长事务，则当前online ddl 阻塞等待的时间段内，后续select 也会因为MDL锁的调度规则被阻塞，即便DDL还没有真正拿到排他锁。<a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-performance.html?ff=nopfpls&amp;amp;utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >Mysql8.0 reference Manual#OnlineDDL和MetadataLocks一节</a></p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q2：什么是online ddl，什么是之前的ddl。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>之前的ddl相当于获取独占MDL锁，然后进行ddl，会阻塞后续的DML操作。</p>
+<p>现在的online ddl是mysql 5.6 引入的功能，允许在不阻塞dml操作的情况下执行表结构变更。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q3：online ddl的性能如何判断？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><a class="link" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-performance.html?ff=nopfpls&amp;amp;utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >Mysql8.0 reference Manual#OnlineDDL Performance</a> 一节 有提到过。</p>
+<p>执行ddl的时候添加algorithm 可以看到受影响的行数，来确定ddl操作是inplace就地更改，还是执行表复制/重建表。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 新建表
+</span></span></span><span class="line"><span class="cl"><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">ddl_users</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">`</span><span class="n">name</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="o">`</span><span class="n">password</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- inplace + none lock
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 这里使用的是 INPLACE 算法。对于需要重建表的操作，InnoDB 可以在存储引擎内部重新构建聚簇索引，而 MySQL 返回的 Records 不一定统计这些内部处理的记录。
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">ddl_users</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">name</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">Records</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="n">Duplicates</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="n">Warnings</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- copy 使用的 lock 至少得是shared，锁住并发写，允许并发读。
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">ddl_users</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">name</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">125</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="k">COPY</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="n">SHARED</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">Records</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">  </span><span class="n">Duplicates</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="n">Warnings</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">demo_users</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>mysqlsh / mysql cli 中才会显示多少rows affected</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">demo_users</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">demo_users</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>输出：可见inplace重建表，mysql返回的rows affected和后面的附加消息不多。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="w"> </span><span class="n">MySQL</span><span class="w">  </span><span class="n">aios</span><span class="p">:</span><span class="mi">3306</span><span class="w"> </span><span class="n">ssl</span><span class="w">  </span><span class="n">test_db</span><span class="w">  </span><span class="k">SQL</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">demo_users</span><span class="o">`</span><span class="w">   </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">   </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="n">INPLACE</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="k">NONE</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">Query</span><span class="w"> </span><span class="n">OK</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="n">affected</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">.</span><span class="mi">4646</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">Records</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="n">Duplicates</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">  </span><span class="n">Warnings</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+</span></span></span></code></pre></div><p>使用copy的，基于mysql server实现的 临时表 copy的方法，可以正常显示rows affected 和 后面的消息</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="w"> </span><span class="n">MySQL</span><span class="w">  </span><span class="n">aios</span><span class="p">:</span><span class="mi">3306</span><span class="w"> </span><span class="n">ssl</span><span class="w">  </span><span class="n">test_db</span><span class="w">  </span><span class="k">SQL</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">ddl_users</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                   </span><span class="o">-&gt;</span><span class="w">   </span><span class="k">MODIFY</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="o">`</span><span class="n">name</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">125</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                                   </span><span class="o">-&gt;</span><span class="w">   </span><span class="n">ALGORITHM</span><span class="o">=</span><span class="k">COPY</span><span class="p">,</span><span class="w"> </span><span class="k">LOCK</span><span class="o">=</span><span class="n">SHARED</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">Query</span><span class="w"> </span><span class="n">OK</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">rows</span><span class="w"> </span><span class="n">affected</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">0671</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：45、pt-online-schema-change和gh-ost的工作原理分别是什么？各有什么优缺点？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>大表的在线ddl工具，一个是percona toolkit，一个是github官方的工具。</p>
+<p>ptosc和ghost的实现原理不同。</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th></th>
+					<th>pt osc</th>
+					<th>gh ost</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>创建影子表执行ddl</td>
+					<td>✓</td>
+					<td>✓</td>
+			</tr>
+			<tr>
+					<td>变更捕获：DDL期间原表的DML操作如何更新到影子表上</td>
+					<td>在原表上创建dml的触发器，将原表的dml操作更新到新表</td>
+					<td>监听解析binlog上的dml变更 然后应用到新表。</td>
+			</tr>
+			<tr>
+					<td>原表的数据如何更新</td>
+					<td>分批chunk 拷贝到影子表</td>
+					<td>分批chunk 拷贝到影子表</td>
+			</tr>
+			<tr>
+					<td>拷贝完成后，如何切换到新表。</td>
+					<td>原子性重命名，a和a_cp，a重命名为a_bak, a_cp重命名为a。</td>
+					<td>cutover 原子性切表</td>
+			</tr>
+			<tr>
+					<td><strong>支持方面</strong></td>
+					<td></td>
+					<td></td>
+			</tr>
+			<tr>
+					<td>对主库影响</td>
+					<td>触发器有性能开销，会增加负载。</td>
+					<td>binlog 解析较触发器更轻量</td>
+			</tr>
+			<tr>
+					<td>是否需要配置binlog</td>
+					<td>✗</td>
+					<td>✓</td>
+			</tr>
+			<tr>
+					<td>可控性</td>
+					<td>有限</td>
+					<td>支持动态暂停/限速/恢复</td>
+			</tr>
+			<tr>
+					<td>外键支持</td>
+					<td>有限支持</td>
+					<td>不支持</td>
+			</tr>
+			<tr>
+					<td>replaction 主从支持</td>
+					<td>一般</td>
+					<td>较好，支持多种模式的ddl。<br />- 可以配置连接从库的binlog并监听dml修改，online ddl和影子表都在主库上进行，减轻主库压力。</td>
+			</tr>
+			<tr>
+					<td>场景</td>
+					<td>有外键、简单场景的大表在线ddl 使用。</td>
+					<td>无外键的大表在线ddl，需要主从支持。</td>
+			</tr>
+	</tbody>
+</table></div>
+</div></div>
+</details>
+
+<p><strong>98、什么是 MySQL 的元数据锁（Metadata Lock）等待？如何排查 DDL 被阻塞的问题？如何解决？如何模拟这种ddl锁等待情况？</strong></p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：ddl会获取表的mdl排他锁，普通dml sql会获取表的mdl共享锁。在长事务执行的时候占有共享mdl锁，此时ddl无法获取排他ddl锁 阻塞，之后的新dml/dql会排队等待共享锁，导致表不可用。</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>如何模拟这种ddl锁等待情况：开多个窗口。</p>
+<ul>
+<li>
+<p>A 持MDL读锁（查询窗口1）</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">USE</span><span class="w"> </span><span class="n">test_db</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">BEGIN</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">ddl_users</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 事务内普通读也会持有 SHARED_READ MDL 直到提交
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 不要 COMMIT，保持这行会话
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>B 获取mdl读锁被挡住（查询窗口2）</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="n">lock_wait_timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 防止无限挂住
+</span></span></span><span class="line"><span class="cl"><span class="n">USE</span><span class="w"> </span><span class="n">test_db</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">ddl_users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">tmp_mdl_test</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>此时从performance-schema的metadatalocks表中获取锁（窗口3喵）</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 查看详细的 
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">PROCESSLIST_ID</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">conn_id</span><span class="p">,</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">PROCESSLIST_USER</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">user</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">PROCESSLIST_HOST</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">host</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">PROCESSLIST_DB</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">db</span><span class="p">,</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">PROCESSLIST_TIME</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">secs</span><span class="p">,</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">PROCESSLIST_STATE</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">state</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">ml</span><span class="p">.</span><span class="n">OBJECT_TYPE</span><span class="p">,</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">OBJECT_SCHEMA</span><span class="p">,</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">OBJECT_NAME</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">ml</span><span class="p">.</span><span class="n">LOCK_TYPE</span><span class="p">,</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">LOCK_DURATION</span><span class="p">,</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">LOCK_STATUS</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">metadata_locks</span><span class="w"> </span><span class="n">ml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">JOIN</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">threads</span><span class="w"> </span><span class="n">t</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="k">ON</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">THREAD_ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">OWNER_THREAD_ID</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">WHERE</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">OBJECT_SCHEMA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test_db&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">OBJECT_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ddl_users&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">ml</span><span class="p">.</span><span class="n">LOCK_STATUS</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span><span class="w">   </span><span class="c1">-- PENDING 排前面
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">--       conn_id: 228903
+</span></span></span><span class="line"><span class="cl"><span class="c1">--          user: root
+</span></span></span><span class="line"><span class="cl"><span class="c1">--          host: 100.75.94.25
+</span></span></span><span class="line"><span class="cl"><span class="c1">--            db: test_db
+</span></span></span><span class="line"><span class="cl"><span class="c1">--          secs: 27
+</span></span></span><span class="line"><span class="cl"><span class="c1">--         state: NULL
+</span></span></span><span class="line"><span class="cl"><span class="c1">--   OBJECT_TYPE: TABLE
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- OBJECT_SCHEMA: test_db
+</span></span></span><span class="line"><span class="cl"><span class="c1">--   OBJECT_NAME: ddl_users
+</span></span></span><span class="line"><span class="cl"><span class="c1">--     LOCK_TYPE: SHARED_READ
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- LOCK_DURATION: TRANSACTION
+</span></span></span><span class="line"><span class="cl"><span class="c1">--   LOCK_STATUS: GRANTED
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 
+</span></span></span><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">metadata_locks</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">where</span><span class="w"> </span><span class="n">OBJECT_SCHEMA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;test_db&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">OBJECT_NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ddl_users&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">--           OBJECT_TYPE: TABLE
+</span></span></span><span class="line"><span class="cl"><span class="c1">--         OBJECT_SCHEMA: test_db
+</span></span></span><span class="line"><span class="cl"><span class="c1">--           OBJECT_NAME: ddl_users
+</span></span></span><span class="line"><span class="cl"><span class="c1">--           COLUMN_NAME: NULL
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- OBJECT_INSTANCE_BEGIN: 129677679760272
+</span></span></span><span class="line"><span class="cl"><span class="c1">--             LOCK_TYPE: SHARED_READ
+</span></span></span><span class="line"><span class="cl"><span class="c1">--         LOCK_DURATION: TRANSACTION
+</span></span></span><span class="line"><span class="cl"><span class="c1">--           LOCK_STATUS: GRANTED
+</span></span></span><span class="line"><span class="cl"><span class="c1">--                SOURCE: sql_parse.cc:6142
+</span></span></span><span class="line"><span class="cl"><span class="c1">--       OWNER_THREAD_ID: 228964
+</span></span></span><span class="line"><span class="cl"><span class="c1">--        OWNER_EVENT_ID: 12
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p><code>SELECT * FROM sys.schema_table_lock_waits;</code> 查看谁阻塞谁</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="o">***************************</span><span class="w"> </span><span class="mi">1</span><span class="p">.</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="o">***************************</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">               </span><span class="n">object_schema</span><span class="p">:</span><span class="w"> </span><span class="n">test_db</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                 </span><span class="n">object_name</span><span class="p">:</span><span class="w"> </span><span class="n">ddl_users</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">           </span><span class="n">waiting_thread_id</span><span class="p">:</span><span class="w"> </span><span class="mi">228970</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- thread_id, Performance Schema 的 THREAD_ID
+</span></span></span><span class="line"><span class="cl"><span class="w">                 </span><span class="n">waiting_pid</span><span class="p">:</span><span class="w"> </span><span class="mi">228909</span><span class="w"> </span><span class="c1">-- 阻塞的id
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- pid mysql的连接id，processlist id，客户端连接，可以执行kill等操作
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 指向的是同一个 MySQL 连接对应的线程
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 这里的pid 和 linux的 进程id不同。
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="n">waiting_account</span><span class="p">:</span><span class="w"> </span><span class="n">root</span><span class="o">@</span><span class="mi">100</span><span class="p">.</span><span class="mi">75</span><span class="p">.</span><span class="mi">94</span><span class="p">.</span><span class="mi">25</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">           </span><span class="n">waiting_lock_type</span><span class="p">:</span><span class="w"> </span><span class="k">EXCLUSIVE</span><span class="w"> </span><span class="c1">-- 在等待 派他 mdl锁
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="n">waiting_lock_duration</span><span class="p">:</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">               </span><span class="n">waiting_query</span><span class="p">:</span><span class="w"> </span><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">ddl_users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">tmp_mdl_test</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="c1">-- 等待的sql语句
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="n">waiting_query_secs</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="n">waiting_query_rows_affected</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="n">waiting_query_rows_examined</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="n">blocking_thread_id</span><span class="p">:</span><span class="w"> </span><span class="mi">228964</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">blocking_pid</span><span class="p">:</span><span class="w"> </span><span class="mi">228903</span><span class="w"> </span><span class="c1">-- 连接 id
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">blocking_account</span><span class="p">:</span><span class="w"> </span><span class="n">root</span><span class="o">@</span><span class="mi">100</span><span class="p">.</span><span class="mi">75</span><span class="p">.</span><span class="mi">94</span><span class="p">.</span><span class="mi">25</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="n">blocking_lock_type</span><span class="p">:</span><span class="w"> </span><span class="n">SHARED_READ</span><span class="w"> </span><span class="c1">-- 持有 shared_read 共享MDL锁
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="n">blocking_lock_duration</span><span class="p">:</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="n">sql_kill_blocking_query</span><span class="p">:</span><span class="w"> </span><span class="n">KILL</span><span class="w"> </span><span class="n">QUERY</span><span class="w"> </span><span class="mi">228903</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">sql_kill_blocking_connection</span><span class="p">:</span><span class="w"> </span><span class="n">KILL</span><span class="w"> </span><span class="mi">228903</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 
+</span></span></span><span class="line"><span class="cl"><span class="o">***************************</span><span class="w"> </span><span class="mi">2</span><span class="p">.</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="o">***************************</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 这行忽略，没有排除同一个线程持有的锁，也没有逐个判断锁是否真正冲突。
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- join错误
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- ... 
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+<li>
+<p>找到阻塞源的线程id后，通过 <code>SELECT * FROM information_schema.PROCESSLIST WHERE ID=xxx;</code> 确认是哪个长事务。</p>
+</li>
+</ul>
+<p>解决方法：</p>
+<ul>
+<li>排查出长事务id后，通过<code>kill processlist_id(连接id);</code>后 杀掉源事务。</li>
+<li><code>KILL QUERY 228909</code>：只终止当前执行的 SQL，不断开连接。</li>
+<li><code>KILL CONNECTION 228909</code>：断开整个连接，未提交事务会回滚并释放相关锁。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：99、对数十亿行的大表执行 DDL 有哪些策略？如何避免长时间锁表？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content">避免ddl的时候长时间阻塞dml，基本策略就是 从 instant ddl，inplace ddl，到ptosc和ghost考虑。如果是添加索引，可以在从库上进行，完成后切换主从。</div></div>
+</details>
+
+<h3 id="mysql版本变迁升级">Mysql版本变迁&amp;升级
+</h3><p><strong>46、MySQL从5.7升级到8.0的主要步骤和注意事项有哪些？</strong></p>
+<p><strong>升级前检查</strong>：</p>
+<ol>
+<li>
+<p>运行 <code>mysql_upgrade_checker</code>（MySQL Shell工具）： <code>mysqlsh -- util checkForServerUpgrade root@localhost:3306</code>，自动检测不兼容项。</p>
+<ol>
+<li>Note：在真正升级前，连接到旧版本 MySQL，检查数据库里有没有不兼容新版本的配置、表结构和 SQL 对象。</li>
+</ol>
+</li>
+<li>
+<p><strong>检查废弃功能</strong>：Query Cache已移除、 <code>sql_mode</code> 默认值变化、<del>分区表必须使用InnoDB等。</del></p>
+<ol>
+<li>Query Cache 查询缓存，mysql5的功能，查询后mysql server会缓存结果。但是一旦表的数据发生修改，相关缓存就需要失效。高并发写入场景下，缓存维护与锁竞争的开销可能很大。</li>
+<li>sql_mode是一个系统变量，用来控制 MySQL 如何解析 SQL、检查数据合法性以及处理异常输入。一般生产环境下会使用严格模式。可以用<code>select @@GLOBAL.sql_mode; @@SESSION.sql_mode</code>来获取，旧mysql可能会支持一些新mysql中不支持的而sql mode</li>
+</ol>
+</li>
+<li>
+<p><strong>检查认证插件兼容性</strong>：8.0默认 <code>caching_sha2_password</code>，确认所有客户端支持。</p>
+<ol>
+<li>MySQL 的一种用户身份认证插件，负责客户端连接 MySQL 时的密码验证。</li>
+<li><code>mysql_native_password</code>：MySQL 5.7 默认使用的认证方式。</li>
+<li><code>caching_sha2_password</code>：MySQL 8.0 默认使用的认证方式，基于 SHA-256，支持服务端缓存认证信息，提高重复连接时的认证效率。</li>
+<li><strong>升级 MySQL Server 不会自动将已有用户全部切换成</strong> <code>caching_sha2_password</code> <strong>。 已有用户通常保留原来的认证插件</strong>，而新建用户使用新版本的默认认证方式。</li>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- plugin中就是 认证插件
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="k">user</span><span class="p">,</span><span class="w"> </span><span class="k">host</span><span class="p">,</span><span class="w"> </span><span class="n">plugin</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="n">mysql</span><span class="p">.</span><span class="k">user</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ol>
+</li>
+<li>
+<p><strong>备份</strong>：执行完整的物理备份和逻辑备份。</p>
+<ol>
+<li>
+<p>物理备份是备份数据库底层文件，例如 InnoDB 表空间及相关文件。</p>
+<ol>
+<li>
+<p>通常使用支持一致性热备份的工具，例如 MySQL Enterprise Backup 或 Percona XtraBackup（注意版本兼容性）。</p>
+<p>优势是备份、恢复大型数据库通常更快，但对存储格式和 MySQL 版本兼容性有要求。</p>
+</li>
+</ol>
+</li>
+<li>
+<p>逻辑备份则是将数据库导出为 SQL 或其他逻辑数据格式，例如使用mysqldump。逻辑备份更容易跨版本迁移，但是大量数据需要转换、导出并重新导入，通常比较慢。</p>
+</li>
+<li>
+<p>生产环境不一定必须同时做两份全量备份，关键是备份方案能支持实际恢复需求，并且已经验证过备份可恢复。如果需要按时间点恢复，还应妥善保留 Binlog。</p>
+</li>
+</ol>
+</li>
+</ol>
+<p><strong>升级方式</strong>：</p>
+<ol>
+<li>
+<p><strong>In-Place Upgrade 原地升级</strong>（推荐小型数据库）：停机 → 替换MySQL二进制文件 → 启动（自动执行数据字典升级）。8.0.16+不再需要手动运行 <code>mysql_upgrade</code>。</p>
+<ol>
+<li>直接升级现有mysql server的版本，保留原来的datadir，使用新版本的mysql server启动，启动时升级数据字典和必要的系统结构。</li>
+<li>MySQL 8.0 在启动时发现旧版本的数据字典结构后，会执行必要的元数据转换。它并不是把所有业务数据导出再重新 INSERT 一遍。</li>
+<li>优点：迁移简单，避免逻辑导出导入整库数据。</li>
+<li>缺点：原实例需要停机，而且升级失败后的恢复比较麻烦。</li>
+</ol>
+</li>
+<li>
+<p><strong>逻辑导出导入</strong>：<code>mysqldump</code>导出5.7数据到backup.sql → 再将sql导入8.0新实例执行。最安全但最慢。</p>
+<ol>
+<li>逻辑升级不代表 SQL 一定兼容。 如果导出的建表语句、存储过程或配置使用了 8.0 不再支持的语法，导入同样可能失败。但是相对的，修改也容易。</li>
+</ol>
+</li>
+<li>
+<p><strong>复制升级（推荐生产环境）</strong> ：搭建5.7→8.0的主从复制 → 验证数据一致性 → 切换主库。可实现接近零停机。</p>
+<ol>
+<li>mysql5.7 作为主库承担业务读写，mysql8通过binlog持续复制数据变更和原有数据复制。追平后验证数据一致性、兼容性和复制状态。切换时短暂停止5.7的写入，8.0追平全部已提交事务时提升为主库，proxysql切换业务连接后恢复写入。</li>
+<li><strong>耗时最长的全量数据迁移和增量同步，都可以在业务正常运行期间完成。</strong>  停机窗口主要集中在最后的追平、主库切换和连接迁移。</li>
+<li>切换后 原 5.7 主库退出复制拓扑，不能直接挂到 8.0 主库下面。</li>
+<li>问题：不是无风险的0停机，需要检查主从的gtid，binlog和replica status的状态。Mysql支持 5.7主库 8.0从库的跨版本复制，但是不支持翻过来的。对复制一致性、切换后的故障回退和路由切换的一套流程要求高</li>
+</ol>
+</li>
+</ol>
+<p><strong>关键注意事项</strong>：</p>
+<ul>
+<li>
+<p>不支持跨大版本升级，必须从5.7升级，不能从5.6直接升级到8.0。</p>
+<ul>
+<li>不支持降级：数据字典只支持5.7向8.0的转换，不支持8.0向5的转换。</li>
+<li><code>MySQL 5.6 → 5.7 → 8.0</code></li>
+</ul>
+</li>
+<li>
+<p>8.0使用数据字典（Data Dictionary），升级后无法回退到5.7。</p>
+<ul>
+<li>mysql管理数据库对象的元信息系统。对于users表，mysql还需要知道表中的列，列类型，主键、索引，属于那个数据库，使用那个存储引擎，表空间组织方式。这些信息在mysql5.7中 使用 <code>.frm</code> 文件等机制保存表定义信息，而 MySQL 8.0 引入了基于 InnoDB 的事务性数据字典，集中管理数据库对象的元数据。</li>
+</ul>
+</li>
+<li>
+<p>GROUP BY 默认不再隐式排序，依赖此行为的SQL可能出错。</p>
+<ul>
+<li>5.7在<code>fgroup by department</code>的时候，会按照department排序。</li>
+<li>8后不会排序，结果无序。如果需要显式指定<code>group by dptmt order by dptmt</code>。</li>
+</ul>
+</li>
+<li>
+<p>保留字新增（如 RANK、 <code>ROW_NUMBER</code>、 GROUPS），检查是否与现有列名冲突。</p>
+</li>
+<li>
+<p>utf8mb4成为默认字符集，排序规则变为 <code>utf8mb4_0900_ai_ci</code>，可能影响索引和比较。</p>
+</li>
+</ul>
+<p>note：MySQL 8.0 于 2026 年 4 月结束 Premier Support，应尽快规划升级到 8.4 LTS。</p>
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：8.4的升级内容？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><ul>
+<li>认证插件，默认禁用mysql_native_password，强制使用caching_sha2_password。</li>
+<li>复制相关参数重命名，完全移除旧语法：slave 该为 replica，change master to 改为 change replication source to。</li>
+<li>并行binlog复制支持。</li>
+<li>组复制简化配置。</li>
+<li>字符集默认utf8mb4。</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：8.4 LTS 和 innovation版本的区别？如何指定迁移策略？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>从 MySQL 8.4 开始，Oracle 正式引入 <strong>LTS（Long-Term Support）</strong>  和 <strong>Innovation</strong> 双轨发布模型。</p>
+<ul>
+<li>LTS 版本提供更长的支持时间，适合生产环境运行。</li>
+<li>Innovation 版本每个季度发不，包含最新特性但只支持到下一个版本发行。</li>
+</ul>
+<p>使用<code>select version();</code>获取版本，使用<code>mysql_upgrade</code>升级mysql版本。LTS 版本只接收 bugfix 和安全补丁，不引入新功能变更，保证稳定性。</p>
+<p>迁移策略：生产库先升级到8.4 LTS，测试开发环境可以先使用9.x的innovation版本。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：8.4 移除或者废弃（将来移除）的功能？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>移除：</p>
+<ul>
+<li>mysql_native_password 默认禁用，认证插件使用caching_sha2_password。</li>
+<li>replication等语法，change master to，show slave status，skip-slave-start</li>
+</ul>
+<p>废弃：</p>
+<ul>
+<li>binlog_format参数</li>
+<li>sync_master_info参数</li>
+</ul>
+<p>更新所有用户的认证插件，替换所有slave/master为replica/source的配置和sql，检查客户端是否支持caching_sha2_password.</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：如何制订mysql的升级计划？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>假如说要从mysql8.0 迁移到 mysql8.4 / mysql 9.x innovation版本。</p>
+<ul>
+<li>
+<p>评估目标版本：</p>
+<ul>
+<li>目标版本如果是lts版本，因其支持和稳定性优先考虑。其他版本评估是否有需要的特性，比如vector类型可以考虑9.x innovation版本。</li>
+<li>评估 新版本的移除和depcreted废弃功能。</li>
+</ul>
+</li>
+<li>
+<p>兼容性检查：通过mysqlcheck 或者 mysqlshell。</p>
+</li>
+<li>
+<p>测试：先逻辑备份，再导入到目标版本数据库上测试。</p>
+</li>
+<li>
+<p>逐步升级：如果是跨版本升级到9.x，建议先升级到8.4LTS过渡后再升级到9.x。</p>
+</li>
+<li>
+<p>兜底方案：升级前先逻辑备份/物理备份所有数据库。</p>
+</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：Mysql9.x innovation版本的对比？从功能特性、支持周期、升级路径等方面对比？给出生产环境部署的建议策略？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>特性</th>
+					<th>MySQL 8.4 LTS (8.4.5)</th>
+					<th>MySQL 9.x Innovation (9.6.0)</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>VECTOR 数据类型</td>
+					<td>不支持</td>
+					<td>支持（9.0+）</td>
+			</tr>
+			<tr>
+					<td>REST 服务</td>
+					<td>不支持</td>
+					<td>支持（9.3+）</td>
+			</tr>
+			<tr>
+					<td>AI 插件 AI addon</td>
+					<td>不支持</td>
+					<td>支持（9.4+）</td>
+			</tr>
+			<tr>
+					<td>HeatWave 临时表<br />（核心oltp使用8.4lts，分析副本使用9.x的HeatWave）</td>
+					<td>不支持</td>
+					<td>支持（9.3+）</td>
+			</tr>
+			<tr>
+					<td>异步任务</td>
+					<td>不支持</td>
+					<td>支持（9.3+）</td>
+			</tr>
+			<tr>
+					<td>自动分区管理</td>
+					<td>不支持</td>
+					<td>支持（9.3+）</td>
+			</tr>
+	</tbody>
+</table></div>
+</div></div>
+</details>
+
+<h3 id="主从拓扑">主从拓扑
+</h3><p>主从拓扑 HA高可用 有多种不同的方案：这里简单列几个。</p>
+<ul>
+<li>InnoDB Cluster mysql官方的高可用，使用多节点构建MGR组复制、Mysql Shell提供adminapi 管理工具创建和管理集群，MysqlRouter SQL代理。</li>
+<li>Mysql Router：Mysql官方的应用&amp;Mysql集群的中间件，提供透明的连接路由和故障转移。提供读写 和 只读两种端口来分立读写；故障转移时通过MGR组复制选举新primary，router 感知拓扑变化切换主从路由。部署时建议 集群部署。</li>
+<li>一般地，还可以基于GTID异步复制的搭建mysql主从，然后使用orchestrator管理拓扑和故障时自动主从切换，ProxySQL来负责读写分离。</li>
+</ul>
+<h3 id="慢日志分析工具">慢日志分析工具
+</h3><ul>
+<li>pt-query-digest：分析慢查询日志。支持在不开启<code>慢查询日志</code>的时候对tcpdump抓的包进行分析。</li>
+</ul>
+<h3 id="监控">监控
+</h3><ul>
+<li>
+<p>监控方案：</p>
+<ul>
+<li>可以自己 使用prom的mysqld-exporter来监听，搭建mysql集群 - mysqld-exporter - prom - grafana 展示的链路。</li>
+<li>Percona 提供 PMM（Percona Monitor 和 Management），基于clickhouse+grafana+prometheus来监控mysql。</li>
+<li>实际生产的时候，也有接入自己平台的。</li>
+<li>Zabbix偏重OS监控，PMM专注数据库；MySQL Enterprise Monitor是商业方案。PMM免费且功能全面，是MySQL监控的首选。</li>
+</ul>
+</li>
+<li>
+<p>监控什么？</p>
+<ul>
+<li>mysql server</li>
+<li>innodb 指标</li>
+<li>replication 复制相关</li>
+<li>query 查询sql的分析：慢查询分析，耗时排行，执行计划，锁等待时间。</li>
+<li>node summary：运行mysql实例的机器状态。</li>
+</ul>
+</li>
+<li>
+<p>监控后的告警：通过Grafana的Alerting功能配置告警规则，如Buffer Pool命中率 &lt; 99%、复制延迟 &gt; 10秒、磁盘使用率 &gt; 80% 等，通过邮件/Slack/PagerDuty通知。</p>
+</li>
+</ul>
+<h3 id="配置和参数">配置和参数
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：utf8和utf8mb4 区别是什么？为什么生产环境需要使用utfmb4？如何迁移？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>一个3B，一个4B，4B的还支持emoji和一些扩展汉字。</p>
+<p>为什么需要使用utf8mb4，因为支持的更多。</p>
+<p>如何迁移？DDL修改character set和collate，大表可能触发ddl的重建表，必要时使用 ptosc或者ghost。客户端连接也需要使用utf8mb4。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：Mysql的连接管理参数 如何调优？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>几个参数 max_connections，thread_cache_size，wait_timeout。</p>
+<p>一般地，建议max_connectons 设置为<code>SHOW STATUS LIKE 'Max_used_connections';</code>峰值的1.5倍。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">@@</span><span class="k">global</span><span class="p">.</span><span class="n">max_connections</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">show</span><span class="w"> </span><span class="n">variables</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="s1">&#39;max_connections&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">@@</span><span class="k">global</span><span class="p">.</span><span class="n">thread_cache_size</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="o">@@</span><span class="k">global</span><span class="p">.</span><span class="n">wait_timeout</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- mysql状态 查询
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Max_used_connections&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Threads_created&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>通过以下命令，排查 长时间空闲的连接。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">show</span><span class="w"> </span><span class="n">processlist</span><span class="p">;</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 查找长时间空闲的连接。
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sys</span><span class="p">.</span><span class="k">session</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">command</span><span class="o">=</span><span class="s1">&#39;Sleep&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">300</span><span class="p">;</span><span class="w"> 
+</span></span></span></code></pre></div></div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：IOPS是什么？innodb_io_capacity控制什么？什么是O_DIRECT？innodb_flush_method 控制什么？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>io persecond，每秒的io次数，用于衡量磁盘 I/O 能力。SDD 远大于 HDD。</p>
+<p>innodb_io_capacity 控制 io容量，一般HDD设置为200，提供200IOPS。用于告诉 InnoDB 可用于后台维护任务的预估 IOPS，主要影响脏页刷新、Change Buffer 合并等，默认 200；<code>innodb_io_capacity_max</code> 用于控制后台任务积压时更积极的 I/O 速率，但二者都不是 MySQL 整体磁盘 IOPS 的硬性上限。</p>
+<p>linux下的innodb有两层缓存，一层是innodb进程自己的数据页缓存，一层是os page cache（linux内核管理的缓存），通过o_direct可以绕过os page cache，减少重复缓存，将更多内存留给其他用途。</p>
+<p>o_direct不代表直接持久化buffer pool中的内容到磁盘，存储设备和文件系统元数据也有持久化要求，主要解决是否绕过os page cache。</p>
+<p><code>O_DIRECT</code> 不等于持久化，仍需考虑 <code>fsync()</code> 及存储设备缓存。fsync用于内核将相关文件的数据及必要元数据同步到持久存储。fsync 可以搭配 o_direct 使用。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;innodb_io_capacity&#39;</span><span class="p">;</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;innodb_io_capacity_max&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;innodb_flush_method&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">-- fsync
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">VARIABLES</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;innodb_flush_sync&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">-- on
+</span></span></span></code></pre></div></div></div>
+</details>
+
+<h3 id="运维相关问题">运维相关问题
+</h3><details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：Mysql服务器出现OOM kill时？什么是OOM kill？Mysql的内存花在哪里？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>MySQL 内存消耗过大，Linux 内核为了避免整个系统崩溃，可能强制杀死 mysqld 进程。</p>
+<p>排查时可以通过 Linux 的 <code>ps</code>、<code>top</code> 查看进程 RSS，通过 Performance Schema 和 <code>sys.memory_by_thread_by_current_bytes</code> 等视图定位内存分配，并检查 <code>max_connections</code>、活跃连接数及高内存 SQL。</p>
+<p>Mysql内存花在哪里？</p>
+<ul>
+<li>
+<p>全局共享内存</p>
+<ul>
+<li>包括 innodb_buffer_pool_size 数据页索引页undolog页；innodb_log_bfufer_size 对应redo log buffer；主要是buffer pool的占用。</li>
+</ul>
+</li>
+<li>
+<p>连接 / 查询 使用的内存：每个连接使用的内存。</p>
+<ul>
+<li>MySQL 通常使用一个工作线程服务一个客户端连接（传统线程模型）。执行复杂sql时可能还会有额外申请的内存。包括 线程栈、sql排序缓冲（执行 order by的时候没有索引，需要使用filesort在内存或者临时文件中排序）、顺序扫描读取缓冲 和 随机顺序读取缓冲区。</li>
+</ul>
+</li>
+</ul>
+<p>如何定位：</p>
+<ul>
+<li>
+<p>在linux中定位 mysqld进程的内存情况，like <code>ps -o pid,rss,vsz,cmd -p $(pidof mysqld)</code>。</p>
+</li>
+<li>
+<p>在mysql内部提供的监控表中 performance schema中，统计线程、sql、锁、内存分配等信息。</p>
+</li>
+<li>
+<p>在mysql内部的sys视图中定位，sys 是 Performance Schema 等底层数据提供的更容易使用的视图。</p>
+<ul>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- MySQL 内部已经统计到的总内存：
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sys</span><span class="p">.</span><span class="n">memory_global_total</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 排查各个线程占用的内存。
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">thread_id</span><span class="p">,</span><span class="w"> </span><span class="k">user</span><span class="p">,</span><span class="w"> </span><span class="n">current_allocated</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="n">sys</span><span class="p">.</span><span class="n">memory_by_thread_by_current_bytes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">current_allocated</span><span class="w"> </span><span class="k">DESC</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">-- thread_id 内部线程id，user 线程关联用户，currented_allocated当前已分配内存。
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 查看各个组件占用：bunfferPool，sql执行缓冲
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">event_name</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="n">current_alloc</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="n">sys</span><span class="p">.</span><span class="n">memory_global_by_current_bytes</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></li>
+</ul>
+</li>
+</ul>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：Mysql的ibdata1是什么？持续增长如何处理？共享表空间和独立表空间什么区别？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code> ibdata1</code> 是 InnoDB 的<strong>共享系统表空间</strong>文件，存储数据字典、undo logs（5.7 以前）、change buffer 文件、double write buffer 文件 等。</p>
+<p>可能的持续增长原因：</p>
+<ul>
+<li>innodb_file_per_table=off，所有表数据存在ibdata1中。默认开启，开启时每个表一个ibd文件。</li>
+<li>长事务时 undo log无法清理，ibdata中的undo log越来越大。</li>
+<li>ibdata1无法缩小，唯一的缩小方法就是逻辑备份所有数据后，删除所有数据文件后，设置innodb-file-per-table为on，再重新导入逻辑备份的数据。</li>
+</ul>
+<p>mysql8后，undolog存在独立表空间中，减少ibdata增长。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：查看当前undo log的回收状态？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Innodb_history_list_length&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 空
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 2. 正确的入口在 INNODB_METRICS 里
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="n">NAME</span><span class="p">,</span><span class="w"> </span><span class="n">STATUS</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">INNODB_METRICS</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">WHERE</span><span class="w"> </span><span class="n">NAME</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;%history%&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p><del>如果 Innodb_history_list_length 值过大，则说明 undo log链过长，此时undo log回收清理受阻。</del></p>
+<p>trx_rseg_history_len 是历史链表长度大小，如果过长说明undo log回收受阻。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：information_schema ， performance_schema, status， vairables 各是什么东西？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p><code>information_schema</code>、<code>performance_schema</code> 是系统数据库。</p>
+<ul>
+<li>
+<p>information_schema（元数据系统数据库） Mysql自带的系统数据库，用于查看数据库表、字段、索引等结构信息，也提供部分运行时信息。</p>
+</li>
+<li>
+<p><code>performance_schema</code>（性能监控系统数据库）：MySQL 自带的系统数据库，用于采集 SQL 执行、等待事件、锁、内存、I/O 等运行时信息。例如<code>events_statements_summary_by_digest</code> 可统计不同 SQL 模板的执行情况。</p>
+<ul>
+<li>sys，performance_schema的一个视图。</li>
+</ul>
+</li>
+<li>
+<p><code>STATUS</code>（运行状态）：MySQL 的状态变量，反映服务器运行情况，例如 <code>Threads_connected</code>（当前连接数）、<code>Questions</code>（客户端执行的语句数）、<code>Slow_queries</code>（慢查询数）。</p>
+</li>
+<li>
+<p><code>VARIABLES</code>（配置参数）：MySQL 的系统变量，用于控制服务器行为，例如 <code>max_connections</code>（最大连接数）、<code>innodb_buffer_pool_size</code>（Buffer Pool 大小）。</p>
+</li>
+</ul>
+<p>四套不是完全独立，有时候会有交叉。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：Mysql 如何在 kubernetes 上部署和管理？Mysql Operator for k8s是什么？为什么生产环境不建议docker部署mysql，而是k8s部署mysql？为什么有很多企业还是在 物理机或者虚拟机上部署MySQL？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>不是不建议用 Docker 部署 MySQL，而是生产环境中，单独使用 Docker 管理 MySQL，通常不如成熟的 K8s + Operator 方案具备完善的高可用和运维能力。</p>
+<p>Docker 解决容器运行问题，K8s 解决容器编排问题，MySQL Operator 解决数据库集群管理问题。K8s 的主要优势是自动化运维，并非 MySQL 运行性能或数据安全性天然更好。</p>
+<p>主要区别在于高可用、持久化、故障恢复和自动化运维。</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>对比</th>
+					<th>Docker/DockerCompose</th>
+					<th>K8s</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>容器管理</td>
+					<td>手动管理或通过Compose编排</td>
+					<td>自动调度、重启、迁移</td>
+			</tr>
+			<tr>
+					<td>数据持久化</td>
+					<td>Volume/BindMount</td>
+					<td>PV/PVC</td>
+			</tr>
+			<tr>
+					<td>故障恢复</td>
+					<td>可自动重启容器，跨机器恢复需额外方案</td>
+					<td>节点故障后可重新调度Pod</td>
+			</tr>
+			<tr>
+					<td>MySQL高可用</td>
+					<td>需要额外搭建主从复制和故障切换</td>
+					<td>可以结合MySQLOperator自动管理</td>
+			</tr>
+			<tr>
+					<td>扩缩容</td>
+					<td>需要自行管理数据库节点</td>
+					<td>Operator可以协调副本增减</td>
+			</tr>
+			<tr>
+					<td>监控运维</td>
+					<td>需要额外搭建</td>
+					<td>容易集成Prometheus、Operator等</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>这里需要注意三个问题：</p>
+<ol>
+<li>K8s 自动恢复 Pod ≠ MySQL 高可用。MySQL 主从复制、主库选举、数据一致性仍然需要 MySQL Operator 或其他高可用组件管理。</li>
+<li>K8s 不一定比 Docker 性能更好。MySQL 对磁盘 I/O 延迟比较敏感，K8s 的网络存储、存储插件可能增加开销，需要合理选择存储方案。</li>
+<li>Docker 本身不意味着数据不安全。只要正确使用 Volume、备份和高可用机制，Docker 完全可以用于生产环境。</li>
+</ol>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：为什么有很多企业还是在 物理机或者虚拟机上部署MySQL？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>因为 MySQL 是有状态服务，对存储性能、数据一致性和故障恢复要求较高。</p>
+<p>K8s 虽然提供了自动化管理能力，但同时引入了网络、存储、调度和 Operator 等额外复杂性。</p>
+<p>对于追求极致性能、稳定性的大型数据库集群，直接在物理机或虚拟机部署 MySQL，再结合 Orchestrator、ProxySQL 等组件实现高可用，同样是成熟的生产方案。</p>
+</div></div>
+</details>
+
+<details class="qa-item">
+    <summary class="qa-question"><strong>Q：</strong>Q：108、MySQL 8.4 中 InnoDB Buffer Pool 在线调整（Online Resize）的行为有何变化？</summary>
+    <div class="qa-answer"><span class="qa-answer-label">A：</span><div class="qa-answer-content"><p>innodb buffer pool之前在线调整时，大幅度缩小buffer pool，会引发比较基金的页面淘汰导致突发的大量磁盘io，同时也可能导致长时间阻塞和oom。</p>
+<p>8.4及之后，缩小操作采用更渐进的页面淘汰策略，避免突发的大量磁盘 I/O；调整进度信息更详细，新增完成百分比和预计剩余时间。如果调整过程中检测到内存压力过大，会自动暂停并报告状态，而不是强制继续。</p>
+<p>调整幅度建议不超过当前buffer pool size的50%，分多次进行直到完成缩小。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 在线调整 Buffer Pool 大小（以 chunk_size 为粒度，默认 128MB）
+</span></span></span><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">innodb_buffer_pool_size</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">8589934592</span><span class="w"> </span><span class="p">;</span><span class="w">   </span><span class="c1">-- 8GB
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 监控调整进度
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w">  </span><span class="n">STATUS</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;Innodb_buffer_pool_resize_status%&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 查看详细进度
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w">  </span><span class="o">*</span><span class="w">  </span><span class="k">FROM</span><span class="w">  </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">innodb_buffer_pool_resize_status</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div></div></div>
+</details>
+
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/work/my-qa-index/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">我的QA索引</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
