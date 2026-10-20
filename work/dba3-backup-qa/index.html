@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="一些备份工具\n逻辑备份\nmysqldump mysqlpump mysql shell dump utilities mydumper、myloader 物理备份\nXtraBackup Mysql Clone Plugin Mysql克隆插件 Mysql Enterprise Backup （MEB） binlog实时归档\nmysqlbinlog：远程binlog备份服务器 通过mysqlbinlog --raw --read-from-remote-server --host=10.0.0.1 --port=3306 --user=repl --password=xxx --stop-never --result-file=/backup/binlog/ binlog.000100将主库的binlog拉取到备份服务器上，提供额外的pitr时间点恢复能力。 mysqldump和mysqlpump Q：什么是一致性备份？\nA：Mysql 数据库的事务特性 ACID的consistency 一致性，由AID一起保证。\n例如：A向B转账的这个事务，转账前AB共有1000r，转账后A少200，B多200；这是数据一致性。如果转账后两人的钱少了，这是数据不一致性。\n进行备份同样有这个问题，当使用 备份工具 进行备份时，如果转账事务正在进行，已经创建了转账的流水单，但是AB的钱还没有变。此时将这些全部备份下来，会得到一个数据不一致的版本「AB两者余额无变化，但是转账流水已经创建」。一致性备份得到的数据应该是「T0时刻的数据：AB旧余额，无转账流水」或者「T1时刻数据：AB新余额，有转账流水」两个状态。\n一致性备份 需要 备份读取的数据来自一个共同的一致性视图。\nmysqldump，单线程逻辑备份，逐表导出sql。实现逻辑类似 首先将事务隔离级别设置为可重复读 然后开启事务，利用innodb的一致性读实现备份。\nmysqldump -u root -p --single-transaction --master-data=2 --routines --triggers --events --databases db1 db2 &gt; backup.sql 备份时不影响其他事务的提交，不会改变备份事务看到的数据。此时如果开启了 转账事务，也只会读取转账事务开始前的数据版本。 不会为了读取数据而长时间加表锁。 基于binlog位点的主从复制集群中，备份开始前会首先短暂获取全局读锁，以同步binlog位点和一致性快照匹配，之后释放该锁，开启备份事务并导出。 mysqldump备份时开启事务后，之后在备份完成之前提交的事务进行的DML如何导出？不会，mysqldump只负责建立一致性备份的快照，并记录binlog位点，之后的增量DML可以使用binlog回放从T1推进到T5。 mysqlpump，多线程逻辑备份，在Mysql8.0.34被弃用，Mysql8.4移除，由mysql shell的dump utilities替代。\n">
+<title>Mysql备份 QA </title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/work/dba3-backup-qa/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Mysql备份 QA ">
+<meta property='og:description' content="一些备份工具\n逻辑备份\nmysqldump mysqlpump mysql shell dump utilities mydumper、myloader 物理备份\nXtraBackup Mysql Clone Plugin Mysql克隆插件 Mysql Enterprise Backup （MEB） binlog实时归档\nmysqlbinlog：远程binlog备份服务器 通过mysqlbinlog --raw --read-from-remote-server --host=10.0.0.1 --port=3306 --user=repl --password=xxx --stop-never --result-file=/backup/binlog/ binlog.000100将主库的binlog拉取到备份服务器上，提供额外的pitr时间点恢复能力。 mysqldump和mysqlpump Q：什么是一致性备份？\nA：Mysql 数据库的事务特性 ACID的consistency 一致性，由AID一起保证。\n例如：A向B转账的这个事务，转账前AB共有1000r，转账后A少200，B多200；这是数据一致性。如果转账后两人的钱少了，这是数据不一致性。\n进行备份同样有这个问题，当使用 备份工具 进行备份时，如果转账事务正在进行，已经创建了转账的流水单，但是AB的钱还没有变。此时将这些全部备份下来，会得到一个数据不一致的版本「AB两者余额无变化，但是转账流水已经创建」。一致性备份得到的数据应该是「T0时刻的数据：AB旧余额，无转账流水」或者「T1时刻数据：AB新余额，有转账流水」两个状态。\n一致性备份 需要 备份读取的数据来自一个共同的一致性视图。\nmysqldump，单线程逻辑备份，逐表导出sql。实现逻辑类似 首先将事务隔离级别设置为可重复读 然后开启事务，利用innodb的一致性读实现备份。\nmysqldump -u root -p --single-transaction --master-data=2 --routines --triggers --events --databases db1 db2 &gt; backup.sql 备份时不影响其他事务的提交，不会改变备份事务看到的数据。此时如果开启了 转账事务，也只会读取转账事务开始前的数据版本。 不会为了读取数据而长时间加表锁。 基于binlog位点的主从复制集群中，备份开始前会首先短暂获取全局读锁，以同步binlog位点和一致性快照匹配，之后释放该锁，开启备份事务并导出。 mysqldump备份时开启事务后，之后在备份完成之前提交的事务进行的DML如何导出？不会，mysqldump只负责建立一致性备份的快照，并记录binlog位点，之后的增量DML可以使用binlog回放从T1推进到T5。 mysqlpump，多线程逻辑备份，在Mysql8.0.34被弃用，Mysql8.4移除，由mysql shell的dump utilities替代。\n">
+<meta property='og:url' content='https://blog.aoidayo.site/work/dba3-backup-qa/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Work' /><meta property='article:tag' content='bg' /><meta property='article:published_time' content='2026-10-20T22:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-20T22:00:00&#43;08:00'/>
+<meta name="twitter:title" content="Mysql备份 QA ">
+<meta name="twitter:description" content="一些备份工具\n逻辑备份\nmysqldump mysqlpump mysql shell dump utilities mydumper、myloader 物理备份\nXtraBackup Mysql Clone Plugin Mysql克隆插件 Mysql Enterprise Backup （MEB） binlog实时归档\nmysqlbinlog：远程binlog备份服务器 通过mysqlbinlog --raw --read-from-remote-server --host=10.0.0.1 --port=3306 --user=repl --password=xxx --stop-never --result-file=/backup/binlog/ binlog.000100将主库的binlog拉取到备份服务器上，提供额外的pitr时间点恢复能力。 mysqldump和mysqlpump Q：什么是一致性备份？\nA：Mysql 数据库的事务特性 ACID的consistency 一致性，由AID一起保证。\n例如：A向B转账的这个事务，转账前AB共有1000r，转账后A少200，B多200；这是数据一致性。如果转账后两人的钱少了，这是数据不一致性。\n进行备份同样有这个问题，当使用 备份工具 进行备份时，如果转账事务正在进行，已经创建了转账的流水单，但是AB的钱还没有变。此时将这些全部备份下来，会得到一个数据不一致的版本「AB两者余额无变化，但是转账流水已经创建」。一致性备份得到的数据应该是「T0时刻的数据：AB旧余额，无转账流水」或者「T1时刻数据：AB新余额，有转账流水」两个状态。\n一致性备份 需要 备份读取的数据来自一个共同的一致性视图。\nmysqldump，单线程逻辑备份，逐表导出sql。实现逻辑类似 首先将事务隔离级别设置为可重复读 然后开启事务，利用innodb的一致性读实现备份。\nmysqldump -u root -p --single-transaction --master-data=2 --routines --triggers --events --databases db1 db2 &gt; backup.sql 备份时不影响其他事务的提交，不会改变备份事务看到的数据。此时如果开启了 转账事务，也只会读取转账事务开始前的数据版本。 不会为了读取数据而长时间加表锁。 基于binlog位点的主从复制集群中，备份开始前会首先短暂获取全局读锁，以同步binlog位点和一致性快照匹配，之后释放该锁，开启备份事务并导出。 mysqldump备份时开启事务后，之后在备份完成之前提交的事务进行的DML如何导出？不会，mysqldump只负责建立一致性备份的快照，并记录binlog位点，之后的增量DML可以使用binlog回放从T1推进到T5。 mysqlpump，多线程逻辑备份，在Mysql8.0.34被弃用，Mysql8.4移除，由mysql shell的dump utilities替代。\n">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+<link rel="stylesheet" href="/css/article-cards.1bc71f0340f70c2a83456f9e10bbe2a0dc330c44e7cd76453871b8311a1531d0.css">
+
+    
+    <meta name="robots" content="noindex, nofollow">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#mysqldump和mysqlpump">mysqldump和mysqlpump</a></li>
+    <li><a href="#percona-xtrabackup">Percona XtraBackup</a></li>
+    <li><a href="#pitr-基于时间点的恢复">PITR 基于时间点的恢复</a></li>
+    <li><a href="#mysql-clone-plugin">Mysql Clone Plugin</a></li>
+    <li><a href="#生产实践">生产实践</a></li>
+    <li><a href="#相关概念">相关概念</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/work/dba3-backup-qa/">Mysql备份 QA </a>
+        </h2>
+
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-20T22:00:00&#43;08:00'>Tuesday, October 20, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                    
+                    
+                    <button id="qa-mode-toggle" class="qa-mode-toggle" type="button" data-mode="questions" aria-label="展开全部答案" title="展开全部答案">
+                        <span class="qa-mode-toggle-label">展开全部</span>
+                    </button>
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#mysqldump和mysqlpump">mysqldump和mysqlpump</a></li>
+    <li><a href="#percona-xtrabackup">Percona XtraBackup</a></li>
+    <li><a href="#pitr-基于时间点的恢复">PITR 基于时间点的恢复</a></li>
+    <li><a href="#mysql-clone-plugin">Mysql Clone Plugin</a></li>
+    <li><a href="#生产实践">生产实践</a></li>
+    <li><a href="#相关概念">相关概念</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>一些备份工具</p>
+<ul>
+<li>
+<p>逻辑备份</p>
+<ul>
+<li>mysqldump</li>
+<li>mysqlpump</li>
+<li>mysql shell dump utilities</li>
+<li>mydumper、myloader</li>
+</ul>
+</li>
+<li>
+<p>物理备份</p>
+<ul>
+<li>XtraBackup</li>
+<li>Mysql Clone Plugin Mysql克隆插件</li>
+<li>Mysql Enterprise Backup （MEB）</li>
+</ul>
+</li>
+<li>
+<p>binlog实时归档</p>
+<ul>
+<li>mysqlbinlog：远程binlog备份服务器 通过<code>mysqlbinlog --raw --read-from-remote-server --host=10.0.0.1 --port=3306 --user=repl --password=xxx --stop-never --result-file=/backup/binlog/ binlog.000100</code>将主库的binlog拉取到备份服务器上，提供额外的pitr时间点恢复能力。</li>
+</ul>
+</li>
+</ul>
+<h2 id="mysqldump和mysqlpump">mysqldump和mysqlpump
+</h2><p><strong>Q：什么是一致性备份？</strong></p>
+<p>A：Mysql 数据库的事务特性 ACID的consistency 一致性，由AID一起保证。</p>
+<p>例如：A向B转账的这个事务，转账前AB共有1000r，转账后A少200，B多200；这是数据一致性。如果转账后两人的钱少了，这是数据不一致性。</p>
+<p>进行备份同样有这个问题，当使用 备份工具 进行备份时，如果转账事务正在进行，已经创建了转账的流水单，但是AB的钱还没有变。此时将这些全部备份下来，会得到一个数据不一致的版本「AB两者余额无变化，但是转账流水已经创建」。一致性备份得到的数据应该是「T0时刻的数据：AB旧余额，无转账流水」或者「T1时刻数据：AB新余额，有转账流水」两个状态。</p>
+<p>一致性备份 需要 备份读取的数据来自一个共同的一致性视图。</p>
+<p>mysqldump，单线程逻辑备份，逐表导出sql。实现逻辑类似 首先将事务隔离级别设置为可重复读 然后开启事务，利用innodb的一致性读实现备份。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="n">mysqldump</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="o">-</span><span class="n">p</span><span class="w"> </span><span class="c1">--single-transaction --master-data=2 --routines --triggers --events --databases db1 db2  &gt;  backup.sql
+</span></span></span></code></pre></div><ul>
+<li>备份时不影响其他事务的提交，不会改变备份事务看到的数据。此时如果开启了 转账事务，也只会读取转账事务开始前的数据版本。</li>
+<li>不会为了读取数据而长时间加表锁。</li>
+<li>基于binlog位点的主从复制集群中，备份开始前会首先短暂获取全局读锁，以同步binlog位点和一致性快照匹配，之后释放该锁，开启备份事务并导出。</li>
+<li>mysqldump备份时开启事务后，之后在备份完成之前提交的事务进行的DML如何导出？不会，mysqldump只负责建立一致性备份的快照，并记录binlog位点，之后的增量DML可以使用binlog回放从T1推进到T5。</li>
+</ul>
+<p>mysqlpump，多线程逻辑备份，在Mysql8.0.34被弃用，Mysql8.4移除，由mysql shell的dump utilities替代。</p>
+<ul>
+<li><del>数据一致性较弱的原因是 并行线程各自的事务快照不能简单视为一个全局快照，因此不能把单个线程的事务一致性直接等同于所有表的全局一致性。</del></li>
+<li><del>不保证表之间的一致性快照（不同线程在不同时间点读取），不适合需要严格一致性的场景。</del></li>
+<li>数据不一致问题已经修复了，早期 <code>mysqlpump</code> 的多个备份线程缺少同步点，导致备份数据不一致。之后官方的修复方法就是使用全局读锁短暂阻止写入，在锁保护期间使用多个备份线程建立一致性快照，释放全局读锁。接着各个备份线程基于快照并行导出innodb数据。</li>
+<li>后期因为功能可以被mysqldump和mysqlshell的dump utilities覆盖，就不再维护了。</li>
+</ul>
+<p>mysqldump的问题：</p>
+<ul>
+<li>事务的MVCC一致性读无法跨跃DDL：备份事务进行时如果其他事务对将要修改的表进行ddl，备份事务备份这张表时就会报错。</li>
+<li>备份事务执行时间过长时：undo log的history list len过长无法清理</li>
+</ul>
+<p><code>--single-transaction</code> 的一致性保障针对 InnoDB，备份期间也应避免对相关表进行 <code>ALTER TABLE</code>、<code>DROP TABLE</code>、<code>TRUNCATE TABLE</code> 等 DDL 操作。MVCC 的一致性读不能跨越某些 DDL 操作，例如重建表的 <code>ALTER TABLE</code>。</p>
+<ul>
+<li>
+<p><a class="link" href="https://dev.mysql.com/doc/refman/8.4/en/mysqldump.html?utm_source=chatgpt.com"  title="mysqldump"
+     target="_blank" rel="noopener"
+    >MysqlReference: mysqldump, A Database Backup Program</a></p>
+</li>
+<li>
+<p>普通事务访问某张表后，MDL 通常会阻止其他事务对该表执行 DDL；但 <code>mysqldump</code> 的一致性快照不会提前锁住所有待备份表，因此未访问的表仍可能发生 DDL，破坏备份一致性。</p>
+</li>
+<li>
+<p>假设 <code>mysqldump</code> 要备份 A、B 两张表：</p>
+<ol>
+<li>T0：开启事务，创建一致性快照，但尚未访问表 B。</li>
+<li>T1：备份表 A，获取 A 的 MDL。</li>
+<li>T2：另一个连接对表 B 执行 <code>ALTER TABLE</code>，由于备份事务还没有访问 B，因此可能执行成功。</li>
+<li>T3：<code>mysqldump</code> 开始读取表 B，发现表结构已变化，可能出现 <code>Table definition has changed</code>，导致备份失败。</li>
+</ol>
+</li>
+</ul>
+<p>物理热备份工具 比如XtraBackUp的工作原理不同：它先复制可能处于不同时间状态的数据页，再结合 Redo 和 Undo 在准备阶段恢复出一致状态，而不是依靠一个长时间运行的 SQL 快照事务。</p>
+<h2 id="percona-xtrabackup">Percona XtraBackup
+</h2><p><strong>Q：XtraBackUp物理备份的基本流程？</strong></p>
+<p>A：</p>
+<p>XtraBackUp 的工作原理：</p>
+<ul>
+<li>
+<p>backup：复制原始.ibd数据文件，启动后台线程追踪并复制新增的redo log（从LSN long sequence number 开始），数据拷贝完成后加全局读锁，拷贝非innodb文件和binlog位点信息，最后释放锁。</p>
+</li>
+<li>
+<p>prepare：对备份文件进行崩溃恢复，具体的首先重放redo log，将数据页恢复到备份结束的一致性点，再通过undo log回滚该时刻尚未提交的事务的修改。</p>
+<ul>
+<li>如果备份期间执行的事务已经提交，此时可以通过之前的redo log向最新的lsn位置前滚，保留事务修改。</li>
+<li>如果事务没有提交，对其可能已经修改的数据通过undo log回滚数据，变更ibd数据文件，使所有数据页达到一致性状态。</li>
+</ul>
+</li>
+<li>
+<p>copy-back：将备份好的文件拷贝回数据目录，重启mysql。</p>
+</li>
+</ul>
+<p><strong>Q：【Mysql事务未提交 ≠ 数据页尚未落盘】xtra的prepare，如果没有提交的话，对脏页的修改也不会落盘到ibd文件中，那还需要啥undo log回滚？</strong></p>
+<p>A：事务中未提交的数据也能落盘：innodb采用的是steal+no-force策略。InnoDB 的脏页刷盘与事务是否提交没有直接的对应关系。未提交事务修改的数据也可能已经写入 .ibd 文件。</p>
+<ul>
+<li>STEAL：允许未提交事务修改的脏页刷盘，如果后期事务回滚，通过undo log回滚。</li>
+<li>NO-FORCE：事务提交时，不要求立即将修改的数据页刷盘，由后台线程来进行刷盘。只需要按持久化策略保证 Redo Log 持久化。</li>
+</ul>
+<p>比如：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">BEGIN</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 原来 age = 20
+</span></span></span><span class="line"><span class="cl"><span class="k">UPDATE</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">25</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 不提交
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- update 后，buffer pool中的数据页修改为25, 生成对应的undo log 和 redo log。
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 具体的 undo log 写入buffer pool，redo log写入到redo log buffer。
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 即使没有 commit，buffer pool中的脏数据页 也可能被刷入ibd文件
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 如果事务最终回滚，就需要根据undo log回滚。
+</span></span></span></code></pre></div><p><strong>Q：XtraBackUp的大体流程看懂了，但是拷贝redolog 和 innodb 数据文件的时候，如果有DML操作，这个新增的dml操作在哪里进行呢？XtraBackup 复制数据文件期间，其他事务执行的 DML 如何备份？</strong></p>
+<p>A：DML 仍然在原 MySQL 实例上正常执行，修改 Buffer Pool 中的数据页并生成 Redo Log，脏页随后按正常机制刷盘。XtraBackup 一边复制数据文件，一边持续复制新增的 Redo Log，因此即使数据文件已经复制完成，备份期间后续发生的修改仍可通过 Redo Log 捕获。备份完成后，通过 <code>--prepare</code> 重放 Redo Log 恢复数据页，并利用 Undo Log 回滚一致性点尚未提交的事务，最终得到一致性备份。</p>
+<p>percona参考：<a class="link" href="https://docs.percona.com/percona-xtrabackup/8.0/prepare-full-backup.html?utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >Prepare a full backup - Percona XtraBackup</a></p>
+<p><strong>Q：redolog是循环复用的，假如xtrabackup复制数据文件和追踪并复制新增redo log的速度不够快，出现redo log尚未备份就被重新覆盖的问题时，这部分新增的DML执行如何处理？</strong></p>
+<p>A：参考 <a class="link" href="https://docs.percona.com/percona-xtrabackup/8.0/create-full-backup.html?utm_source=chatgpt.com"  target="_blank" rel="noopener"
+    >Create a full backup - Percona XtraBackup</a></p>
+<p>XtraBackup 启动独立的redo log复制线程，持续追踪新日志，尽量在MySQL 覆盖旧日志之前将其复制到备份目录。</p>
+<p>XtraBackUp存在的问题：redolog复制线程的复制速度 &laquo; mysql写入redo的速度时，redo log产生覆盖写，xtra没能复制下来，此时备份直接失效。</p>
+<ul>
+<li>加入Mysql Redo log的容量为1G，Mysql每秒产生100MB redo，XtraBackup每秒复制50MB redo，xtrabackup的复制在一段时间后落后于mysql写入速度，脏页持久化redo log覆盖写了，但是被覆盖的redo log没有被 xtrabackup的 redo log复制线程复制下来。此时备份可能直接失效。</li>
+</ul>
+<p>xtra 8.0.30 为解决这个问题，引入 <code>redo-log-consumer</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">xtrabackup --backup <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --register-redo-log-consumer <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --target-dir<span class="o">=</span>/backup
+</span></span></code></pre></div><ol>
+<li>XtraBackup 向 MySQL 注册为 Redo Log Consumer。</li>
+<li>MySQL 跟踪 XtraBackup 已经读取到的 LSN, 未被 XtraBackup 读取的 Redo Log 不允许被覆盖。</li>
+<li>如果 redo log的 日志空间耗尽，MySQL阻塞后续写入，等待 XtraBackup消费完成后释放。</li>
+</ol>
+<p>可以避免日志被提前覆盖，缺点是 备份速度跟不上时，mysql会阻塞并发dml执行，等待xtrabackup的consumer消费完成。</p>
+<p><strong>Q：XtraBackup如何进行增量备份？</strong></p>
+<p>A：命令参考Q33。</p>
+<p>XtraBackup 基于 InnoDB 数据页的 LSN 实现增量备份。它读取上一次备份记录的 to_lsn，扫描 InnoDB 数据文件，逐页比较 Page LSN，复制 LSN 大于上次备份 to_lsn 的数据页，并结合 Redo Log 保证备份一致性。普通模式需要扫描全部数据页，存在较大的 I/O 开销；支持 Page Tracking 时，Mysql提前记录发生过变化的数据页，xtra直接定位发生变化的数据页，无需扫描全部数据页。</p>
+<h2 id="pitr-基于时间点的恢复">PITR 基于时间点的恢复
+</h2><p>适用于 binlog开启后有binlog持续归档 且 有定期全量备份的场景。</p>
+<p>将数据库恢复到指定时间点/某个误操作位置之前的状态。</p>
+<p>主要流程：定位误操作的binlog位点或者时间，然后使用最近的全量备份恢复到mysql实例中，接着确认全量备份文件中的binlog位点，使用mysqlbinlog重放 全量备份文件中的binlog位点 到 误操作前的时刻或者位点 中的binlog，来恢复数据。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 定位误操作对应的位点，或者时间点 【略】</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 恢复备份（删除原来的表及其数据，根据备份重建/插入全量备份数据，binlog重放到指定目标时间点/位点）</span>
+</span></span><span class="line"><span class="cl">mysql &lt; full_backup.sql
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 查找备份文件 类似文本中的binlog pos：CHANGE MASTER TO MASTER_LOG_FILE=&#39;mysql-bin.000005&#39;, MASTER_LOG_POS=154 </span>
+</span></span><span class="line"><span class="cl">grep -i <span class="s2">&#34;CHANGE REPLICATION SOURCE TO&#34;</span> full_backup.sql
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 在数据库上执行binlog重放，将数据库中的数据恢复到目标时间点。</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 按时间点恢复（恢复到误操作前一刻）</span>
+</span></span><span class="line"><span class="cl">mysqlbinlog --start-position<span class="o">=</span><span class="m">154</span> --stop-datetime<span class="o">=</span> <span class="s2">&#34;2024-03-15 14:30:00&#34;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">mysql-bin.000005 mysql-bin.000006  <span class="p">|</span>  mysql -u root -p
+</span></span><span class="line"><span class="cl"><span class="c1"># 或按位点恢复（需先用mysqlbinlog找到误操作的位点）</span>
+</span></span><span class="line"><span class="cl">mysqlbinlog --start-position<span class="o">=</span><span class="m">154</span> --stop-position<span class="o">=</span><span class="m">28456</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">mysql-bin.000005  <span class="p">|</span>  mysql -u root -p
+</span></span></code></pre></div><p><strong>Q：通过 mysqlbinlog 完成 PITR 后，Binlog 也恢复到目标位点了吗？</strong></p>
+<p>A：没有。PITR 通过重放 Binlog 恢复数据库的逻辑数据状态，但不会将目标实例的 Binlog 文件和偏移量恢复为原来的值。如果目标实例开启 Binlog，重放操作默认会生成新的 Binlog 记录；也可以使用 <code>--disable-log-bin</code> 禁止重复记录。原始 Binlog 位点与恢复后数据库实例的当前 Binlog 位点是两个不同的概念。</p>
+<p><strong>Q：PITR 是否需要从第一条 Binlog 开始重放？</strong></p>
+<p>A： 不需要。mysqldump/xtra 全量备份已经包含备份一致性点之前的全部数据状态，恢复时只需要从全量备份记录的 Binlog 文件和位点开始，重放后续事务直到目标恢复点的binlog位点。</p>
+<p>如果从第一条 Binlog 开始重放，就可能重复执行已经包含在全量备份中的事务，造成数据冲突。</p>
+<p><strong>Q：全量备份日志中记录的binlog位点是什么？</strong></p>
+<p>A：是与全量备份的一致性数据状态对应的 Binlog时间 末尾位点，表示此前已经提交并包含在备份状态中的事务所对应的日志结束位置。PITR 恢复时，从该位点开始重放后续 Binlog，即可补齐全量备份之后的事务变更。</p>
+<h2 id="mysql-clone-plugin">Mysql Clone Plugin
+</h2><p>Mysql8.0.17引入的原生数据克隆插件，将一个mysql实例上的innodb数据完整clone到当前实例上，支持本地克隆和远程克隆。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 安装插件
+</span></span></span><span class="line"><span class="cl"><span class="n">INSTALL</span><span class="w"> </span><span class="n">PLUGIN</span><span class="w"> </span><span class="n">clone</span><span class="w"> </span><span class="n">SONAME</span><span class="w">  </span><span class="s1">&#39;mysql_clone.so&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- (1) 远程克隆（在目标实例上执行）
+</span></span></span><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w">  </span><span class="n">clone_valid_donor_list</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s1">&#39;source_host:3306&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">CLONE</span><span class="w"> </span><span class="n">INSTANCE</span><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="w"> </span><span class="o">@</span><span class="w"> </span><span class="s1">&#39;source_host&#39;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">3306</span><span class="w">  </span><span class="n">IDENTIFIED</span><span class="w">  </span><span class="k">BY</span><span class="w"> </span><span class="s1">&#39;password&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- (2) 本地克隆
+</span></span></span><span class="line"><span class="cl"><span class="n">CLONE</span><span class="w">  </span><span class="k">LOCAL</span><span class="w"> </span><span class="k">DATA</span><span class="w">  </span><span class="n">DIRECTORY</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="s1">&#39;/path/to/clone_dir&#39;</span><span class="w"> </span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></div><p>具体的，基本流程是：初始化，拷贝innodb数据，页面拷贝，redo log拷贝，完成重启。</p>
+<p>限制：</p>
+<ul>
+<li>克隆 会覆盖当前实例上的所有数据</li>
+<li>source 和 dest 的mysql版本必须完全相同</li>
+<li>ddl 在克隆期间阻塞。</li>
+</ul>
+<h2 id="生产实践">生产实践
+</h2><p><strong>Q：逻辑备份和物理备份什么区别？生产实践中如何使用？</strong></p>
+<p>A：逻辑备份指导出sql语句或者csv格式数据，优点：可读性好、跨平台/跨版本兼容性好、可以选择性备份（单表、多表、整库、全部）；缺点是导出慢、恢复慢、备份期间使用一个/多个长事务来执行备份select，或者逐sql重建，可能影响性能。常见的例子是：myqsldump、mysqlshell dump utilities、mysqlpump。</p>
+<p>物理备份直接拷贝数据文件。优点：备份和恢复的速度快（接近磁盘io速度），对线上影响小，支持增量备份；缺点是：只能恢复到同平台/同版本的mysql实例中、一般不能选择性备份。常见的工具是 xtrabackup、mysql enterprise backup、文件系统快照。</p>
+<p>生产实践：binlog持续归档（用于pitr）+ 每天物理增量备份 + 每周逻辑/物理备份（用于跨版本跨平台恢复和验证）。方便按时间点精确恢复、快速恢复、跨平台版本恢复。</p>
+<p>增量备份链越长，恢复时间越长。每周可以做次全量备份重置增量备份链。</p>
+<p><strong>Q：跨版本恢复备份中需要注意的内容？</strong></p>
+<p>A：跨版本无法使用物理备份，只能使用逻辑备份。</p>
+<p>逻辑备份的sql中可能有跨版本不兼容的内容：字符集、保留字、不再支持的sql_mode，用户认证插件mysql_native_password或者caching_sha2_password。</p>
+<p>在目标版本的空实例中导入后，验证数据完整性。</p>
+<h2 id="相关概念">相关概念
+</h2><p><strong>Q：什么是LSN？为什么XtraBackup需要LSN？</strong></p>
+<p>A：LSN（Log Sequence Number）是 InnoDB 用于标识 Redo Log 逻辑写入位置的单调递增序列号，随着 Redo Log 的生成不断增长，即使日志文件循环复用也不会归零。InnoDB 通过 LSN 跟踪日志写入、刷盘和 Checkpoint 进度，在崩溃恢复时确定 Redo Log 的重放起点，同时 XtraBackup 也利用 LSN 确定增量备份范围。</p>
+<p>xtra 全量备份结束时：to_lsn = 100,000;
+xtra 后续进行增量备份需要从 from_lsn = 100,000 开始，到redo log尾部 to_lsn = 150,000 结束，包含从LSN 100,000 到 150,000 间发生变化的数据页 就是「全量备份结束后，到我们当前增量备份这个时间点的增量数据」。</p>
+<p>具体的：XtraBackup 基于 InnoDB 数据页的 LSN 实现增量备份。它读取上一次备份记录的 to_lsn，扫描 InnoDB 数据文件，逐页比较 Page LSN，复制 LSN 大于上次备份 to_lsn 的数据页，并结合 Redo Log 保证备份一致性。普通模式需要扫描全部数据页，存在较大的 I/O 开销；支持 Page Tracking 时，Mysql提前记录发生过变化的数据页，xtra直接定位发生变化的数据页，无需扫描全部数据页。</p>
+<p><strong>Q：什么是FTWRL？FTWRL在备份工具中的作用是什么？什么是备份锁Backup Lock？</strong></p>
+<p>FTWRL 获取全局读锁，会短暂阻塞所有DML、DDL操作，直到FTWRL释放。</p>
+<p>FTWRL的作用？保证ReadView和记录Binlog位点的一致性，避免不一致导致的binlog位点记录不准确，PITR重放时丢失特定事务的binlog/重复重放binlog。</p>
+<p><img alt="c1fa98fb578d20feebf1610c70983aa1" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="assets/c1fa98fb578d20feebf1610c70983aa1-20261020154343-sio71l7.jpeg"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- 短暂全局读锁，阻止新的写事务提交，方便确定一个一致性快照点
+</span></span></span><span class="line"><span class="cl"><span class="n">FLUSH</span><span class="w"> </span><span class="n">TABLES</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="k">READ</span><span class="w"> </span><span class="k">LOCK</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">SET</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">ISOLATION</span><span class="w"> </span><span class="k">LEVEL</span><span class="w"> </span><span class="k">REPEATABLE</span><span class="w"> </span><span class="k">READ</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">CONSISTENT</span><span class="w"> </span><span class="n">SNAPSHOT</span><span class="p">;</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 备份事务开始，同时创建innodb的一致性快照
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 后续select 都在备份事务中执行，读取同一个一致性快照。
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">SHOW</span><span class="w"> </span><span class="nb">BINARY</span><span class="w"> </span><span class="n">LOG</span><span class="w"> </span><span class="n">STATUS</span><span class="p">;</span><span class="w"> </span><span class="c1">-- 获取binlog位点 or gitd set。
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- mysql8.0.x的时候 使用show master status
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- -- File: mysql-bin.000005, Position: 41697720, Executed_Gtid_Set: b61b44a0-ba44-11f1-8b09-9c6b004b1e43:1-29,fa412ac4-ba44-11f1-8c59-9c6b004b1e43:1-20040
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="n">UNLOCK</span><span class="w"> </span><span class="n">TABLES</span><span class="p">;</span><span class="w"> </span><span class="c1">-- 只释放全局读锁
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="c1">-- 完成数据导出
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">db1</span><span class="p">.</span><span class="n">table1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">db1</span><span class="p">.</span><span class="n">table2</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="k">COMMIT</span><span class="p">;</span><span class="w"> </span><span class="c1">-- 事务结束
+</span></span></span></code></pre></div><p>Backup Lock 是MySQL 8.0引入的轻量级备份锁，通过 LOCK INSTANCE FOR BACKUP 获取：</p>
+<pre tabindex="0"><code>LOCK INSTANCE  FOR BACKUP ;
+-- 执行备份操作...
+UNLOCK  INSTANCE;
+</code></pre><p>不阻塞innodb表的dml（FTWRL会阻塞），阻塞DDL，对在线业务影响比FTWRL更小。</p>
+<p>目前XtraBackup 8.0在纯InnoDB环境下自动使用Backup Lock替代FTWRL。需要 BACKUP_ADMIN 权限： <code>GRANT BACKUP_ADMIN ON </code> <em><code>.</code></em> <code> TO 'backup_user'@'localhost'</code>。</p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/bg/">Bg</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="">
+    <a href="/work/my-qa-index/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">我的QA索引</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
