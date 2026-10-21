@@ -10,25 +10,16 @@
         <loc>https://blog.aoidayo.site/tags/bg/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
     </url>
     <url>
-        <loc>https://blog.aoidayo.site/categories/blog/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
-    </url>
-    <url>
-        <loc>https://blog.aoidayo.site/categories/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
-    </url>
-    <url>
-        <loc>https://blog.aoidayo.site/tags/mysql/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
-    </url>
-    <url>
-        <loc>https://blog.aoidayo.site/mysql/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
-    </url>
-    <url>
-        <loc>https://blog.aoidayo.site/mysql/mysql-install-script/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
-    </url>
-    <url>
         <loc>https://blog.aoidayo.site/tags/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
     </url>
     <url>
         <loc>https://blog.aoidayo.site/work/</loc><lastmod>2026-10-20T22:00:00&#43;08:00</lastmod>
+    </url>
+    <url>
+        <loc>https://blog.aoidayo.site/categories/blog/</loc><lastmod>2026-10-19T21:26:00&#43;08:00</lastmod>
+    </url>
+    <url>
+        <loc>https://blog.aoidayo.site/categories/</loc><lastmod>2026-10-19T21:26:00&#43;08:00</lastmod>
     </url>
     <url>
         <loc>https://blog.aoidayo.site/tags/moment/</loc><lastmod>2026-10-19T21:26:00&#43;08:00</lastmod>
@@ -56,6 +47,9 @@
     </url>
     <url>
         <loc>https://blog.aoidayo.site/blog/multi-theme-hugo-content-guide/</loc><lastmod>2026-10-02T00:00:00&#43;00:00</lastmod>
+    </url>
+    <url>
+        <loc>https://blog.aoidayo.site/tags/mysql/</loc><lastmod>2026-09-29T22:01:19&#43;08:00</lastmod>
     </url>
     <url>
         <loc>https://blog.aoidayo.site/blog/mysql-monitor/</loc><lastmod>2026-09-29T22:01:19&#43;08:00</lastmod>
@@ -104,6 +98,12 @@
     </url>
     <url>
         <loc>https://blog.aoidayo.site/blog/novel-collection/</loc><lastmod>2026-06-20T15:38:52&#43;08:00</lastmod>
+    </url>
+    <url>
+        <loc>https://blog.aoidayo.site/mysql/</loc><lastmod>2026-06-19T22:00:00&#43;08:00</lastmod>
+    </url>
+    <url>
+        <loc>https://blog.aoidayo.site/mysql/mysql-install-script/</loc><lastmod>2026-06-19T22:00:00&#43;08:00</lastmod>
     </url>
     <url>
         <loc>https://blog.aoidayo.site/blog/auto-ssl/</loc><lastmod>2026-03-02T19:58:04&#43;08:00</lastmod>
