@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。">
+<title>DB Agent的设计与实现</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/mysql/simple-db-agent/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="DB Agent的设计与实现">
+<meta property='og:description' content="在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。">
+<meta property='og:url' content='https://blog.aoidayo.site/mysql/simple-db-agent/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Mysql' /><meta property='article:tag' content='Mysql' /><meta property='article:published_time' content='2026-10-21T23:59:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-21T23:59:00&#43;08:00'/>
+<meta name="twitter:title" content="DB Agent的设计与实现">
+<meta name="twitter:description" content="在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+<link rel="stylesheet" href="/css/article-cards.1bc71f0340f70c2a83456f9e10bbe2a0dc330c44e7cd76453871b8311a1531d0.css">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#some-qas">Some QAs</a></li>
+    <li><a href="#execute_query实现">execute_query实现</a>
+      <ul>
+        <li><a href="#sql-risk-分类">Sql Risk 分类</a>
+          <ul>
+            <li><a href="#几种sql-risk">几种sql risk</a></li>
+            <li><a href="#如何实现sql分类">如何实现sql分类</a></li>
+          </ul>
+        </li>
+        <li><a href="#生产库隔离">生产库隔离</a></li>
+        <li><a href="#一次性授权和会话授权">一次性授权和会话授权</a></li>
+        <li><a href="#结果返回">结果返回</a></li>
+        <li><a href="#流程总结">流程总结</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/mysql/simple-db-agent/">DB Agent的设计与实现</a>
+        </h2>
+
+        
+        <h3 class="article-subtitle">
+            在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-21T23:59:00&#43;08:00'>Wednesday, October 21, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#some-qas">Some QAs</a></li>
+    <li><a href="#execute_query实现">execute_query实现</a>
+      <ul>
+        <li><a href="#sql-risk-分类">Sql Risk 分类</a>
+          <ul>
+            <li><a href="#几种sql-risk">几种sql risk</a></li>
+            <li><a href="#如何实现sql分类">如何实现sql分类</a></li>
+          </ul>
+        </li>
+        <li><a href="#生产库隔离">生产库隔离</a></li>
+        <li><a href="#一次性授权和会话授权">一次性授权和会话授权</a></li>
+        <li><a href="#结果返回">结果返回</a></li>
+        <li><a href="#流程总结">流程总结</a></li>
+      </ul>
+    </li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    
+    <blockquote>
+        <p>今天是特别快乐的一天。</p>
+
+    </blockquote>
+<p>在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。</p>
+<p>首先明确本文讨论的 DB Agent 的功能边界，主要实现Ask和Agent模式：Agent模式开放execute_query来执行DML/DQL，DML需要生产库隔离和一次性授权允许执行；Ask模式负责简单的库、表、字段、时间的只读功能。</p>
+<ul>
+<li>Ask模式：DB Agent对数据库进行只读操作：list_databases，list_tables，get_columns，get_current_time。</li>
+<li>Agent模式：包括只读与写操作在内的的所有tools，写操作tools：execute_query，explain_query以及get_sample_data。</li>
+</ul>
+<p>本文讨论的DB Agent不包括对于「通过performance_schema, information_schema、status、variables表」和「主从复制状态」等进行根因分析的高级功能。</p>
+<p>核心工具execute_query的思路与实现可以参考：<a class="link" href="https://github.com/t8y2/dbx"  target="_blank" rel="noopener"
+    >t8y2/dbx</a>；agent-loop的for-loop和工具调用部分可以自己实现，实现思路可以参考 <a class="link" href="https://github.com/Fate-Aoidayo/learn-claude-code"  target="_blank" rel="noopener"
+    >learn-claude-code</a>。</p>
+<h2 id="some-qas">Some QAs
+</h2><p>用几个QA明确一下相关概念。</p>
+<p><strong>Q：DB Agent的这些功能，需要实现哪些tools？</strong></p>
+<p>A：基于mysql Agent模式下的tools有如下几个：</p>
+<ul>
+<li>
+<p>只读</p>
+<ul>
+<li>list_databases 列出当前课访问的数据库</li>
+<li>list_tables 列出当前数据库中的表和视图</li>
+<li>get_columns 列出当前表的完整字段定义</li>
+<li>get_current_time 获取当前用户客户端所在时间以及时区对应的utc时间。（和数据库无关）</li>
+</ul>
+</li>
+<li>
+<p>Agent模式的基础tools</p>
+<ul>
+<li>
+<p>execute_query：执行 SQL 并返回结果。对于DML和 DDL，需要进行生产库隔离，用户一次性授权后执行。</p>
+<ul>
+<li>限制mysql执行结果给Agent的返回数量，避免撑爆上下文：并非是在mysql的sql语句中加 `limit 50 / 1000`，而是输出后截断，默认最多返回50行，可以显示在工具调用时设置返回上限。</li>
+</ul>
+</li>
+<li>
+<p>get_sample_data：从指定表采样数据，默认20行最多100行。</p>
+</li>
+<li>
+<p>explain_query 获取只读 SQL 的 MySQL 执行计划，使用 <code>EXPLAIN FORMAT=JSON</code>获取。</p>
+<ul>
+<li>explain_query不会在exexcute_query之前自动调用，需要Agent主动触发，比如「帮我看下为什么这个sql执行这么慢」时会调用explain_query。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Ask模式下 没有 execute_query、get_sample_data和explain_query这几个读写工具，只支持库、表、字段属性和时间。</p>
+<p><strong>Ask模式下的tools实现比较简单，Agent模式下的execute_query使我们今天主要讨论的对象。</strong></p>
+<p><strong>Q：用户询问，ai生成后，后端是如何从生成文本中拿到这一条或者多条sql的呢？</strong></p>
+<p>A：分几种模式：Agent模式、Ask模式</p>
+<p>（1）Agent模式下提问，模型响应后返回工具调用，agent-back执行工具调用（风险分类，读sql直接执行，如果是ddl/dml且非生产库，则进行权限检查，向用户申请一次性授权），后端不是从ai返回文本中抽取sql，而是通过在询问时携带tools声明，规定必须携带一个字符串参数sql。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-Plain" data-lang="Plain"><span class="line"><span class="cl"># execute_query_sql
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">  &#34;name&#34;: &#34;execute_query&#34;,
+</span></span><span class="line"><span class="cl">  &#34;arguments&#34;: {
+</span></span><span class="line"><span class="cl">    &#34;sql&#34;: &#34;SELECT * FROM users LIMIT 10&#34;
+</span></span><span class="line"><span class="cl">  }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><ol>
+<li>
+<p>模型流式返回工具调用时，后端把分段到达的参数拼起来，解析成 JSON。如果模型一次返回多个工具调用，就得到多个调用对象。</p>
+</li>
+<li>
+<p>Agent 循环逐个处理调用；执行器直接读取 <code>arguments[&quot;sql&quot;]</code>，然后做 MySQL 风险分类和权限检查。</p>
+<ol>
+<li>如果是单个sql，则按照上面的流程进行。</li>
+<li>如果一个sql参数中包含多个sql语句，sql risk分类器会做mysql风险分类和权限检查。</li>
+</ol>
+</li>
+</ol>
+<p>（2）Ask模式</p>
+<p>用户提问后，模型可能会回复一大堆内容，其中包括sql代码块的，前端会进行展示优化，在点击执行/临时执行时会分别 「创建基于codemirror6的代码query窗口，将sql块中的sql append进行 并执行」或者「直接执行 捕获并展示结果」。</p>
+<h2 id="execute_query实现">execute_query实现
+</h2><p>用户提问后，模型返回携带一个sql或者多个sql的execute_query调用json，agent-loop收到后进行execute_query的工具调用，下面是我们最简单的工具流程。</p>
+<ol>
+<li>sql risk分类。</li>
+<li>如果是非生产库上的DDL/DQL，如果确认缓存中包含则直接执行，如果没有确认过，则携带目标sql申请用户确认并获取一次性授权/会话授权，得到授权后如果是一次性则消耗后执行，如果不是则交给mysql执行层执行，最后将结果返回。</li>
+</ol>
+<h3 id="sql-risk-分类">Sql Risk 分类
+</h3><h4 id="几种sql-risk">几种sql risk
+</h4><p>sql风险有两种：</p>
+<ul>
+<li>sql对数据库执行什么操作：DDL、DQL、DML，TCL等等。</li>
+<li>是否是慢sql，性能如何，扫描量、执行成本估计，加锁对其他库的影响。</li>
+</ul>
+<p>1、Sql risk 分类</p>
+<p>定义如下几个等级，先对sql进行分类</p>
+<p>分类器不只看开头的关键字。例如 <code>SELECT ... FOR UPDATE</code> 会加锁，<code>SELECT nextval(...)</code> 会改变序列，某些数据库的 <code>SELECT ... INTO</code> 会创建表；这些会归为 <code>Write</code>。存在多条语句时则取其中最高的风险级别。</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th><strong>分类</strong></th>
+					<th><strong>典型语句</strong></th>
+					<th><strong>Agent 处理</strong></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>ReadOnly</td>
+					<td>普通 SELECT、SHOW、DESCRIBE</td>
+					<td>可以执行</td>
+			</tr>
+			<tr>
+					<td>Write</td>
+					<td>INSERT、UPDATE、DELETE、MERGE</td>
+					<td>需要用户确认具体 SQL</td>
+			</tr>
+			<tr>
+					<td>Ddl</td>
+					<td>CREATE、ALTER、DROP、TRUNCATE、GRANT</td>
+					<td>需要用户确认具体 SQL</td>
+			</tr>
+			<tr>
+					<td>Transaction</td>
+					<td>BEGIN、COMMIT、ROLLBACK</td>
+					<td>Agent 禁止执行</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>2、慢sql分析、执行成本估计</p>
+<p>注意：这部分功能没有实现，作为未来的扩展点，目前实现最基本的功能。</p>
+<p>Agent 可以调用 <code>explain_query</code> 工具 查看 MySQL 的 <code>EXPLAIN</code>，但执行 <code>execute_query</code> 前没有强制先运行 <code>EXPLAIN</code>，也没有“预计扫描超过多少行就拒绝”的阈值。</p>
+<p>Agent 执行的sql 默认取50行，最多1000行，但这是限制的返给Agent的数据量，不能保证mysql只扫描这么多行。</p>
+<h4 id="如何实现sql分类">如何实现sql分类
+</h4><p>对于sql risk 分类没有使用goinception，使用rust/go的sqlParser 以及 python的mysqlDialect 通过构建AST（Abstract Semantic Tree 抽象语法树）解析sql，再由自己的规则做词法分析，最后得到分类。</p>
+<p>（1）以<code>select ... for update</code>为例，如何分类？</p>
+<ul>
+<li>
+<p><code>sqlparser</code> 将它解析为查询，同时在查询 AST 中记录锁定子句。</p>
+</li>
+<li>
+<p>DBX 检查 <code>query.locks</code>；非空就归入 <code>SqlRisk::Write</code>。</p>
+<ul>
+<li>DBX 还用词法检查识别 <code>FOR UPDATE</code>、<code>FOR SHARE</code>、<code>LOCK IN SHARE MODE</code> 等，以覆盖解析器未完整表达的写法。如果存在 <code>for update</code>，表明是当前读，加了next-key lock（记录行锁 or 间隙gap锁），因为上了锁，所以归类为Write。</li>
+</ul>
+</li>
+</ul>
+<p>这里的Write是SqlRisk，加了exclusive lock / shared lock的都算<code>SqlRisk-Write</code>。</p>
+<p>sqlParser语法检查、手动词法检查，最后得到sql的分类。</p>
+<p>（2）另外一种特殊的case：model返回的execute_query的调用的sql中存在多条sql语句。这种情况如何处理？</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># execute_query_sql</span>
+</span></span><span class="line"><span class="cl"><span class="o">{</span>
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;name&#34;</span>: <span class="s2">&#34;execute_query&#34;</span>,
+</span></span><span class="line"><span class="cl">  <span class="s2">&#34;arguments&#34;</span>: <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;sql&#34;</span>: <span class="s2">&#34;SELECT * FROM users LIMIT 10; update users set name = &#39;new_name&#39; where id = 1;&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></div><p>在正常解析路径中，分类器将整个字符串交给<code>Parser@parse_sql</code>，返回多个 <code>Statement</code>，DBX逐条根据statement以及词法匹配获取这些statement的最高风险等级。</p>
+<p>比如 <code>SELECT * FROM users LIMIT 10; update users set name = 'new_name' where id = 1;</code> 最后会被分类为 Write。</p>
+<h3 id="生产库隔离">生产库隔离
+</h3><p>生产库和快照库需要分开，不能在生产库上上锁或者执行长事务，导致正常业务DML无法进行。</p>
+<h3 id="一次性授权和会话授权">一次性授权和会话授权
+</h3><p>Sql Risk分类后：readonly直接执行，transcation拒绝，非目标生产库的DML/DDL直接执行</p>
+<ul>
+<li>
+<p>如果是 ReadOnly，直接进入Mysql查询层复用 connection进行查询。</p>
+</li>
+<li>
+<p>如果是 Transcation事务，则拒绝。</p>
+</li>
+<li>
+<p>如果是DML/DDL</p>
+<ul>
+<li>目标数据库是生产库，拒绝。</li>
+<li>目标数据库不是生产库，且用户<u>本会话</u> / <u>传入execute_query的一次性授权参数</u>中  授权过完全相同的sql，进入Mysql查询层。</li>
+<li>目标数据库不是生产库，且用户没有确认过相同的sql，请求用户的授权，不同意则拒绝，同意则重新携带<u>一次性授权参数（包括确认的sql和确认参数）调用execute_query( ack_sql: string, ack: boolean)</u>来重新调用并执行。一次性授权即用即消耗，只有显式请求用户ack后才会调用 <code>execute_query( ack_sql: string, ack: boolean)</code>。</li>
+</ul>
+</li>
+</ul>
+<p>Mysql查询层：每次agent模式调用sql执行时，都会优先查找当前agent conn pool中是否有空闲连接，没有则创建conn并执行。</p>
+<p>注意：代码中 授权粒度 是一次execute_query对应的完整sql字符串，不是用分号分隔的每条sql语句。</p>
+<p>多条 SQL 的规则：</p>
+<ol>
+<li><strong>多个工具调用</strong>：一个调用处理完再处理下一个。一次确认只能用于其中<strong>一个</strong>匹配的写入调用。</li>
+<li><strong>一个调用的</strong> <strong><code>sql</code></strong> <strong>参数里有多条语句</strong>：整段 SQL 一起展示、一起比对、作为<strong>一次授权</strong>提交执行；不会按分号逐条消耗授权。</li>
+</ol>
+<h3 id="结果返回">结果返回
+</h3><p>默认返回的sql结果，默认最多返回50行，可以有model返回execute_query调用传入limit，最多1000。</p>
+<p>设置最多返回行数的原因：让模型决定取哪部分数据，不让过多tool calling result message占用过多上下文。</p>
+<h3 id="流程总结">流程总结
+</h3><p>用GPT简单画了个图，实现起来还是比较简单的。</p>
+<p><img alt="Db Agent 执行 execute_query" class="gallery-image" data-flex-basis="67px" data-flex-grow="28" height="3508" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="/mysql/simple-db-agent/assets/image.png" srcset="/mysql/simple-db-agent/assets/image_hu_b8d10c184cf8ab20.png 800w, /mysql/simple-db-agent/assets/image.png 992w" width="992"></p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/mysql/">Mysql</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/blog/mysql-monitor/">
+        
+        <div class="article-image">
+            <img alt="Featured image of post 使用Prometheus和Grafana监控mysql主从延迟和慢查询" height="150" loading="lazy" src="/blog/mysql-monitor/feature_hu_e5ab4c272a7216ff.png" srcset="/blog/mysql-monitor/feature_hu_e5ab4c272a7216ff.png 1x, /blog/mysql-monitor/feature_hu_e6479f06df05104e.png 2x" width="250">
+
+        </div>
+        
+
+        <div class="article-details"style="background: linear-gradient(0deg, #ba4c1780 0%, #44150bC0 100%);">
+            <h2 class="article-title">使用Prometheus和Grafana监控mysql主从延迟和慢查询</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="has-image">
+    <a href="/blog/mysql-s1mple-ha/">
+        
+        <div class="article-image">
+            <img alt="Featured image of post Mysql简单高可用搭建: 异步主从复制+Orchestrator+ProxySQL" height="150" loading="lazy" src="/blog/mysql-s1mple-ha/feature_hu_7a755ca3b737511c.jpg" srcset="/blog/mysql-s1mple-ha/feature_hu_7a755ca3b737511c.jpg 1x, /blog/mysql-s1mple-ha/feature_hu_6cf4685109f5a395.jpg 2x" width="250">
+
+        </div>
+        
+
+        <div class="article-details"style="background: linear-gradient(0deg, #e5ded880 0%, #453935C0 100%);">
+            <h2 class="article-title">Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="">
+    <a href="/mysql/mysql-install-script/">
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Mysql二进制部署脚本 | Readme</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
