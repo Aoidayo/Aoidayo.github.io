@@ -8,8 +8,14 @@
         <lastBuildDate>Tue, 20 Oct 2026 22:00:00 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/tags/index.xml" rel="self" type="application/rss+xml" /><item>
             <title>Bg</title>
             <link>https://blog.aoidayo.site/tags/bg/</link>
-            <pubDate>Mon, 19 Oct 2026 22:00:00 +0800</pubDate>
+            <pubDate>Tue, 20 Oct 2026 22:00:00 +0800</pubDate>
             <guid>https://blog.aoidayo.site/tags/bg/</guid>
+            <description></description>
+        </item><item>
+            <title>Mysql</title>
+            <link>https://blog.aoidayo.site/tags/mysql/</link>
+            <pubDate>Tue, 20 Oct 2026 22:00:00 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/tags/mysql/</guid>
             <description></description>
         </item><item>
             <title>Moment</title>
@@ -34,12 +40,6 @@
             <link>https://blog.aoidayo.site/tags/hugo/</link>
             <pubDate>Fri, 02 Oct 2026 00:00:00 +0000</pubDate>
             <guid>https://blog.aoidayo.site/tags/hugo/</guid>
-            <description></description>
-        </item><item>
-            <title>Mysql</title>
-            <link>https://blog.aoidayo.site/tags/mysql/</link>
-            <pubDate>Tue, 29 Sep 2026 22:01:19 +0800</pubDate>
-            <guid>https://blog.aoidayo.site/tags/mysql/</guid>
             <description></description>
         </item><item>
             <title>Linux</title>

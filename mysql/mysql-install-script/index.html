@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Mysql二进制部署脚本，在Ubuntu上自动化单实例、多实例mysql的部署。">
+<title>Mysql二进制部署脚本 | Readme</title>
+
+
+<link rel="canonical" href="https://blog.aoidayo.site/mysql/mysql-install-script/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
+<link rel="stylesheet" href="/css/stack.css">
+<meta property='og:title' content="Mysql二进制部署脚本 | Readme">
+<meta property='og:description' content="Mysql二进制部署脚本，在Ubuntu上自动化单实例、多实例mysql的部署。">
+<meta property='og:url' content='https://blog.aoidayo.site/mysql/mysql-install-script/'>
+<meta property='og:site_name' content='Aoidayo'>
+<meta property='og:type' content='article'><meta property='article:section' content='Mysql' /><meta property='article:tag' content='Mysql' /><meta property='article:published_time' content='2026-10-20T22:00:00&#43;08:00'/><meta property='article:modified_time' content='2026-10-20T22:00:00&#43;08:00'/>
+<meta name="twitter:title" content="Mysql二进制部署脚本 | Readme">
+<meta name="twitter:description" content="Mysql二进制部署脚本，在Ubuntu上自动化单实例、多实例mysql的部署。">
+    <link rel="shortcut icon" href="/img/hugo.ico" />
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-L93JFY81SM');
+        }
+      </script><link rel="stylesheet" href="/css/hugo-encrypt.css">
+<script defer src="/js/hugo-encrypt.js"></script>
+
+<link rel="stylesheet" href="/css/article-cards.1bc71f0340f70c2a83456f9e10bbe2a0dc330c44e7cd76453871b8311a1531d0.css">
+
+
+    <script>
+        try {
+            if (localStorage.getItem('aoi-blog:toc-visible:' + location.pathname) === 'false') {
+                document.documentElement.classList.add('toc-hidden');
+            }
+            if (localStorage.getItem('aoi-blog:zen-mode:' + location.pathname) === 'true') {
+                document.documentElement.classList.add('zen-mode');
+                const tocWidth = Number(localStorage.getItem('aoi-blog:zen-toc-width'));
+                if (tocWidth >= 200 && tocWidth <= 600) {
+                    document.documentElement.style.setProperty('--zen-toc-width', tocWidth + 'px');
+                }
+            }
+        } catch (_) {}
+    </script>
+    
+    <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
+
+
+    </head>
+    <body class="
+    article-page
+     has-toc">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        <figure class="site-avatar">
+                <a href="/">
+                    <img src="/img/icon.jpeg" 
+                        width="1080"
+                        height="1080"
+                        class="site-logo"
+                        loading="lazy"
+                        alt="Avatar">
+                </a>
+                
+            </figure>
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">Aoidayo</a></h1>
+            <h2 class="site-description">语言的界限</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/23522093'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M6 3l3 4m9 -4l-3 4" />
+  <rect x="2" y="7" width="20" height="14" rx="3" />
+  <path d="M8 12v3m8 -3v3" />
+</svg>
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/Aoidayo'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>首页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/blog/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>博客</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav class="toc-nav" id="TableOfContents">
+                
+  <ul>
+    <li><a href="#安装">安装</a>
+      <ul>
+        <li><a href="#默认安装配置">默认安装配置</a></li>
+        <li><a href="#单实例安装">单实例安装</a></li>
+        <li><a href="#多实例安装">多实例安装</a></li>
+        <li><a href="#参数一览">参数一览</a>
+          <ul>
+            <li><a href="#安装参数">安装参数</a></li>
+            <li><a href="#卸载参数">卸载参数</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#连接与服务管理">连接与服务管理</a></li>
+    <li><a href="#卸载">卸载</a></li>
+    <li><a href="#安装失败清理">安装失败清理</a></li>
+  </ul>
+
+            </nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    
+<article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/mysql/mysql-install-script/">Mysql二进制部署脚本 | Readme</a>
+        </h2>
+
+        
+        <h3 class="article-subtitle">
+            Mysql二进制部署脚本，在Ubuntu上自动化单实例、多实例mysql的部署。
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    
+
+    
+    <footer class="article-meta">
+        
+            <div class="inline-meta">
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                    <time class="article-time--published" datetime='2026-10-20T22:00:00&#43;08:00'>Tuesday, October 20, 2026</time>
+                
+
+                
+                    <button id="zen-mode-toggle" class="reading-control zen-mode-toggle" type="button" aria-pressed="false" aria-label="开启专注阅读" title="开启专注阅读">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3" />
+                        </svg>
+                    </button>
+                    
+                    <button id="toc-mode-toggle" class="reading-control toc-mode-toggle" type="button" aria-pressed="true" aria-label="隐藏目录" title="隐藏目录" aria-controls="TableOfContents">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <path d="M3 4h3m3 0h12M3 12h3m3 0h12M3 20h3m3 0h12" />
+                        </svg>
+                    </button>
+                    
+                    
+                
+                
+            </div>
+        
+
+        
+
+        
+    </footer>
+    
+</div>
+
+</header>
+
+    
+    <aside class="article-toc">
+        <details>
+            <summary>
+                <div class="article-toc-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                    <span>目录</span>
+                </div>
+            </summary>
+            <nav class="toc-nav">
+                
+  <ul>
+    <li><a href="#安装">安装</a>
+      <ul>
+        <li><a href="#默认安装配置">默认安装配置</a></li>
+        <li><a href="#单实例安装">单实例安装</a></li>
+        <li><a href="#多实例安装">多实例安装</a></li>
+        <li><a href="#参数一览">参数一览</a>
+          <ul>
+            <li><a href="#安装参数">安装参数</a></li>
+            <li><a href="#卸载参数">卸载参数</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#连接与服务管理">连接与服务管理</a></li>
+    <li><a href="#卸载">卸载</a></li>
+    <li><a href="#安装失败清理">安装失败清理</a></li>
+  </ul>
+
+            </nav>
+        </details>
+    </aside>
+    
+
+    <section class="article-content">
+    
+    
+    <p>Gist上 <a class="link" href="https://gist.github.com/Aoidayo/62f61391ac7f7f06b14f6448b1f288fd"  target="_blank" rel="noopener"
+    >基于python的单mysql二进制的部署脚本 | github gist</a>的说明文档。</p>
+<ul>
+<li>
+<p>参考：<a class="link" href="https://github.com/Fate-Aoidayo/Notes-Mysql/blob/main/Mysql-Installer/MySQLShellInstall.sh"  target="_blank" rel="noopener"
+    >Notes-Mysql/Mysql-Installer/MySQLShellInstall.sh at main · Fate-Aoidayo/Notes-Mysql</a></p>
+</li>
+<li>
+<p>修改后的python 自动化二进制单实例/多实例部署脚本：<a class="link" href="https://github.com/Fate-Aoidayo/Notes-Mysql/blob/main/mysqlInstall/mysql_binary_install.py"  target="_blank" rel="noopener"
+    >Notes-Mysql/mysqlInstall/mysql_binary_install.py at main · Fate-Aoidayo/Notes-Mysql</a></p>
+</li>
+</ul>
+<p><code>mysql_binary_install.py</code> 是一个单文件 MySQL Generic 二进制安装工具，在 Linux 本机完成安装、初始化、设置 root 密码、注册 systemd 服务，以及卸载或清理安装残留。每次执行管理一个实例，多次执行可部署不同端口的实例。</p>
+<p>边界：</p>
+<ul>
+<li>脚本不自动下载 MySQL 安装包，不搭建复制、MGR、Router，也不配置防火墙、远程 SSH 或主机调优。</li>
+<li>不包含 远程SSH配置，主从复制、MGR、Router、防火墙、主机调优逻辑。</li>
+<li>自动补齐运行时动态库可能调用 APT、DNF 或 YUM。脚本使用 Python 标准库，通过 <code>ldd</code> 检查 <code>mysqld</code>、<code>mysql</code> 的动态库，必要时自动安装可识别的系统依赖包；这要求软件源可用。离线部署应提前准备好动态库和解压工具。未知依赖、软件源没有候选包等情况需要人工处理。</li>
+</ul>
+<p>条件：</p>
+<ul>
+<li>提前准备可信来源的 MySQL Community Generic <code>.tar.xz</code> 或 <code>.tar.gz</code> 安装包，以及官方提供的 32 位 MD5。MD5 用于比对文件，不能替代可信来源或签名验证。</li>
+<li>Linux 主机，Python <strong>3.10 或以上</strong>；实际安装、卸载需要 root 或 sudo。不支持windows / macos，dry-run执行也必须在 Linux 上执行。</li>
+<li>使用 systemd 管理服务；主机需要提供 <code>tar</code>、<code>chown</code>、<code>getent</code>、<code>id</code>、<code>groupadd</code>、<code>useradd</code>、<code>runuser</code>、<code>systemctl</code>，创建软件入口还会使用 <code>ln</code>。解压 <code>.tar.xz</code> 需要对应的解压支持。</li>
+<li>安装包架构需与主机匹配，脚本识别 <code>x86_64</code> 和 <code>aarch64</code>；若文件名标明 glibc 版本，主机 glibc 不得低于该版本。保留官方包名，避免架构检查失败。</li>
+<li>软件入口的父目录必须已经存在；配置文件、目标 systemd unit 不得已存在，数据目录必须不存在或为空，端口必须空闲。</li>
+<li>默认 buffer pool 为 <code>1G</code>，应按主机可用内存调整。脚本对磁盘可用空间低于 10 GiB、物理内存低于 512 MiB 只发出提醒，不会据此阻止安装。</li>
+</ul>
+<h2 id="安装">安装
+</h2><h3 id="默认安装配置">默认安装配置
+</h3><p>部署路径：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>项目</th>
+					<th>3306 实例</th>
+					<th>非 3306 实例（以 3307 为例）</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>软件目录 <code>basedir</code></td>
+					<td><code>/usr/local/mysql</code> <u>软链接</u>到 实际二进制解压缩的位置</td>
+					<td><code>/usr/local/mysql</code></td>
+			</tr>
+			<tr>
+					<td>数据目录 <code>datadir</code></td>
+					<td><code>/var/lib/mysql</code></td>
+					<td><code>/var/lib/mysql-3307</code></td>
+			</tr>
+			<tr>
+					<td>mysql 配置文件 /etc/xx.cnf</td>
+					<td><code>/etc/my.cnf</code></td>
+					<td><code>/etc/my-3307.cnf</code></td>
+			</tr>
+			<tr>
+					<td>Unix socket</td>
+					<td><code>/var/lib/mysql/mysql.sock</code> <br />也就是 <code>${datadir}/mysql.sock</code></td>
+					<td><code>/var/lib/mysql-3307/mysql.sock</code></td>
+			</tr>
+			<tr>
+					<td>systemd service 服务名</td>
+					<td><code>mysqld.service</code></td>
+					<td><code>mysqld-3307.service</code></td>
+			</tr>
+			<tr>
+					<td>systemd service unit 文件</td>
+					<td><code>/etc/systemd/system/mysqld.service</code></td>
+					<td><code>/etc/systemd/system/mysqld-3307.service</code></td>
+			</tr>
+	</tbody>
+</table></div>
+<p>默认部署路径：</p>
+<ul>
+<li>
+<p>二进制包 解压缩到：<code>/usr/local/mysql-8.0.46-linux-glibc2.28-x86_64</code> 中。</p>
+</li>
+<li>
+<p>myqsl的软件目录 basedir：软链接 <code>/usr/local/mysql</code> link 到 <code>/usr/local/mysql-8.0.46-linux-glibc2.28-x86_64</code>。多个mysql实例可以共用一个 二进制包解压缩的位置。</p>
+</li>
+<li>
+<p>mysql的数据目录 datadir：<code>/var/lib/mysql{}/</code></p>
+<ul>
+<li>3306端口：<code>/var/lib/myqsl</code></li>
+<li>非3306端口：<code>/var/lib/mysql-xxxx</code></li>
+</ul>
+</li>
+<li>
+<p>UnixSocket：<code>${datadir}/mysql.sock</code> 也就是 <code>/var/lib/mysql/mysql.scok</code></p>
+</li>
+</ul>
+<p>默认cnf配置：参考<code>render_config()</code>函数，生成单实例的my.cnf</p>
+<ul>
+<li>
+<p><code>bind-address</code>默认监听 127.0.0.1，<code>default-character-set/character-set-server</code>字符集 utf8mb4，排序规则<code>collation-server</code> utf8mb4_unicode_ci。</p>
+</li>
+<li>
+<p>server-id 默认使用端口值，时区<code>default-time-zone </code>为 <code>+08:00</code>，最大连接数<code>max_connections</code>为 500。</p>
+</li>
+<li>
+<p>buffer-pool大小由<code>innodb-buffer-pool-size</code>控制，大小1G。</p>
+</li>
+<li>
+<p>redo log的持久化策略为1，事务提交时落盘：<code>`innodb_flush_log_at_trx_commit = 1`</code></p>
+</li>
+<li>
+<p>relay-log存放在datadir/relay-bin中。</p>
+</li>
+<li>
+<p>binlog默认开启，相关配置如下：</p>
+<ul>
+<li>log-bin 位置放在 <code>/var/lib/mysql/binlog/mysql-bin</code>。</li>
+<li>sync_binlog：设置为1，事务提交时 落盘。</li>
+<li>默认 开启gtid，gitd_mode=ON, enforce_gtid_consistency = ON</li>
+<li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">    <span class="k">if</span> options.binlog <span class="o">==</span> <span class="s2">&#34;ON&#34;</span>:
+</span></span><span class="line"><span class="cl">        <span class="nv">lines</span> <span class="o">+=</span> <span class="o">[</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;# --- binlog 配置 ---&#34;</span>,
+</span></span><span class="line"><span class="cl">            f<span class="s2">&#34;log-bin = {options.datadir / &#39;binlog&#39; / &#39;mysql-bin&#39;}&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;binlog_format = ROW&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;sync_binlog = 1&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;# 从库回放的事务也写入自己的 binlog，级联复制和故障切换必需&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="o">(</span>
+</span></span><span class="line"><span class="cl">                <span class="s2">&#34;log_slave_updates = ON&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> options.mysql_version <span class="o">==</span> <span class="s2">&#34;5.7&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">else</span> <span class="s2">&#34;log_replica_updates = ON&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="o">)</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;# GTID 核心参数&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;# 所有事务都必须有gtid&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;gtid_mode = ON&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;# 禁止不兼容gtid的sql&#34;</span>,
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;enforce_gtid_consistency = ON&#34;</span>,
+</span></span><span class="line"><span class="cl">        <span class="o">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> options.mysql_version <span class="o">==</span> <span class="s2">&#34;5.7&#34;</span>:
+</span></span><span class="line"><span class="cl">            lines.append<span class="o">(</span><span class="s2">&#34;expire_logs_days = 7&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span>:
+</span></span><span class="line"><span class="cl">            lines.append<span class="o">(</span><span class="s2">&#34;binlog_expire_logs_seconds = 604800&#34;</span><span class="o">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>:
+</span></span><span class="line"><span class="cl">        <span class="c1"># 明确写 skip-log-bin，避免主机默认配置意外开启 binlog。</span>
+</span></span><span class="line"><span class="cl">        lines.append<span class="o">(</span><span class="s2">&#34;skip-log-bin&#34;</span><span class="o">)</span>
+</span></span></code></pre></div></li>
+</ul>
+</li>
+</ul>
+<h3 id="单实例安装">单实例安装
+</h3><p>预览安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --mysql-version 8.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --dry-run
+</span></span><span class="line"><span class="cl">  --verbose
+</span></span></code></pre></div><p>预览会实际读取安装包、计算 MD5、检查包结构、系列版本、主机兼容性、路径和端口，但不会解压、安装依赖、初始化数据库或启动服务，也不会要求输入 root 密码。因此，预览成功不代表运行时依赖或服务启动一定成功。加上 <code>--verbose</code> 可查看拟生成的配置内容。</p>
+<p>正式安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --mysql-version 8.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span>
+</span></span></code></pre></div><ul>
+<li>mysql-version：对应二进制包的mysql版本</li>
+<li>md5sum：二进制包的md5和，用于校验是否相等。</li>
+<li>root-password：默认创建的root账号密码，该密码用于 <code>root@localhost</code> 和本机 TCP 账号 <code>root@127.0.0.1</code>。</li>
+</ul>
+<h3 id="多实例安装">多实例安装
+</h3><p>上面我们在3306端口默认安装，接下来在3307和3308端口进行多实例安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3306</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bind-address 0.0.0.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --server-id <span class="m">101</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-host 127.0.0.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-port <span class="m">3306</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3307</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bind-address 0.0.0.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --server-id <span class="m">102</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-host 127.0.0.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-port <span class="m">3307</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql-3307 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my-3307.cnf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3308</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bind-address 0.0.0.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --server-id <span class="m">103</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-host 127.0.0.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-port <span class="m">3308</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql-3308 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my-3308.cnf
+</span></span></code></pre></div><h3 id="参数一览">参数一览
+</h3><h4 id="安装参数">安装参数
+</h4><div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>默认值</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>--mysql-version</code></td>
+					<td><code>8.0</code></td>
+					<td>系列版本，接受 <code>5.7</code>、<code>8.x</code>、<code>9.x</code> 格式；不接受 <code>8.4.5</code> 这样的补丁版本。具体补丁由安装包决定，接受参数格式不代表所有系列均经过部署验证</td>
+			</tr>
+			<tr>
+					<td><code>--archive</code></td>
+					<td>无</td>
+					<td>安装必填，本地 <code>.tar.xz</code> 或 <code>.tar.gz</code> 的<strong>绝对路径</strong></td>
+			</tr>
+			<tr>
+					<td><code>--md5sum</code></td>
+					<td>无</td>
+					<td>安装必填，32 位十六进制 MD5，大小写均可</td>
+			</tr>
+			<tr>
+					<td><code>--port</code></td>
+					<td><code>3306</code></td>
+					<td>TCP 端口，范围 1～65535，同时决定默认路径和服务名</td>
+			</tr>
+			<tr>
+					<td><code>--basedir</code></td>
+					<td><code>/usr/local/mysql</code></td>
+					<td>mysql本地的软件入口，软链接到二进制包解压缩位置。</td>
+			</tr>
+			<tr>
+					<td><code>--datadir</code></td>
+					<td>按端口推导</td>
+					<td>数据目录；卸载时必须显式提供。<br />默认端口3306：<code>/var/lib/mysql</code>。<br />其他端口：<code>/var/lib/mysql-3307, /var/lib/mysql-3308</code>。</td>
+			</tr>
+			<tr>
+					<td><code>--socket</code></td>
+					<td><code>&lt;datadir&gt;/mysql.sock</code></td>
+					<td>Unix socket 路径；自定义时需保证父目录及权限适合 mysql 用户使用</td>
+			</tr>
+			<tr>
+					<td><code>--config</code></td>
+					<td>按端口推导</td>
+					<td>配置文件路径；卸载时必须显式提供</td>
+			</tr>
+			<tr>
+					<td><code>--bind-address</code></td>
+					<td><code>127.0.0.1</code></td>
+					<td>监听地址</td>
+			</tr>
+			<tr>
+					<td><code>--server-id</code></td>
+					<td>默认与 <code>--port</code> 相同</td>
+					<td>范围 1～4294967295</td>
+			</tr>
+			<tr>
+					<td><code>--report-host</code></td>
+					<td>不写入</td>
+					<td>复制上报地址</td>
+			</tr>
+			<tr>
+					<td><code>--report-port</code></td>
+					<td>设置 report-host 时使用实例端口，否则不写入</td>
+					<td>上报端口，范围 1～65535，也可单独指定</td>
+			</tr>
+			<tr>
+					<td><code>--time-zone</code></td>
+					<td><code>+08:00</code></td>
+					<td>固定偏移，如 <code>+08:00</code>，或 <code>SYSTEM</code> 跟随系统时区</td>
+			</tr>
+			<tr>
+					<td><code>--root-password</code></td>
+					<td>交互输入并确认</td>
+					<td><strong>非交互安装必须提供</strong>；预览可省略</td>
+			</tr>
+			<tr>
+					<td><code>--charset</code></td>
+					<td><code>utf8mb4</code></td>
+					<td>服务端及客户端字符集</td>
+			</tr>
+			<tr>
+					<td><code>--collation</code></td>
+					<td><code>utf8mb4_unicode_ci</code></td>
+					<td>服务端排序规则，需与字符集及目标版本兼容</td>
+			</tr>
+			<tr>
+					<td><code>--binlog</code></td>
+					<td><code>ON</code></td>
+					<td>仅接受大写 <code>ON</code>、<code>OFF</code>；ON 时配置 binlog+GTID，OFF 时写入 <code>skip-log-bin</code> 且不写入启用 GTID 的配置</td>
+			</tr>
+			<tr>
+					<td><code>--innodb-buffer-pool-size</code></td>
+					<td><code>1G</code></td>
+					<td>整数，可带 K/M/G 单位，如 <code>512M</code>、<code>2G</code>；不支持 <code>1.5G</code></td>
+			</tr>
+			<tr>
+					<td><code>--max-connections</code></td>
+					<td><code>500</code></td>
+					<td>正整数</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>所有路径参数必须是绝对路径，不能含 <code>..</code>；脚本支持展开 <code>~</code>，但 sudo 环境下建议直接写完整路径。软件和数据目录不能相同或互相包含，配置文件不能放在数据目录内。路径检查通常拒绝经过符号链接，软件入口的最终链接除外。</p>
+<h4 id="卸载参数">卸载参数
+</h4><div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>--uninstall</code> / <code>--cleanup</code></td>
+					<td>同一开关，卸载完整实例或识别并清理未完成安装</td>
+			</tr>
+			<tr>
+					<td><code>--confirm-delete-data</code></td>
+					<td>卸载必填，原样重复数据目录的绝对路径，即使预览也需要</td>
+			</tr>
+			<tr>
+					<td><code>--purge-basedir</code></td>
+					<td>卸载时额外删除软件入口和实际软件目录，默认不删除</td>
+			</tr>
+			<tr>
+					<td><code>--confirm-delete-basedir</code></td>
+					<td>配合 <code>--purge-basedir</code>，原样重复 basedir 的绝对路径</td>
+			</tr>
+			<tr>
+					<td><code>--dry-run</code></td>
+					<td>预览安装或卸载，不执行对应系统变更；日志文件例外见前文</td>
+			</tr>
+			<tr>
+					<td><code>--log-file</code></td>
+					<td>额外日志文件的绝对路径，父目录会自动创建</td>
+			</tr>
+			<tr>
+					<td><code>--verbose</code></td>
+					<td>输出 DEBUG 日志，包括生成的配置内容</td>
+			</tr>
+			<tr>
+					<td><code>--version</code></td>
+					<td>显示工具版本</td>
+			</tr>
+			<tr>
+					<td><code>-h</code> / <code>--help</code></td>
+					<td>查看命令行帮助</td>
+			</tr>
+	</tbody>
+</table></div>
+<h2 id="连接与服务管理">连接与服务管理
+</h2><p>服务安装后立即启动并设置开机自启，脚本当前<strong>不会写入</strong>  <strong><code>/etc/profile.d/mysql.sh</code></strong> <strong>或自动设置 PATH，如果需要方便本地使用，可以使用alias自定义快捷命令加入</strong>**<code>zshrc/bashrc</code>**中。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nb">alias</span> <span class="nv">mysql3306</span><span class="o">=</span><span class="s1">&#39;/usr/local/mysql/bin/mysql -uroot -h127.0.0.1 -P3306 -pb617@cumt&#39;</span>
+</span></span></code></pre></div><p>这里的mysql是二进制包中的mysql客户端工具，通过<code>mysql -uroot -hxxx -P3306 -p</code>来连接，这里定义后直接<code>mysql3306</code>进入服务器终端。</p>
+<p>使用systemd来管理：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo systemctl status mysqld.service --no-pager
+</span></span><span class="line"><span class="cl"><span class="c1"># 可以简写成 systemctl status mysqld-3307, mysqld-3308, mysqld(对应mysqld-3306)</span>
+</span></span><span class="line"><span class="cl">sudo systemctl restart mysqld.service
+</span></span><span class="line"><span class="cl">sudo systemctl stop mysqld.service
+</span></span><span class="line"><span class="cl">sudo systemctl start mysqld.service
+</span></span><span class="line"><span class="cl">sudo journalctl -u mysqld.service -n <span class="m">100</span> --no-pager
+</span></span><span class="line"><span class="cl">sudo tail -n <span class="m">100</span> /var/lib/mysql/mysql-error.log
+</span></span></code></pre></div><h2 id="卸载">卸载
+</h2><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># dry run </span>
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py --uninstall <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my.cnf <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --confirm-delete-data /var/lib/mysql
+</span></span><span class="line"><span class="cl">  --dry-run
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 确认目标后，执行卸载</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># --basedir: 指定了 basedir，但是不会删除basedir，这里只是指定</span>
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py --uninstall <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my.cnf <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --confirm-delete-data /var/lib/mysql
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 卸载3307</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># --basedir: 指定了 basedir，但是不会删除basedir，这里只是指定</span>
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py --uninstall <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3307</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --basedir /usr/local/mysql <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql-3307 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my-3307.cnf <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --confirm-delete-data /var/lib/mysql-3307
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 卸载3308 </span>
+</span></span><span class="line"><span class="cl"><span class="c1"># --basedir: 指定了 basedir，但是不会删除basedir，这里只是指定</span>
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py --uninstall <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3308</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --basedir /usr/local/mysql <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql-3308 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my-3308.cnf <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --confirm-delete-data /var/lib/mysql-3308
+</span></span></code></pre></div><p>如果需要删除mysql软件目录，可以在卸载命令中添加：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">--purge-basedir <span class="se">\
+</span></span></span><span class="line"><span class="cl">--confirm-delete-basedir /usr/local/mysql
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 即</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 只有确认软件目录不再被其他实例共享时，才额外删除软件目录</span>
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py --uninstall <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my.cnf <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --confirm-delete-data /var/lib/mysql <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --purge-basedir <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --confirm-delete-basedir /usr/local/mysql
+</span></span></code></pre></div><p>对应安装</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3306</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bind-address 0.0.0.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --server-id <span class="m">101</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-host 127.0.0.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-port <span class="m">3306</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3307</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bind-address 0.0.0.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --server-id <span class="m">102</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-host 127.0.0.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-port <span class="m">3307</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql-3307 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my-3307.cnf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo python3 mysql_binary_install.py <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --archive ~/mysql/Notes-Mysql/Mysql-Installer/mysql-8.0.37-linux-glibc2.28-x86_64.tar.xz <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --md5sum 4ef87d5f5160a6565e767ec10002ce74 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --root-password <span class="s1">&#39;b617@cumt&#39;</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --port <span class="m">3308</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --bind-address 0.0.0.0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --server-id <span class="m">103</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-host 127.0.0.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --report-port <span class="m">3308</span> <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --datadir /var/lib/mysql-3308 <span class="se">\
+</span></span></span><span class="line"><span class="cl">  --config /etc/my-3308.cnf
+</span></span></code></pre></div><h2 id="安装失败清理">安装失败清理
+</h2><p>安装失败后，脚本根据失败阶段处理：</p>
+<ol>
+<li><strong>初始化流程成功返回前失败：</strong> 自动尝试回滚本次新建的datadir数据目录、软件链接和mycnf配置。已有目录、系统账号和已安装的依赖包不会自动删除。</li>
+<li><strong>初始化流程成功返回后失败</strong>：保留数据和配置，需要检查日志后，手动执行清理。</li>
+</ol>
+<p><code>mysqlinstall-instance-id</code> 是脚本为本次安装生成的 UUID，用来确认配置、数据和服务属于同一个实例，避免删错数据库。它会出现在三处：</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>位置</th>
+					<th><strong>写入时间与形式</strong></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>配置文件，例如<code>/etc/my.cnf</code></td>
+					<td>初始化前写入：<code># mysqlinstall-instance-id: UUID</code></td>
+			</tr>
+			<tr>
+					<td>systemd unit</td>
+					<td>初始化后注册服务时写入同样的注释</td>
+			</tr>
+			<tr>
+					<td>数据目录内<code>.mysqlinstall-instance-id</code></td>
+					<td>全部安装验证通过后才写入，文件内容为 UUID</td>
+			</tr>
+	</tbody>
+</table></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">❯ cat /etc/my.cnf
+</span></span><span class="line"><span class="cl"><span class="c1"># mysqlinstall-instance-id: 0f3655c1-420b-4966-88d6-180e01faa1b5</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>client<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">port</span> <span class="o">=</span> <span class="m">3306</span>
+</span></span><span class="line"><span class="cl"><span class="nv">socket</span> <span class="o">=</span> /var/lib/mysql/mysql.sock
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>mysql<span class="o">]</span>
+</span></span><span class="line"><span class="cl">default-character-set <span class="o">=</span> utf8mb4
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[</span>mysqld<span class="o">]</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">❯ cat /etc/systemd/system/mysqld.service
+</span></span><span class="line"><span class="cl"><span class="c1"># mysqlinstall-instance-id: 0f3655c1-420b-4966-88d6-180e01faa1b5</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>Unit<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="nv">Description</span><span class="o">=</span>MySQL Server <span class="o">(</span>mysqld<span class="o">)</span>
+</span></span><span class="line"><span class="cl"><span class="nv">After</span><span class="o">=</span>network.target
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/var/lib/mysql                                                              with root@aios
+</span></span><span class="line"><span class="cl">❯ cat .mysqlinstall-instance-id
+</span></span><span class="line"><span class="cl">0f3655c1-420b-4966-88d6-180e01faa1b5
+</span></span></code></pre></div><p>因此，安装失败时没有数据目录标记文件是正常的；配置文件里的标记是清理的必要依据。</p>
+<p>手动清理时，先预览：</p>
+<pre tabindex="0"><code>sudo python3 mysql_binary_install.py --cleanup \
+  --port 3306 \
+  --basedir /usr/local/mysql \
+  --datadir /var/lib/mysql \
+  --config /etc/my.cnf \
+  --confirm-delete-data /var/lib/mysql \
+  --dry-run
+</code></pre><p>确认目标正确、需要的数据已备份后，移除 <code>--dry-run</code> 再执行。<strong>这会永久删除整个数据目录。</strong>  自定义端口和路径必须改成安装时的实际值。</p>
+<p>实际清理流程是：</p>
+<ol>
+<li>检查配置文件mycnf的 instance-id，以及 <code>basedir</code>、<code>datadir</code>、<code>port</code> 是否与清理参数一致。</li>
+<li>数据目录标记和 unit 如果存在，检查它们的 instance-id 是否一致；缺失则按未完成安装处理。</li>
+<li>停止并禁用对应服务，检查服务和 PID 是否仍在运行。</li>
+<li>删除数据目录、配置文件和对应 unit，并重载 systemd。</li>
+</ol>
+<p>如果配置文件已丢失、没有 instance-id，或者标记不一致，脚本会拒绝清理。这时需要人工确认残留归属，不能靠补写或修改标记绕过检查。</p>
+
+    
+</section>
+
+
+    <footer class="article-meta article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/mysql/">Mysql</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        const elementsToRender = [".main-article", ".widget--toc"];
+
+        elementsToRender.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                renderMathInElement(element, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[", right: "\\]", display: true }
+                    ],
+                    ignoredClasses: ["gist"]
+                });
+            }
+        });
+    });
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside>
+    <h2 class="section-title">相关文章</h2>
+    <div class="subsection-list">
+        <div class="article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/blog/mysql-monitor/">
+        
+        <div class="article-image">
+            <img alt="Featured image of post 使用Prometheus和Grafana监控mysql主从延迟和慢查询" height="150" loading="lazy" src="/blog/mysql-monitor/feature_hu_e5ab4c272a7216ff.png" srcset="/blog/mysql-monitor/feature_hu_e5ab4c272a7216ff.png 1x, /blog/mysql-monitor/feature_hu_e6479f06df05104e.png 2x" width="250">
+
+        </div>
+        
+
+        <div class="article-details"style="background: linear-gradient(0deg, #ba4c1780 0%, #44150bC0 100%);">
+            <h2 class="article-title">使用Prometheus和Grafana监控mysql主从延迟和慢查询</h2>
+        </div>
+    </a>
+</article>
+            
+                
+<article class="has-image">
+    <a href="/blog/mysql-s1mple-ha/">
+        
+        <div class="article-image">
+            <img alt="Featured image of post Mysql简单高可用搭建: 异步主从复制+Orchestrator+ProxySQL" height="150" loading="lazy" src="/blog/mysql-s1mple-ha/feature_hu_7a755ca3b737511c.jpg" srcset="/blog/mysql-s1mple-ha/feature_hu_7a755ca3b737511c.jpg 1x, /blog/mysql-s1mple-ha/feature_hu_6cf4685109f5a395.jpg 2x" width="250">
+
+        </div>
+        
+
+        <div class="article-details"style="background: linear-gradient(0deg, #e5ded880 0%, #453935C0 100%);">
+            <h2 class="article-title">Mysql简单高可用搭建: 异步主从复制&#43;Orchestrator&#43;ProxySQL</h2>
+        </div>
+    </a>
+</article>
+            
+        </div>
+    </div>
+</aside>
+
+
+     
+    
+        
+
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2026 Aoidayo
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+
+
+
+<script type="module">
+    import gallery from '\/ts\/gallery.js';
+
+    const articleContent = document.querySelector('.article-content');
+    const shouldLoad = articleContent && (articleContent.querySelectorAll('figure').length > 0 || articleContent.querySelectorAll('img.gallery-image').length > 0);
+    
+    if (shouldLoad) {
+        gallery(articleContent);
+
+        const PhotoSwipeLightbox = (await import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe-lightbox.esm.min.js")).default;
+        const styleHref = "https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.css";
+
+        const styleTag = document.createElement('link');
+        styleTag.rel = 'stylesheet';
+        styleTag.href = styleHref;
+        document.head.appendChild(styleTag);
+
+        const lightbox = new PhotoSwipeLightbox({
+            gallerySelector: '.article-content',
+            childSelector: 'figure a.image-link',
+            pswpModule: () => import("https:\/\/cdn.jsdelivr.net\/npm\/photoswipe@5.4.4\/dist\/photoswipe.esm.min.js")
+        });
+        lightbox.init();
+    }
+</script>
+
+    
+
+            </main>
+        </div>
+        
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+
+
+    </body>
+</html>
