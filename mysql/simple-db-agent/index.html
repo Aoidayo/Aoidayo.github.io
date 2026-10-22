@@ -393,12 +393,7 @@
     <section class="article-content">
     
     
-    
-    <blockquote>
-        <p>今天是特别快乐的一天。</p>
-
-    </blockquote>
-<p>在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。</p>
+    <p>在已有对Agent的了解下，如何设计并实现一个最小可运行的DB Agent。</p>
 <p>首先明确本文讨论的 DB Agent 的功能边界，主要实现Ask和Agent模式：Agent模式开放execute_query来执行DML/DQL，DML需要生产库隔离和一次性授权允许执行；Ask模式负责简单的库、表、字段、时间的只读功能。</p>
 <ul>
 <li>Ask模式：DB Agent对数据库进行只读操作：list_databases，list_tables，get_columns，get_current_time。</li>
