@@ -1,0 +1,53 @@
+/* Desktop and tablet sidebars share these controls; the phone menu remains unchanged. */
+.article-sidebar-toggle-item { display: none; }
+
+@media (min-width: 768px) {
+    html.article-sidebar-resizable:not(.zen-mode) body .article-sidebar-toggle-item { display: block; }
+
+    .article-sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--menu-icon-separation);
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--body-text-color);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .article-sidebar-toggle:hover { color: var(--accent-color); }
+    .article-sidebar-toggle:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; border-radius: 3px; }
+
+    html.article-sidebar-resizable:not(.zen-mode) body .main-container > .left-sidebar {
+        flex: 0 0 min(var(--article-left-sidebar-width, 100%), var(--left-sidebar-max-width));
+        width: min(var(--article-left-sidebar-width, 100%), var(--left-sidebar-max-width));
+        max-width: min(var(--article-left-sidebar-width, 100%), var(--left-sidebar-max-width));
+    }
+
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar {
+        --sidebar-avatar-size: 52px;
+    }
+
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .site-meta { display: none; }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .menu-social { display: none; }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .site-avatar { margin-inline: auto; }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar #main-menu > li > a,
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .article-sidebar-toggle,
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar #dark-mode-toggle {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar #main-menu li span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+    }
+}
