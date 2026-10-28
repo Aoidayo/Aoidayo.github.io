@@ -1,0 +1,110 @@
+.article-content .code-fold {
+    --code-fold-line-height: 1.5em;
+    margin: 1.5em calc(-1 * var(--card-padding));
+    width: calc(100% + 2 * var(--card-padding));
+    background: var(--pre-background-color);
+    color: var(--pre-text-color);
+    scroll-margin-top: 24px;
+}
+
+.article-content .code-fold-viewport {
+    position: relative;
+    overflow: hidden;
+}
+
+.article-content .code-fold.is-collapsed .code-fold-viewport {
+    max-height: calc(var(--code-fold-preview-lines) * var(--code-fold-line-height) + 2 * var(--card-padding));
+}
+
+.article-content .code-fold-short-preview.is-collapsed .code-fold-viewport {
+    /* Top padding + two code lines; fade only the second, not the first. */
+    max-height: calc(2 * var(--code-fold-line-height) + var(--card-padding));
+}
+
+.article-content .code-fold.is-collapsed .code-fold-viewport::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: calc(2.5 * var(--code-fold-line-height));
+    background: linear-gradient(transparent, var(--pre-background-color));
+    pointer-events: none;
+}
+
+.article-content .code-fold-short-preview.is-collapsed .code-fold-viewport::after {
+    height: var(--code-fold-line-height);
+}
+
+.article-content .code-fold .highlight,
+.article-content .code-fold pre {
+    margin: 0;
+    width: auto;
+}
+
+.article-content .code-fold-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px var(--card-padding);
+    border: 0;
+    border-top: 1px solid var(--table-border-color);
+    border-bottom: 1px solid var(--table-border-color);
+    background: var(--pre-background-color);
+    color: var(--card-text-color-secondary);
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.article-content .code-fold-toggle:hover {
+    background: color-mix(in srgb, var(--accent-color) 8%, var(--pre-background-color));
+    color: var(--accent-color);
+}
+
+.article-content .code-fold-toggle:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: -3px;
+    border-radius: 4px;
+}
+
+.article-content .code-fold-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.article-content .code-fold-action::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(2px) rotate(225deg);
+    transition: transform 0.2s ease;
+}
+
+.article-content .is-collapsed .code-fold-action::after {
+    transform: translateY(-2px) rotate(45deg);
+}
+
+.article-content .code-fold .copyCodeButton:focus-visible { opacity: 1; }
+
+@media (hover: none) {
+    .article-content .code-fold .copyCodeButton { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .article-content .code-fold-toggle,
+    .article-content .code-fold-action::after { transition: none; }
+}
+
+@media print {
+    .article-content .code-fold.is-collapsed .code-fold-viewport { max-height: none; }
+    .article-content .code-fold-toggle,
+    .article-content .code-fold-viewport::after { display: none; }
+}

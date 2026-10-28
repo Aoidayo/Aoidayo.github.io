@@ -37,6 +37,20 @@
 <script defer src="/js/hugo-encrypt.js"></script>
 
 <link rel="stylesheet" href="/css/article-cards.1bc71f0340f70c2a83456f9e10bbe2a0dc330c44e7cd76453871b8311a1531d0.css">
+<script>
+    
+    try {
+        const saved = localStorage.getItem('aoi-blog:article-sidebar-width');
+        const width = Number(saved);
+        if (saved !== null && Number.isFinite(width) && width >= 64 && width <= 600) {
+            document.documentElement.style.setProperty('--article-left-sidebar-width', width + 'px');
+            document.documentElement.classList.add('article-sidebar-resizable');
+            if (width < 150) document.documentElement.classList.add('article-sidebar-compact');
+        }
+    } catch (_) {}
+</script>
+
+<link rel="stylesheet" href="/css/sidebar-resize.3ba2625317e7eb583ddb56e08472aefe88e4c3205adfeb71aa23a5152a038495.css">
 
 
     <script>
@@ -55,6 +69,8 @@
     </script>
     
     <link rel="stylesheet" href="/css/zen-mode.a7a36d6e4bf39d8776ebf01151575e9f74daa0fffb7ebc3fdc5e63daf5250427.css">
+    
+    <link rel="stylesheet" href="/css/code-fold.8b5eeaabe7f3c3906234f20ce50d94da49ccc909231bcd564d4313a18414ceff.css">
     
     <link rel="stylesheet" href="/css/qa.b6bb0c48f09bffa00f66718833269f9626dc417bbb3ec3f782c21ea853bd9a8c.css">
 
@@ -304,7 +320,7 @@
     <section class="article-content">
     
     
-        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"5uy9UYw+WJZtLbZ5lpJvlA==","iv":"LDgoYXzobT3E/NpO","ciphertext":"2Ph4PCj9NQg33NsTPhI3W0tPkunDOhedgpWmft32MCF/1+Wz97XqFJZ2l0yxpongkwF8njWhpqCtKHnDu01T/7Un3VWRujOQ79aTxJ0O/0opnxjIgLh2ruE8+76SP6O3Wk7/qW1fV83JXhcQniifxWLT+u5IikuXCUbYUiN6Y3K1CzzZmRUM/MJKs7X9DJ5m8ZbKWhXQLHH9gJ3h3sEb/oJXaBnuYoOuLEdz/Y9nOgETVELPvTFi2JNFW0uNLBfN/TJDZcxqFoC6XhLGILOflCxiBDJjF0NdM4ID78o8lal15umxNar7SsWdjFBsfx4SabIeuBz+eWqgHU6ItClwUhG7mtz7sECchJw6LpnX000TyQwbv7w5+xe8DjmVj/UC8s1OGQR9jITVKvDhcv3KXPCCo7ip2dCDxxSLfswSWo0ln1Pox8nE9V94HEe71E72XYotysg7xTuPrIlWgQ7+k5xbMFUuX9/j9KyKLeqosoN2GEPPzwZY33eBe1ekSprY7ee6SDQLD+7wmHwZFFC+dCr32woXUvs0vEQIB1PrVSlolOKZKBKouB+sLzlZZmHySFP9KZC4kaLVRnfzzOLZOeMbwOQMUte1GbDaeNDJ1xG99zn/p6v9z8mKFXf2dmRgXsvx6uz3ph9LjXRfKkIo+bJPjxuonS/wIl/sL1Prl4IMepdsCBfrCj/x0tZrdKBUe8HfhAeML4dDT4Tjge8PSdKWQdbuLgR6aOfL8+29HT3AuyK/nLPG0qZcDD4V70/wy4pyMKLDINJgrm4uKcYp9Q6/H7R4qQIaDJ6vrIbcIjqPqbJRbkIgKbD8s3wSeq5E7GhbvkOuzpoZFzGKMYw7Wvlc73JsHM6CdWITmzPu74X0C2yGXoC79oXEudd6BPr7W7Sn2kyg+dpyXsIU4IjXPtB6+ptwYkqD4EIM++OJgNDo6ltW9QxdLwvB9t6Xp/zfEmQTTesR7Ppima7+q4jkPHCO1GtAeTSwAmUX","id":"j-rl0xk9NELWHjDzUdpnHf","kind":"article","prompt":"请输入密码"}</script></div>
+        <div class="hugo-encrypt-box" data-hugo-encrypt><script type="application/json">{"v":1,"iterations":150000,"salt":"KvSQqyM60EYVGgg2ZdR09w==","iv":"ygcH/gVcbpPLq0Pv","ciphertext":"5clcOZm+VJZyDCjY0mzo7A5UuAQL5XYimW2gKS26B+XIJkTE0p2f386emcmlLMs95ktjQptrCznzw9zrN+2+FDokzidM/grYXlF1Gle7yiq9iWnQLNHbykBxEpjz6vHl3l4bH4qpMFhzC701Lr6z4cjMaxvyajDxuq0R4tZqJMq42KfHs4h4SHK1z7gBsoZZg/APwGZZ1yiJ56fXdLgIAElllL3z78L830z/c6pKzAdojJWUCLLeYPp9QN6fd8dpPUpaROLwNKw8vy6Tp6g6qqwPF/BC5IUzf3wnD96MnQ12+ETuc7e7UbRmxsU40H3POhUGoNc68Bif+8rxsW/BkGrwUaQ5by8JyfZGGYl+jFzzS+36RqpyKvVmMY4dQhsyWFplW62Bod2qK/ViB/4PfJm3v9qkc31v4gyKLY5HR36CFBMvV58o1ejdVrxK5luM4f38oskL2yEskUXEzlTfUVD7Y3c12GzDBbAaEA06h5KwyMYBFW5+ZHl9+8qGPJXDuItsBuuvLj2qXCz99IZLpzB137hpWWIwuoJOpgIDNhKcNwjAt2ANAm70Se52VulijHDXVFRSXbHaQ05SzOR9xlNbK3+DMz7hdzMfpX0OsmzU5pYdSPqh8vCZKV5CVuFywcxY4ZrzJSd49MpR74UxjcWUPNpm49MCiiIfHH2z4SHX22OrK2eGZ7ew+mYrHF+quf8dDjYBDoV4/HQPZI7nmjKtTgKy7cO5tK9qitcfIWpYtBTpIF37Yssbe0DZbMsEj4/23+CHvyqnA2OBNb7P9OqjuVNYK3yo12x/OYTCQnDuVudZHseXd7cDwfoGaeVaEdFIB+odNyDJAer2Bw+lP3CG5AgrvK+Bf3dd/1SWdah5GLVMVW4kID3tXcnZl/U2lJGB9zS3h+RLDtwpNwlbuTTQYuKXmucwO2ogzhhrCr/WXGw6fSe/51TPHdeGkszSBhG7lx8WTZV3X6uV6D/0XD+486uCzqbcEPLf","id":"j-rl0xk9NELWHjDzUdpnHf","kind":"article","prompt":"请输入密码"}</script></div>
 </section>
 
 
@@ -452,7 +468,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.d685e0f8b3cd9e5e6251f82d4646c9922aa8e4413d2f2f0eab67cb3efabbebbe.js" defer></script>
 
 
     </body>

@@ -1,0 +1,113 @@
+/* Desktop and tablet sidebars share these controls; the phone menu remains unchanged. */
+.article-sidebar-resizer,
+.article-sidebar-toggle-item { display: none; }
+
+@media (min-width: 768px) {
+    html.article-sidebar-resizable:not(.zen-mode) body .article-sidebar-toggle-item { display: block; }
+
+    .article-sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--menu-icon-separation);
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--body-text-color);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .article-sidebar-toggle:hover { color: var(--accent-color); }
+    .article-sidebar-toggle:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 3px; border-radius: 3px; }
+
+    html.article-sidebar-resizable:not(.zen-mode) body .main-container > .left-sidebar {
+        flex: 0 0 min(var(--article-left-sidebar-width, 100%), var(--left-sidebar-max-width));
+        width: min(var(--article-left-sidebar-width, 100%), var(--left-sidebar-max-width));
+        max-width: min(var(--article-left-sidebar-width, 100%), var(--left-sidebar-max-width));
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        html.article-sidebar-animating:not(.zen-mode) body .main-container > .left-sidebar {
+            transition: flex-basis 480ms cubic-bezier(.25, .1, .25, 1),
+                width 480ms cubic-bezier(.25, .1, .25, 1),
+                max-width 480ms cubic-bezier(.25, .1, .25, 1);
+        }
+
+        html.article-sidebar-animating:not(.zen-mode) body .left-sidebar .site-avatar {
+            transition: width 480ms cubic-bezier(.25, .1, .25, 1), height 480ms cubic-bezier(.25, .1, .25, 1);
+        }
+    }
+
+    html.article-sidebar-resizable:not(.zen-mode) .article-sidebar-resizer {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        top: calc(var(--main-top-padding) + 130px);
+        right: calc(-1 * var(--section-separation) / 2 - 10px);
+        width: 20px;
+        height: 64px;
+        cursor: col-resize;
+        touch-action: none;
+        outline: none;
+    }
+
+    .article-sidebar-resizer::before {
+        content: '';
+        width: 3px;
+        height: 32px;
+        border-radius: 3px;
+        background: var(--body-text-color);
+        opacity: 0.25;
+        transition: opacity 0.2s ease, background-color 0.2s ease;
+    }
+
+    .article-sidebar-resizer:hover::before,
+    .article-sidebar-resizer:focus-visible::before,
+    html.article-sidebar-dragging .article-sidebar-resizer::before {
+        background: var(--accent-color);
+        opacity: 0.85;
+    }
+
+    .article-sidebar-resizer:focus-visible { outline: 2px solid var(--accent-color); outline-offset: -2px; border-radius: 5px; }
+    html.article-sidebar-dragging, html.article-sidebar-dragging * { cursor: col-resize !important; user-select: none !important; }
+
+    /* Temporary text reflow during the width transition can otherwise flash a scrollbar. */
+    html.article-sidebar-animating body .left-sidebar #main-menu {
+        scrollbar-width: none;
+        overflow-x: hidden;
+    }
+    html.article-sidebar-animating body .left-sidebar #main-menu::-webkit-scrollbar { display: none; }
+    /* Keep labels on one line while the sidebar is too narrow for the full text. */
+    html.article-sidebar-animating body .left-sidebar .site-meta { overflow: hidden; }
+    html.article-sidebar-animating body .left-sidebar .site-meta > *,
+    html.article-sidebar-animating body .left-sidebar #main-menu li span { white-space: nowrap; }
+    html.article-sidebar-animating body .left-sidebar #main-menu li svg { flex-shrink: 0; }
+
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar {
+        --sidebar-avatar-size: 52px;
+    }
+
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .site-meta { display: none; }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .menu-social { display: none; }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .site-avatar { margin-inline: auto; }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar #main-menu > li > a,
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar .article-sidebar-toggle,
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar #dark-mode-toggle {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+    html.article-sidebar-compact:not(.zen-mode) body .left-sidebar #main-menu li span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+    }
+}

@@ -37,6 +37,20 @@
 <script defer src="/js/hugo-encrypt.js"></script>
 
 <link rel="stylesheet" href="/css/article-cards.1bc71f0340f70c2a83456f9e10bbe2a0dc330c44e7cd76453871b8311a1531d0.css">
+<script>
+    
+    try {
+        const saved = localStorage.getItem('aoi-blog:article-sidebar-width');
+        const width = Number(saved);
+        if (saved !== null && Number.isFinite(width) && width >= 64 && width <= 600) {
+            document.documentElement.style.setProperty('--article-left-sidebar-width', width + 'px');
+            document.documentElement.classList.add('article-sidebar-resizable');
+            if (width < 150) document.documentElement.classList.add('article-sidebar-compact');
+        }
+    } catch (_) {}
+</script>
+
+<link rel="stylesheet" href="/css/sidebar-resize.3ba2625317e7eb583ddb56e08472aefe88e4c3205adfeb71aa23a5152a038495.css">
 
 
 
@@ -536,7 +550,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.558fdb6c159ea422e11dc24680f7038869e1fb78b532148b129d8fbe4426205b.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.d685e0f8b3cd9e5e6251f82d4646c9922aa8e4413d2f2f0eab67cb3efabbebbe.js" defer></script>
 
 
     </body>
