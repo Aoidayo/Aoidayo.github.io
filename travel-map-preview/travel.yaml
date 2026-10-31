@@ -1,0 +1,59 @@
+coverMap:
+  bounds:
+    - [135.4, 34.5]
+    - [136.0, 35.2]
+ending: 风会记得，我们也会。
+days:
+  - day: 0
+    title: 从城市的清晨出发
+    shortTitle: 清晨
+    descriptions:
+      - 这不是一份真实行程，而是一场用插画写成的小小旅行。
+      - 在照片之间滚动，右侧地图会随当前章节和位置变化。点击坐标或地图缩略图，可以停下来探索。
+    photos:
+      - src: morning.svg
+        alt: 清晨，城市刚刚醒来
+        width: 1200
+        height: 800
+        caption: 原创演示插画。车站旁的第一缕阳光，把街道染成了暖色。
+        lat: 35.0116
+        lng: 135.7681
+      - src: hills.svg
+        alt: 山间的风
+        width: 800
+        height: 1100
+        caption: 原创演示插画。用竖幅测试照片版式，位置为虚构场景的示意坐标。
+        lat: 34.99
+        lng: 135.80
+  - day: 1
+    title: 在海岸，慢一点
+    shortTitle: 海岸
+    descriptions:
+      - 同一天可以分为多个章节。章节编号和“第几天”互不替代。
+    photos:
+      - src: coast.svg
+        alt: 通往海边的路
+        width: 1200
+        height: 800
+        caption: 原创演示插画；这一张以当天范围取景，而不是放大到单个点位。
+        mapView: day
+        lat: 34.65
+        lng: 135.51
+      - src: sunset.svg
+        alt: 日落之前
+        width: 1200
+        height: 800
+        caption: 地图标记只表示配置的位置，不会自动把两个照片点连接为旅行路线。
+        lat: 34.63
+        lng: 135.49
+  - day: 1
+    title: 留下一张，没有坐标的明信片
+    shortTitle: 明信片
+    descriptions:
+      - 没有 GPS 的照片也能正常阅读，不会凭空生成位置。
+    photos:
+      - src: postcard.svg
+        alt: 寄给下一次旅行
+        width: 1200
+        height: 800
+        caption: 原创演示插画。真实照片可以替换这些 SVG；本地 JPEG、PNG 和 WebP 会自动生成合适尺寸。

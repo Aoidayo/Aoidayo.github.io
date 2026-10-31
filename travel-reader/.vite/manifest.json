@@ -1,0 +1,38 @@
+{
+  "../node_modules/maplibre-gl/dist/maplibre-gl.mjs": {
+    "file": "assets/maplibre-gl-DCkA6vy8.js",
+    "name": "maplibre-gl",
+    "src": "../node_modules/maplibre-gl/dist/maplibre-gl.mjs",
+    "isDynamicEntry": true
+  },
+  "main.ts": {
+    "file": "reader.js",
+    "name": "main",
+    "src": "main.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "runtime/app/components/travel/editorial/atlas.ts"
+    ],
+    "css": [
+      "assets/main-BR6ZPW-3.css"
+    ]
+  },
+  "runtime/app/components/travel/editorial/atlas.ts": {
+    "file": "assets/atlas-E4gNcAKP.js",
+    "name": "atlas",
+    "src": "runtime/app/components/travel/editorial/atlas.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.ts"
+    ],
+    "dynamicImports": [
+      "../node_modules/maplibre-gl/dist/maplibre-gl.mjs"
+    ],
+    "css": [
+      "assets/atlas-CKRTiAqP.css"
+    ],
+    "assets": [
+      "assets/maplibre-gl-worker-BsCfmTCE.js"
+    ]
+  }
+}
