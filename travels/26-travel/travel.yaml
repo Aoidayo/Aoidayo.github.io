@@ -1,0 +1,173 @@
+# day: 0 用于不按“第几天”编号的月度分组；地图初始范围为江苏省大致范围。
+# 照片使用 R2 地址，图片文件未导入内容仓库。
+coverMap:
+  bounds:
+    - [116.3, 30.7]
+    - [122.0, 35.2]
+ending: 下一段旅程再见。
+days:
+  - day: 0
+    title: 五月
+    shortTitle: 五月
+    descriptions:
+    # 写下五月的行程与见闻。
+      - 五月记行。
+    photos:
+      # 拍摄时间（EXIF）：2026-05-11 11:15:09
+      - src: https://blog-image.aoidayo.site/26-travel/4txpu.jpg
+        width: 3024
+        height: 4032
+        alt: 圆陀角标志建筑
+        lat: 31.6970916666667
+        lng: 121.910413888889
+      # 拍摄时间（EXIF）：2026-05-11 11:45:12
+      - src: https://blog-image.aoidayo.site/26-travel/8ahr3.jpg
+        width: 4032
+        height: 3024
+        alt: 启东海边
+        caption: 启东好漂亮。
+        lat: 31.7089472222222
+        lng: 121.932702777778
+      # 拍摄时间（EXIF）：2026-07-06 19:17:24
+      - src: https://blog-image.aoidayo.site/26-travel/43f03.jpeg
+        width: 4284
+        height: 5712
+        alt: 工位
+        lat: 40.0531916666667
+        lng: 116.288369444444
+      # 拍摄时间（EXIF）：2026-06-25 18:33:40
+      - src: https://blog-image.aoidayo.site/26-travel/wwppc.jpeg
+        width: 3024
+        height: 4032
+        alt: 午饭
+        lat: 40.0529944444444
+        lng: 116.287902777778
+      
+  - day: 0
+    title: 六月
+    shortTitle: 六月
+    descriptions:
+      - 六月记行。
+    photos:
+      # 拍摄时间（EXIF）：2026-06-06 18:58:43
+      - src: https://blog-image.aoidayo.site/26-travel/twb57.jpeg
+        width: 4032
+        height: 3024
+        alt: 颐和园昆明湖
+        lat: 39.9894055555556
+        lng: 116.273294444444
+      # 拍摄时间（EXIF）：2026-06-06 20:34:17
+      - src: https://blog-image.aoidayo.site/26-travel/f6bao.jpeg
+        width: 5712
+        height: 4284
+        alt: 依旧川菜
+        lat: 39.9758277777778
+        lng: 116.306458333333
+      # 拍摄时间（EXIF）：2026-06-13 19:58:59
+      - src: https://blog-image.aoidayo.site/26-travel/jnz72.jpeg
+        width: 4284
+        height: 5712
+        alt: 晚上下班后随手一拍
+        lat: 40.0566361111111
+        lng: 116.307655555556
+
+
+  - day: 0
+    title: 七月
+    shortTitle: 七月
+    descriptions:
+      - 七月记行。
+    photos:
+      # 拍摄时间（EXIF）：2026-07-06 19:27:35
+      - src: https://blog-image.aoidayo.site/26-travel/f5dvp.jpeg
+        width: 3024
+        height: 4032
+        alt: 双彩虹
+        lat: 40.0530972222222
+        lng: 116.291288888889
+      # 拍摄时间（EXIF）：2026-07-12 19:45:28
+      - src: https://blog-image.aoidayo.site/26-travel/e4zhk.jpeg
+        width: 4284
+        height: 5712
+        alt: 依旧随手一拍
+        lat: 40.0571694444444
+        lng: 116.306808333333
+      # 拍摄时间（EXIF）：2026-07-19 17:26:08
+      - src: https://blog-image.aoidayo.site/26-travel/qj7ot.jpeg
+        width: 5712
+        height: 4284
+        alt: 什刹海
+        lat: 39.9338388888889
+        lng: 116.385077777778
+      # 拍摄时间（EXIF）：2026-07-26 18:37:15
+      - src: https://blog-image.aoidayo.site/26-travel/1wjpo.jpg
+        width: 5712
+        height: 4284
+        alt: 好可爱几朵小花
+        lat: 40.0565555555556
+        lng: 116.307808333333
+
+  - day: 0
+    title: 八月
+    shortTitle: 八月
+    descriptions:
+      - 八月记行。
+    photos:
+      # 拍摄时间（EXIF）：2026-08-01 18:08:41
+      - src: https://blog-image.aoidayo.site/26-travel/ha4ix.jpeg
+        width: 4284
+        height: 5712
+        alt: 天安门
+        lat: 39.9059527777778
+        lng: 116.396355555556
+      # 拍摄时间（EXIF）：2026-08-01 20:45:48
+      - src: https://blog-image.aoidayo.site/26-travel/d409v.jpeg
+        width: 5712
+        height: 4284
+        alt: 鸟巢
+        caption: 和龙哥在鸟巢旁边吃完海底捞后，我一个人顺路到地铁站回去时路过鸟巢。
+        lat: 39.9954638888889
+        lng: 116.386938888889
+      # 拍摄时间（EXIF）：2026-08-23 12:24:53
+      - src: https://blog-image.aoidayo.site/26-travel/yszot.jpg
+        width: 5712
+        height: 4284
+        alt: 在外婆家拍的韭菜花。
+        lat: 32.15715
+        lng: 120.705208333333
+
+  - day: 0
+    title: 九月
+    shortTitle: 九月
+    descriptions:
+      - 九月记行。
+    photos:
+      # 拍摄时间（EXIF）：2026-09-25 17:36:40
+      - src: https://blog-image.aoidayo.site/26-travel/ug3rf.jpg
+        width: 4284
+        height: 5712
+        alt: 厨和芝麻鸡的干煸鸡
+        lat: 34.2197027777778
+        lng: 117.189483333333
+        caption: 这是真的好吃😋。
+
+  - day: 0
+    title: 十月
+    shortTitle: 十月
+    descriptions:
+      - 十月记行。
+    photos:
+      # 拍摄时间（EXIF）：2026-10-31 15:01:39
+      - src: https://pub-d2287ec8a6174e6193a5e57baad1db37.r2.dev/26-travel/mbht1.jpg
+        width: 5712
+        height: 4284
+        alt: 后山的水上步道不赖
+        lat: 34.21045
+        lng: 117.137108333333
+      # 拍摄时间（EXIF）：2026-10-31 15:13:03
+      - src: https://blog-image.aoidayo.site/26-travel/q8jen.jpg
+        width: 4284
+        height: 5712
+        alt: 不显山后的杉树从
+        lat: 34.2102555555556
+        lng: 117.139297222222

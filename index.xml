@@ -6,6 +6,12 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-CN</language>
         <lastBuildDate>Wed, 21 Oct 2026 23:59:59 +0800</lastBuildDate><atom:link href="https://blog.aoidayo.site/index.xml" rel="self" type="application/rss+xml" /><item>
+            <title>我的QA索引</title>
+            <link>https://blog.aoidayo.site/work/my-qa-index/</link>
+            <pubDate>Tue, 06 Oct 2026 12:00:00 +0800</pubDate>
+            <guid>https://blog.aoidayo.site/work/my-qa-index/</guid>
+            <description>此文章包含加密内容。</description>
+        </item><item>
             <title>DB Agent的设计与实现</title>
             <link>https://blog.aoidayo.site/mysql/simple-db-agent/</link>
             <pubDate>Wed, 21 Oct 2026 23:59:59 +0800</pubDate>
@@ -22,12 +28,6 @@
             <link>https://blog.aoidayo.site/blog/personal-report/</link>
             <pubDate>Thu, 15 Oct 2026 23:59:59 +0800</pubDate>
             <guid>https://blog.aoidayo.site/blog/personal-report/</guid>
-            <description>此文章包含加密内容。</description>
-        </item><item>
-            <title>我的QA索引</title>
-            <link>https://blog.aoidayo.site/work/my-qa-index/</link>
-            <pubDate>Tue, 06 Oct 2026 12:00:00 +0800</pubDate>
-            <guid>https://blog.aoidayo.site/work/my-qa-index/</guid>
             <description>此文章包含加密内容。</description>
         </item><item>
             <title>SpringBoot2.6&#43;单例bean字段注入的循环依赖问题</title>
@@ -113,6 +113,12 @@
             <pubDate>Fri, 13 Feb 2026 10:36:02 +0800</pubDate>
             <guid>https://blog.aoidayo.site/blog/25-sum/</guid>
             <description>&lt;img src=&#34;https://blog.aoidayo.site/blog/25-sum/feature.jpeg&#34; alt=&#34;Featured image of post 2025：时间的魔法&#34; /&gt;&lt;!-- ## 2025年终：时间的魔法 --&gt;&#xA;&lt;div class=&#34;hugo-alert&#34; role=&#34;note&#34;&gt;&#xA;    孩子们，本文100%由DeepSeek和GPT混合润色，阅读到其中的非人句子时保持心平气合，因为这压根就不是我写的。&#xA;&lt;/div&gt;&#xA;&#xA;&lt;h3 id=&#34;chap1&#34;&gt;chap1&#xA;&lt;/h3&gt;&lt;p&gt;如果说要给过去的2025年选一个总结的主题词的话，那我会把这一票投给 &lt;strong&gt;「时间的魔法」&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;这个名字来自于游戏「白色相簿2」的一首背景音乐「時の魔法」。相比&lt;a class=&#34;link&#34; href=&#34;https://music.163.com/#/song?id=775895&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;人声版本&lt;/a&gt;，&lt;a class=&#34;link&#34; href=&#34;https://music.163.com/#/song?id=775893&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;&#xA;    &gt;八音盒版本&lt;/a&gt; 这种仿佛来自童年的纯粹旋律更贴近人声版本歌词的主旨，一个只属于游戏的美好机制：「Save&amp;amp;Load」，我们知道很多游戏都有这个模式，关键处存档，后续推进游戏遇到棘手情况时读档重开。当然也有像杀戮尖塔这种只允许单把关卡存档的游戏，但不管怎么样，在游戏中我们可以针对一关甚至多关反复重开，通过求多次局部最优的方式达到我们心中的结果最优。&#xA;&lt;div class=&#34;music-embed&#34;&gt;&#xA;    &lt;iframe src=&#34;https://music.163.com/outchain/player?type=2&amp;amp;id=775895&amp;amp;auto=0&amp;amp;height=66&#34; title=&#34;网易云音乐播放器&#34; loading=&#34;lazy&#34; allow=&#34;autoplay&#34; style=&#34;width:100%;height:86px;border:0&#34;&gt;&lt;/iframe&gt;&#xA;    &lt;a href=&#34;https://music.163.com/#/song?id=775895&#34; target=&#34;_blank&#34; rel=&#34;noopener noreferrer&#34;&gt;在网易云音乐中打开&lt;/a&gt;&#xA;  &lt;/div&gt;&#xA;&lt;div class=&#34;music-embed&#34;&gt;&#xA;    &lt;iframe src=&#34;https://music.163.com/outchain/player?type=2&amp;amp;id=775893&amp;amp;auto=0&amp;amp;height=66&#34; title=&#34;网易云音乐播放器&#34; loading=&#34;lazy&#34; allow=&#34;autoplay&#34; style=&#34;width:100%;height:86px;border:0&#34;&gt;&lt;/iframe&gt;&#xA;    &lt;a href=&#34;https://music.163.com/#/song?id=775893&#34; target=&#34;_blank&#34; rel=&#34;noopener noreferrer&#34;&gt;在网易云音乐中打开&lt;/a&gt;&#xA;  &lt;/div&gt;&lt;/p&gt;&#xA;&lt;p&gt;现实和游戏的最大区别就是无法「Save&amp;amp;Load」，也正因为这样，这首歌的名字才叫「时间的魔法」。游戏中选错选项可以读档，打不过可以重开，配卡不理想可以重新构筑，只要愿意投入时间，总能获得一个更好的结果。现实更像每把强制的铁人模式，每一个选择都会被永久写入存档，等意识到你某一步操作的影响时，游戏已经默默向前了一大步。&lt;/p&gt;&#xA;&lt;h3 id=&#34;chap2&#34;&gt;chap2&#xA;&lt;/h3&gt;&lt;p&gt;2025对我来说，就是这样的一年。&lt;/p&gt;&#xA;&lt;p&gt;很多事情当时看都很普通：要不要多花一点时间在某件事上，要不要早点开始准备，要不要把身体的不适当回事。等到回头看，才发现这些当时随手做的决定，已经慢慢把这一年带到了现在这个样子。&lt;/p&gt;&#xA;&lt;p&gt;写年终的时候，很容易去想：如果当时换一个选项，或者再坚持一下，会不会结果不同？但现实没有「重来一次」的机会。错过的就是错过了，只能在现有的基础上继续往下走。&lt;/p&gt;&#xA;&lt;p&gt;明年是我的本命年。十二年前还在小学，那时候对时间没什么概念，一年就是一年。现在走到学生阶段的末尾，再回头看这十二年，才发现很多变化都是一点点发生的。你以为只是普通的一年，其实也许是某个长期故事阶段性章节的收尾。&lt;/p&gt;&#xA;&lt;p&gt;年末生病之后，不得不把小论文的撰写和投递往前赶，又一次寒假提前回家。本来安排好的节奏被打乱，人也感觉明显的状态下降。游戏里血量掉了可以补回来，现实里却不是这样。身体的消耗是慢慢累积的，不会因为休息几天就完全清零。&lt;/p&gt;&#xA;&lt;h3 id=&#34;chap3&#34;&gt;chap3&#xA;&lt;/h3&gt;&lt;p&gt;如果游戏的机制是通过读档来反复尝试逼近最优解，那现实的机制，大概是通过承担后果，逐步修正决策。这或许才是「时间的魔法」的真正含义：&lt;/p&gt;&#xA;&lt;p&gt;不是回溯，而是累积。&lt;/p&gt;&#xA;&lt;p&gt;不是重开，而是继续。&lt;/p&gt;&#xA;&lt;h3 id=&#34;chap4&#34;&gt;chap4&#xA;&lt;/h3&gt;&lt;p&gt;今年没有很多想说的话，过年的时候坐在家里闲的没事儿写一下这篇博客，以此纪念下2025，很多年之后再看会不会感觉很唏嘘呢？&lt;/p&gt;&#xA;&lt;p&gt;最后祝大家身体健康，吃嘛嘛香。身体才是支撑时间魔法的唯一本钱，大家平时忙的时候也要注意休息，压力大的时候多摆摆烂。毕竟我们不必事事努力，生活只需要健康的身体与继续下去的勇气。&lt;/p&gt;&#xA;&lt;p&gt;2025，存档（111真能存档吗，孩子们我想重来了）。&lt;/p&gt;&#xA;&lt;p&gt;2026，继续。&lt;/p&gt;&#xA;</description>
+        </item><item>
+            <title>2026 行记</title>
+            <link>https://blog.aoidayo.site/travels/26-travel/</link>
+            <pubDate>Thu, 01 Jan 2026 00:00:00 +0000</pubDate>
+            <guid>https://blog.aoidayo.site/travels/26-travel/</guid>
+            <description>&lt;img src=&#34;https://blog-image.aoidayo.site/26-travel/cover.png&#34; alt=&#34;Featured image of post 2026 行记&#34; /&gt;悔しい……&#xA;悔しくて死にそう……&#xA;失败总是贯穿人生始终。 · 阅读完整游记：https://blog.aoidayo.site/travels/26-travel/</description>
         </item><item>
             <title>境外借记卡简单调研</title>
             <link>https://blog.aoidayo.site/blog/debit-card/</link>
