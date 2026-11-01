@@ -1,0 +1,5 @@
+/* Keep section-card descriptions readable in both Stack color schemes. */
+:root .section-card .section-details > p,
+:root .section-card .section-description {
+    color: var(--body-text-color);
+}
