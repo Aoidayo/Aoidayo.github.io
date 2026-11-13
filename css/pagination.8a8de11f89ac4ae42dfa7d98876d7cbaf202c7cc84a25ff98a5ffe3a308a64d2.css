@@ -12,6 +12,9 @@
     font-size: 1.6rem;
     font-variant-numeric: tabular-nums;
     box-sizing: border-box;
+}
+
+.pagination.pagination-ready {
     transition: max-width .2s cubic-bezier(.2, .7, .2, 1);
 }
 
@@ -69,5 +72,5 @@
     .pagination { height: 4.4rem; border-radius: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .pagination, .pagination .page-link { transition: none; }
+    .pagination.pagination-ready, .pagination .page-link { transition: none; }
 }

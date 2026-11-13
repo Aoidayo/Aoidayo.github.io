@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="在 Memos 随手记下的公开短帖。">
-<title>碎语</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="memo随手记">
+<title>memo</title>
 
 
 <link rel="canonical" href="https://blog.aoidayo.site/memos/">
@@ -11,13 +11,13 @@
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="/css/stack.css">
-<meta property='og:title' content="碎语">
-<meta property='og:description' content="在 Memos 随手记下的公开短帖。">
+<meta property='og:title' content="memo">
+<meta property='og:description' content="memo随手记">
 <meta property='og:url' content='https://blog.aoidayo.site/memos/'>
 <meta property='og:site_name' content='Aoidayo'>
 <meta property='og:type' content='website'><meta property='og:updated_time' content=' 2026-11-01T15:28:08&#43;08:00 '/>
-<meta name="twitter:title" content="碎语">
-<meta name="twitter:description" content="在 Memos 随手记下的公开短帖。">
+<meta name="twitter:title" content="memo">
+<meta name="twitter:description" content="memo随手记">
     <link rel="shortcut icon" href="/img/hugo.ico" />
 
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
@@ -40,7 +40,7 @@
 
 <link rel="stylesheet" href="/css/section-description.3e856706ed4cf491b0c198b4d0bfef11967e8909f47b8a133477548fb5cfb477.css">
 
-<link rel="stylesheet" href="/css/pagination.58e9344c266cefaa8ff39716fbd140057d523db38c02ea103b56fa8a34e53a5c.css">
+<link rel="stylesheet" href="/css/pagination.8a8de11f89ac4ae42dfa7d98876d7cbaf202c7cc84a25ff98a5ffe3a308a64d2.css">
 <script>
     
     try {
@@ -59,9 +59,9 @@
 
 
     
-    <link rel="stylesheet" href="/css/memos.7f126d5fd53b8f428c5a555814a5d01dd6e86c41c4ffaea1ef3e9fb8eef0c4d8.css">
+    <link rel="stylesheet" href="/css/memos.0e25645d3742a8364403d8e10c16ae2798b2fcc6e34db478c888a4bb9c1368ba.css">
     
-    <script type="module" src="/js/memos.ae0539df23a93f6694aceb8d5884e7d17f1481a40b52d7de6c38ca16a9b8da61.js"></script>
+    <script type="module" src="/js/memos.1990cd336de7797f49a047587fb92329f92942d5ea1ab3b3e7cdafff0ecbc7ea.js"></script>
 
     </head>
     <body class="">
@@ -216,7 +216,7 @@
 
 
                 
-                <span>碎语</span>
+                <span>时刻</span>
             </a>
         </li>
         
@@ -269,25 +269,51 @@
             <main class="main full-width">
     
     
-    <header class="section-card">
-        <div class="section-details">
-            <h1 class="section-term">碎语</h1>
-            <p>在 Memos 随手记下的公开短帖。</p>
-            <p class="memo-links">
-                <a href="https://memos.aoidayo.site:5231/explore" rel="noreferrer">前往 Memos ↗</a>
-                <a href="/moments/">旧随记归档</a>
-            </p>
+    <header class="memo-heading">
+        <div>
+            <h1>memo</h1>
+            <p>memo随手记</p>
         </div>
+        <nav class="memo-links" aria-label="memo 相关链接">
+            <a href="https://memos.aoidayo.site:5231/explore" rel="noreferrer">Memos ↗</a>
+            <a href="/moments/">旧随记</a>
+        </nav>
     </header>
-    <section class="memo-feed" aria-label="公开碎语" data-memo-feed data-base-url="https://memos.aoidayo.site:5231" data-creator="users/aoidayo">
-        <p class="memo-status" role="status">正在加载碎语…</p>
-        <div class="memo-list article-list"></div>
-        <div class="memo-actions">
-            <button type="button" data-memo-more hidden>加载更多</button>
-            <button type="button" data-memo-refresh hidden>刷新</button>
+    
+    <section class="memo-feed" aria-label="公开 memo" data-memo-feed data-base-url="https://memos.aoidayo.site:5231" data-creator="users/aoidayo" data-author="Aoidayo" data-avatar="/img/icon.jpeg">
+        <p class="memo-status" role="status">正在加载 memo…</p>
+        <div class="memo-skeletons" aria-hidden="true" hidden>
+            
+                <div class="memo-skeleton"><i></i><i></i><i></i><i></i></div>
+            
+                <div class="memo-skeleton"><i></i><i></i><i></i><i></i></div>
+            
         </div>
-        <noscript><p>实时碎语需要 JavaScript，也可以通过上方链接直接查看 Memos。</p></noscript>
+        <div class="memo-list"></div>
+        <div class="memo-actions" hidden>
+            <button type="button" data-memo-more>加载更多</button>
+        </div>
+        <noscript><p>实时 memo 需要 JavaScript，也可以通过上方链接直接查看 Memos。</p></noscript>
     </section>
+    <dialog class="memo-lightbox" aria-label="图片预览">
+        <button type="button" class="memo-lightbox-close" aria-label="关闭图片预览" autofocus>×</button>
+        <figure>
+            <div class="memo-image-stage">
+                <img alt="" referrerpolicy="no-referrer" draggable="false" hidden>
+            </div>
+            <figcaption role="status" aria-live="polite"></figcaption>
+        </figure>
+        <div class="memo-zoom" role="group" aria-label="图片缩放">
+            <button type="button" data-image-zoom-out aria-label="缩小图片">−</button>
+            <button type="button" data-image-reset aria-label="重置缩放">100%</button>
+            <button type="button" data-image-zoom-in aria-label="放大图片">+</button>
+        </div>
+        <nav aria-label="切换图片">
+            <button type="button" data-image-prev aria-label="上一张">‹</button>
+            <span class="memo-lightbox-count"></span>
+            <button type="button" data-image-next aria-label="下一张">›</button>
+        </nav>
+    </dialog>
     <footer class="site-footer">
     <section class="copyright">
         &copy; 
@@ -305,7 +331,7 @@
             </main>
         </div>
         
-<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.d9128bc1822256a2df5afe3488c8a602ec10b2b3700df91192cb050b3cb75d0a.js" defer></script>
+<script type="text/javascript" src="/ts/main.f856840516f7c2ad1769a8f5937e3d08d6cb386e2cd2dd025ae696e0ff207958.js" defer></script><script type="text/javascript" src="/ts/custom.12fcc3dceb0ed4e8a4b0d6d6a03edc2878c7931d4b656ef3fada53ef1786ae6c.js" defer></script>
 
 
     </body>
