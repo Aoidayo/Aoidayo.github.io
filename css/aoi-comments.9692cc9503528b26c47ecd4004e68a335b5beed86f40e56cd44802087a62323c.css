@@ -6,7 +6,8 @@
     --aoi-danger: #ad362f;
     --aoi-indent: clamp(1.6rem, 3vw, 3rem);
     --aoi-avatar: 3.4rem;
-    --aoi-thread-line: color-mix(in srgb, var(--card-text-color-main, #16191d) 19%, transparent);
+    /* Elbows overlap the continuing rail. Blend with the card once, not at each stroke. */
+    --aoi-thread-line: color-mix(in srgb, var(--card-text-color-main, #16191d) 19%, var(--card-background, #fff));
     margin-bottom: var(--section-separation);
     overflow-wrap: anywhere;
     font-size: 1.45rem;
@@ -36,20 +37,10 @@
     border-bottom: 1px solid var(--aoi-border);
 }
 .aoi-comment-heading {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
     margin: 0 0 .9rem;
     color: var(--body-text-color, #626970);
     font-size: 1.65rem;
     line-height: 1.3;
-}
-.aoi-comment-heading::before {
-    content: "";
-    width: .27rem;
-    height: 1em;
-    border-radius: .3rem;
-    background: var(--accent-color, #34495e);
 }
 
 .aoi-comment-row, .aoi-comment-session, .aoi-comment-identity,
@@ -441,9 +432,15 @@
 }
 
 .aoi-comment-form {
+    --aoi-scroll-thumb: color-mix(in srgb, var(--card-text-color-main, #16191d) 32%, transparent);
+    color-scheme: light;
     margin: 1rem 0 0;
     border: 1px solid color-mix(in srgb, var(--card-text-color-main, #16191d) 20%, transparent);
     border-radius: 21px;
+}
+[data-scheme="dark"] .aoi-comment-form {
+    --aoi-scroll-thumb: color-mix(in srgb, var(--card-text-color-main, #fff) 36%, transparent);
+    color-scheme: dark;
 }
 .aoi-comment-form:focus-within {
     border-color: color-mix(in srgb, var(--card-text-color-main, #16191d) 50%, transparent);
@@ -452,6 +449,7 @@
 .aoi-comment-reply-slot-inner { min-height: 0; overflow: hidden; opacity: 0; }
 .aoi-comment-reply-slot:is(.aoi-comment-reply-open, .aoi-comment-reply-minimized) { grid-template-rows: 1fr; }
 .aoi-comment-reply-slot:is(.aoi-comment-reply-open, .aoi-comment-reply-minimized) > .aoi-comment-reply-slot-inner { opacity: 1; }
+.aoi-comment-form-field { display: block; margin-inline-end: 8px; }
 .aoi-comment-form textarea {
     box-sizing: border-box;
     display: block;
@@ -461,12 +459,20 @@
     resize: none;
     padding: 8px 16px;
     border: 0;
+    border-start-end-radius: 14px;
     background: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: var(--aoi-scroll-thumb) transparent;
     color: inherit;
     font-family: inherit;
     font-size: 15px;
     line-height: 1.75;
     text-align: start;
+}
+@supports not (scrollbar-color: auto) {
+    .aoi-comment-form textarea::-webkit-scrollbar { width: 6px; }
+    .aoi-comment-form textarea::-webkit-scrollbar-track { background: transparent; margin-block: 8px; }
+    .aoi-comment-form textarea::-webkit-scrollbar-thumb { background: var(--aoi-scroll-thumb); border-radius: 999px; }
 }
 .aoi-comment-form textarea::placeholder { color: var(--aoi-muted); opacity: 1; }
 .aoi-comment-form textarea:focus { outline: none; }
