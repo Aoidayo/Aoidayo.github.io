@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="FrameWork Typecho 24/1/? wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\n因为权限问题弃用。\nHello Hexo 24/4/14 第一个博客在github.io上使用Hexo和GithubActions搭建。\nGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\n这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。\n我尝试过如下几种静博框架的不同主题：\nHexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\n总之Hugo我很喜欢，但是配置和使用太麻烦了。\n顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。\nHello Wordpress 24/5/? Wordpress的Sakurairo很好，但是太重了，我的小带宽承受不了。\nHello Halo 24/10/12 争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。\n抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。\nDeployMent 旅游地图 24/11/1 偶尔看看部署的这个小玩具，可以想起旅游的快乐时光。\nNas导航 24/11/1 copy一个学弟的导航页，用来重定向到我的nas服务。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="FrameWork Hugo Stack改造 26/11/14 hugo的stack主题非常直观，若干年前我也是这么想的。\n参考 shinya blog 扩展实现行记地图与评论服务。\n评论： 行记，大佬做的旅行地图比我几年前做的好看不知道多少倍了。 Hello Halo 24/10/12 争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。\n抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。\nHello Wordpress 24/5/? Wordpress的Sakurairo很好，但是太重了，我的小带宽承受不了。\nHello Hugo 24/4/14 Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\n总之Hugo我很喜欢，但是配置和使用太麻烦了。\n顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。\nHello Hexo 24/4/14 第一个博客在github.io上使用Hexo和GithubActions搭建。\nGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\n这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。\n我尝试过如下几种静博框架的不同主题：\nHexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Typecho 24/1/? wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\n">
 <title>Blog History</title>
 
 
@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap">
 <link rel="stylesheet" href="/css/stack.css">
 <meta property='og:title' content="Blog History">
-<meta property='og:description' content="FrameWork Typecho 24/1/? wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\n因为权限问题弃用。\nHello Hexo 24/4/14 第一个博客在github.io上使用Hexo和GithubActions搭建。\nGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\n这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。\n我尝试过如下几种静博框架的不同主题：\nHexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\n总之Hugo我很喜欢，但是配置和使用太麻烦了。\n顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。\nHello Wordpress 24/5/? Wordpress的Sakurairo很好，但是太重了，我的小带宽承受不了。\nHello Halo 24/10/12 争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。\n抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。\nDeployMent 旅游地图 24/11/1 偶尔看看部署的这个小玩具，可以想起旅游的快乐时光。\nNas导航 24/11/1 copy一个学弟的导航页，用来重定向到我的nas服务。\n">
+<meta property='og:description' content="FrameWork Hugo Stack改造 26/11/14 hugo的stack主题非常直观，若干年前我也是这么想的。\n参考 shinya blog 扩展实现行记地图与评论服务。\n评论： 行记，大佬做的旅行地图比我几年前做的好看不知道多少倍了。 Hello Halo 24/10/12 争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。\n抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。\nHello Wordpress 24/5/? Wordpress的Sakurairo很好，但是太重了，我的小带宽承受不了。\nHello Hugo 24/4/14 Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\n总之Hugo我很喜欢，但是配置和使用太麻烦了。\n顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。\nHello Hexo 24/4/14 第一个博客在github.io上使用Hexo和GithubActions搭建。\nGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\n这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。\n我尝试过如下几种静博框架的不同主题：\nHexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Typecho 24/1/? wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\n">
 <meta property='og:url' content='https://blog.aoidayo.site/blog/blog-history/'>
 <meta property='og:site_name' content='Aoidayo'>
 <meta property='og:type' content='article'><meta property='article:section' content='Blog' /><meta property='article:tag' content='Hugo' /><meta property='article:published_time' content='2025-01-04T15:38:16&#43;08:00'/><meta property='article:modified_time' content='2025-01-04T15:38:16&#43;08:00'/>
 <meta name="twitter:title" content="Blog History">
-<meta name="twitter:description" content="FrameWork Typecho 24/1/? wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\n因为权限问题弃用。\nHello Hexo 24/4/14 第一个博客在github.io上使用Hexo和GithubActions搭建。\nGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\n这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。\n我尝试过如下几种静博框架的不同主题：\nHexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Hello Hugo 24/4/14 Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\n总之Hugo我很喜欢，但是配置和使用太麻烦了。\n顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。\nHello Wordpress 24/5/? Wordpress的Sakurairo很好，但是太重了，我的小带宽承受不了。\nHello Halo 24/10/12 争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。\n抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。\nDeployMent 旅游地图 24/11/1 偶尔看看部署的这个小玩具，可以想起旅游的快乐时光。\nNas导航 24/11/1 copy一个学弟的导航页，用来重定向到我的nas服务。\n">
+<meta name="twitter:description" content="FrameWork Hugo Stack改造 26/11/14 hugo的stack主题非常直观，若干年前我也是这么想的。\n参考 shinya blog 扩展实现行记地图与评论服务。\n评论： 行记，大佬做的旅行地图比我几年前做的好看不知道多少倍了。 Hello Halo 24/10/12 争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。\n抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。\nHello Wordpress 24/5/? Wordpress的Sakurairo很好，但是太重了，我的小带宽承受不了。\nHello Hugo 24/4/14 Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。\n总之Hugo我很喜欢，但是配置和使用太麻烦了。\n顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。\nHello Hexo 24/4/14 第一个博客在github.io上使用Hexo和GithubActions搭建。\nGithub原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。\n这类静态博客使用起来最大的槽点就是主题基本上没有一个比较详细的使用说明，当你 clone一个主题下来后，可以说是开箱不能用🤣，所有关乎到日常使用以及美观的配置都得你自己摸索（甚至直接在github上找别人的配置文件也不保证能100%复现），这也就导致了网上关于静态博客如何配置的教程也是最多的，最奇怪的一点就是为什么作者不能给一个开箱即用的 simple starter再搭配一个接入github评论的 mkdocs让大家来讨论，这就是前端的奇奇怪怪之处吧。\n我尝试过如下几种静博框架的不同主题：\nHexo Butterfly Hugo Blowfish Stack Jekyll tmaize-blog Typecho 24/1/? wordpress的精简版本，用docker装容易产生nginx的user:www-data 权限问题，在使用时必须没写完一篇文章就sudo chmod -Rf 777 typecho/一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。\n">
     <link rel="shortcut icon" href="/img/hugo.ico" />
 
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-L93JFY81SM"></script>
@@ -309,11 +309,12 @@
   <ul>
     <li><a href="#framework">FrameWork</a>
       <ul>
-        <li><a href="#typecho-241">Typecho 24/1/?</a></li>
-        <li><a href="#hello-hexo-24414">Hello Hexo 24/4/14</a></li>
-        <li><a href="#hello-hugo-24414">Hello Hugo 24/4/14</a></li>
-        <li><a href="#hello-wordpress-245">Hello Wordpress 24/5/?</a></li>
+        <li><a href="#hugo-stack改造-261114">Hugo Stack改造 26/11/14</a></li>
         <li><a href="#hello-halo-241012">Hello Halo 24/10/12</a></li>
+        <li><a href="#hello-wordpress-245">Hello Wordpress 24/5/?</a></li>
+        <li><a href="#hello-hugo-24414">Hello Hugo 24/4/14</a></li>
+        <li><a href="#hello-hexo-24414">Hello Hexo 24/4/14</a></li>
+        <li><a href="#typecho-241">Typecho 24/1/?</a></li>
       </ul>
     </li>
     <li><a href="#deployment">DeployMent</a>
@@ -419,11 +420,12 @@
   <ul>
     <li><a href="#framework">FrameWork</a>
       <ul>
-        <li><a href="#typecho-241">Typecho 24/1/?</a></li>
-        <li><a href="#hello-hexo-24414">Hello Hexo 24/4/14</a></li>
-        <li><a href="#hello-hugo-24414">Hello Hugo 24/4/14</a></li>
-        <li><a href="#hello-wordpress-245">Hello Wordpress 24/5/?</a></li>
+        <li><a href="#hugo-stack改造-261114">Hugo Stack改造 26/11/14</a></li>
         <li><a href="#hello-halo-241012">Hello Halo 24/10/12</a></li>
+        <li><a href="#hello-wordpress-245">Hello Wordpress 24/5/?</a></li>
+        <li><a href="#hello-hugo-24414">Hello Hugo 24/4/14</a></li>
+        <li><a href="#hello-hexo-24414">Hello Hexo 24/4/14</a></li>
+        <li><a href="#typecho-241">Typecho 24/1/?</a></li>
       </ul>
     </li>
     <li><a href="#deployment">DeployMent</a>
@@ -448,9 +450,24 @@
     
     
     <h2 id="framework">FrameWork
-</h2><h3 id="typecho-241">Typecho 24/1/?
-</h3><p>wordpress的精简版本，用docker装容易产生<code>nginx的user:www-data</code> 权限问题，在使用时必须没写完一篇文章就<code>sudo chmod -Rf 777 typecho/</code>一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。</p>
-<p>因为权限问题弃用。</p>
+</h2><h3 id="hugo-stack改造-261114">Hugo Stack改造 26/11/14
+</h3><p>hugo的stack主题非常直观，若干年前我也是这么想的。</p>
+<p>参考 <a class="link" href="https://blog.shinya.click/"  target="_blank" rel="noopener"
+    >shinya blog</a> 扩展实现行记地图与评论服务。</p>
+<ul>
+<li>评论：<img alt="comment" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="https://blog-image.aoidayo.site/history/PixPin_2026-11-14_15-54-45.png"></li>
+<li><a class="link" href="/travels/26-travel/" >行记</a>，大佬做的旅行地图比我<a class="link" href="#%e6%97%85%e6%b8%b8%e5%9c%b0%e5%9b%be-24111" >几年前做的</a>好看不知道多少倍了。
+<img alt="travel-map" loading="lazy" sizes="(max-width: 767px) calc(100vw - 30px), (max-width: 1023px) 700px, (max-width: 1279px) 950px, 1232px" src="https://blog-image.aoidayo.site/history/travel_map.webp"></li>
+</ul>
+<h3 id="hello-halo-241012">Hello Halo 24/10/12
+</h3><p>争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。</p>
+<p>抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。</p>
+<h3 id="hello-wordpress-245">Hello Wordpress 24/5/?
+</h3><p>Wordpress的<code>Sakurairo</code>很好，但是太重了，我的小带宽承受不了。</p>
+<h3 id="hello-hugo-24414">Hello Hugo 24/4/14
+</h3><p>Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。</p>
+<p>总之Hugo我很喜欢，但是配置和使用太麻烦了。</p>
+<p>顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。</p>
 <h3 id="hello-hexo-24414">Hello Hexo 24/4/14
 </h3><p>第一个博客在github.io上使用Hexo和GithubActions搭建。</p>
 <p>Github原生支持的静态博客框架有Jekyll, Hexo, Hugo这三个，其中Hexo使用起来最麻烦，Hugo和Jekyll稍微简单一点。</p>
@@ -474,15 +491,9 @@
 </ul>
 </li>
 </ul>
-<h3 id="hello-hugo-24414">Hello Hugo 24/4/14
-</h3><p>Hugo是我尝试过的三个静态博客框架中，视觉效果最为出色的一个。特别是其中的Blowfish和Stack主题，它们的设计简洁而不失优雅，色调和排版清新现代。Blowfish主题一种类似苹果的背景高斯模糊展示两种层次的背景，Stack有一种说不上来的直观、流畅。</p>
-<p>总之Hugo我很喜欢，但是配置和使用太麻烦了。</p>
-<p>顺带一提，Hugo虽然原生支持markdown，但是如果你要在页面上显示目录的话，只能使用二级及以下的目录，不能使用一级目录撰文。</p>
-<h3 id="hello-wordpress-245">Hello Wordpress 24/5/?
-</h3><p>Wordpress的<code>Sakurairo</code>很好，但是太重了，我的小带宽承受不了。</p>
-<h3 id="hello-halo-241012">Hello Halo 24/10/12
-</h3><p>争议性最大的，彼时的Halo还没有开始收费，其在12月份宣布启用专业版收费，价格相当高，960买断才能使用应用市场中的插件。</p>
-<p>抛开争议话题不谈，Halo本身做的还是很优秀的，较低的内存占用和较快的响应速度、不算丑的外观、简单的docker部署、两键将备份打包迁移到新网站，这些优点是许多用户选择它的理由，对比停更几年的Typecho和高占用的Wp，让人很难不选择Halo。</p>
+<h3 id="typecho-241">Typecho 24/1/?
+</h3><p>wordpress的精简版本，用docker装容易产生<code>nginx的user:www-data</code> 权限问题，在使用时必须没写完一篇文章就<code>sudo chmod -Rf 777 typecho/</code>一次，其他没有缺点，主题也都不错，主要走简洁风（Handsome开心版）。</p>
+<p>因为权限问题弃用。</p>
 <h2 id="deployment">DeployMent
 </h2><h3 id="旅游地图-24111">旅游地图 24/11/1
 </h3><p>偶尔看看部署的这个小玩具，可以想起旅游的快乐时光。</p>
@@ -602,7 +613,7 @@
     
     <section class="powerby">
         使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
-        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="4.0.3">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计<br />扩展参考 <a href="https://github.com/senshinya" target="_blank" rel="noopener">senshinya</a> 实现<br /><a href="/blog/blog-history/">博客变更日志</a>
     </section>
 </footer>
 
