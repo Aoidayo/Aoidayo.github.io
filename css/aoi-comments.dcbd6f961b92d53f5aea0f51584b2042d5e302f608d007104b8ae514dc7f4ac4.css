@@ -1,0 +1,673 @@
+.aoi-comments {
+    --aoi-border: color-mix(in srgb, var(--card-text-color-main, #16191d) 13%, transparent);
+    --aoi-tint: color-mix(in srgb, var(--accent-color, #34495e) 5%, var(--card-background, #fff));
+    --aoi-active: color-mix(in srgb, var(--accent-color, #34495e) 14%, var(--card-background, #fff));
+    --aoi-muted: var(--card-text-color-secondary, #626970);
+    --aoi-danger: #ad362f;
+    --aoi-indent: clamp(1.6rem, 3vw, 3rem);
+    --aoi-avatar: 3.4rem;
+    --aoi-thread-line: color-mix(in srgb, var(--card-text-color-main, #16191d) 19%, transparent);
+    margin-bottom: var(--section-separation);
+    overflow-wrap: anywhere;
+    font-size: 1.45rem;
+    line-height: 1.5;
+}
+[data-aoi-content] { min-width: 0; }
+.aoi-comment-card {
+    background: var(--card-background, #fff);
+    color: var(--card-text-color-main, #16191d);
+    border: 1px solid var(--card-separator-color, #e8e9eb);
+    border-radius: var(--card-border-radius, 10px);
+    box-shadow: var(--shadow-l1);
+    padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+[data-scheme="dark"] .aoi-comments { --aoi-danger: #ffafa9; }
+.aoi-comments { --aoi-profile-blue: #0969da; }
+[data-scheme="dark"] .aoi-comments { --aoi-profile-blue: #79b8ff; }
+.aoi-comments :where(h2, h3, p) { margin: 0; }
+.aoi-comments [hidden] { display: none; }
+
+.aoi-comment-feedback {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1.15rem;
+    margin-bottom: 1.3rem;
+    border-bottom: 1px solid var(--aoi-border);
+}
+.aoi-comment-heading {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 0 0 .9rem;
+    color: var(--body-text-color, #626970);
+    font-size: 1.65rem;
+    line-height: 1.3;
+}
+.aoi-comment-heading::before {
+    content: "";
+    width: .27rem;
+    height: 1em;
+    border-radius: .3rem;
+    background: var(--accent-color, #34495e);
+}
+
+.aoi-comment-row, .aoi-comment-session, .aoi-comment-identity,
+.aoi-comment-byline, .aoi-comment-action-links, .aoi-comment-form-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .45rem .65rem;
+    min-width: 0;
+}
+.aoi-comment-session { justify-content: space-between; gap: .55rem 1rem; }
+.aoi-comment-signin {
+    padding: .55rem .55rem .55rem 1.2rem;
+    border: 1px solid var(--aoi-border);
+    border-radius: 1.25rem;
+    background: var(--aoi-tint);
+}
+.aoi-comment-signin > span { flex: 1 1 11rem; }
+.aoi-comment-session .aoi-comment-login { margin-inline-start: auto; }
+.aoi-comment-reactions:empty, .aoi-comment-actions:empty,
+.aoi-comments [data-aoi-status]:empty { display: none; }
+
+.aoi-comment-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    min-height: 3.25rem;
+    padding: .35rem 1rem;
+    border: 1px solid var(--aoi-border);
+    border-radius: 999px;
+    background: var(--card-background, #fff);
+    color: inherit;
+    font: inherit;
+    font-size: 1.26rem;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+}
+.aoi-comment-button:not(:disabled):hover { background: var(--aoi-tint); }
+.aoi-comment-button:focus-visible {
+    outline: 2px solid var(--accent-color, #34495e);
+    outline-offset: 2px;
+}
+.aoi-comment-button:disabled { cursor: default; }
+.aoi-comment-button.aoi-comment-quiet {
+    background: transparent;
+    border-color: transparent;
+    color: var(--aoi-muted);
+}
+.aoi-comment-button.aoi-comment-quiet:not(:disabled):hover { color: inherit; background: var(--aoi-tint); }
+.aoi-comment-button.aoi-comment-danger:not(:disabled):hover { color: var(--aoi-danger); }
+.aoi-comment-button.aoi-comment-primary {
+    background: var(--accent-color, #34495e);
+    border-color: transparent;
+    color: var(--accent-color-text, #fff);
+    font-weight: 700;
+}
+.aoi-comment-button.aoi-comment-primary:not(:disabled):hover { background: var(--accent-color-darker, #2c3e50); }
+.aoi-comment-primary:disabled {
+    background: var(--aoi-active);
+    color: var(--aoi-muted);
+}
+.aoi-comment-button.aoi-comment-login { font-weight: 650; white-space: nowrap; }
+.aoi-comment-icon, .aoi-comment-icon svg { display: block; width: 1.55rem; height: 1.55rem; }
+.aoi-comment-icon { flex: 0 0 auto; }
+
+.aoi-comment-chip {
+    min-width: 3.15rem;
+    min-height: 2.9rem;
+    padding: .25rem .65rem;
+    background: var(--aoi-tint);
+    font-size: 1.35rem;
+}
+.aoi-comment-chip-count { color: var(--aoi-muted); font-size: 1.12rem; font-variant-numeric: tabular-nums; }
+.aoi-comment-chip[aria-pressed="true"], .aoi-comment-picker[aria-expanded="true"] {
+    background: var(--aoi-active);
+    border-color: color-mix(in srgb, var(--accent-color, #34495e) 45%, transparent);
+}
+.aoi-comment-chip[aria-pressed="true"] .aoi-comment-chip-count { color: inherit; }
+.aoi-comment-reactions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    min-block-size: 3.5rem;
+}
+.aoi-comment-reaction-counts {
+    display: flex;
+    gap: .55rem;
+}
+.aoi-comment-reaction-counts + .aoi-comment-picker { margin-inline-start: .55rem; }
+.aoi-comment-reaction-counts > .aoi-comment-chip, .aoi-comment-picker { flex: 0 0 auto; }
+.aoi-comment-picker { color: var(--aoi-muted); }
+.aoi-comment-reaction-tray {
+    --aoi-option: 27px;
+    --aoi-option-gap: 3px;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--aoi-option-gap);
+    inline-size: 0;
+    min-block-size: 3.5rem;
+    box-sizing: border-box;
+    overflow: clip;
+    opacity: 0;
+    visibility: hidden;
+}
+.aoi-comment-tray-open {
+    inline-size: calc(var(--aoi-picker-chips) * (var(--aoi-option) + var(--aoi-option-gap)));
+    margin-inline-start: .55rem;
+    opacity: 1;
+    visibility: visible;
+}
+.aoi-comment-reaction-tray .aoi-comment-chip {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    inline-size: var(--aoi-option);
+    min-inline-size: var(--aoi-option);
+    min-block-size: 27px;
+    padding: 2px 3px;
+    font-size: 13px;
+}
+.aoi-comment-reaction-tray .aoi-comment-chip:focus-visible { outline-offset: -2px; }
+.aoi-comment-chip-glyph { display: inline-block; }
+
+.aoi-comment-list-frame { display: flow-root; }
+.aoi-comment-list { margin-top: 1.65rem; }
+.aoi-comment-empty {
+    display: grid;
+    justify-items: center;
+    gap: .35rem;
+    padding: 2.5rem .8rem 1.5rem;
+    text-align: center;
+}
+.aoi-comment-empty > .aoi-comment-icon {
+    display: grid;
+    place-items: center;
+    width: 4.1rem;
+    height: 4.1rem;
+    margin-bottom: .35rem;
+    border: 1px solid var(--aoi-border);
+    border-radius: 50%;
+    background: var(--aoi-tint);
+    color: var(--aoi-muted);
+}
+.aoi-comment-empty .aoi-comment-icon svg { width: 1.95rem; height: 1.95rem; }
+.aoi-comment {
+    --aoi-avatar-center-y: calc(.6rem + var(--aoi-avatar) / 2);
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--aoi-avatar) minmax(0, 1fr);
+    align-items: start;
+    gap: .9rem;
+    min-width: 0;
+    margin-inline-start: calc(var(--aoi-depth, 0) * var(--aoi-indent));
+    padding: .6rem 0 1rem;
+    scroll-margin-block-start: 2rem;
+}
+.aoi-comment[hidden] { display: none; }
+.aoi-comment[data-thread-root]:not(:first-child) { margin-top: 1.25rem; }
+.aoi-comment-detail { grid-column: 2; min-width: 0; }
+.aoi-comment:target:focus { outline: none; }
+/* The first line shares the avatar's center, including when the + replaces it. */
+.aoi-comment-byline { min-block-size: var(--aoi-avatar); align-content: center; }
+.aoi-comment-rails { position: absolute; inset: 0; pointer-events: none; }
+.aoi-comment-rail {
+    position: absolute;
+    inset-inline-start: calc((var(--aoi-rail-depth) - var(--aoi-depth)) * var(--aoi-indent) + var(--aoi-avatar) / 2 - .5px);
+    border-inline-start: 1px solid var(--aoi-thread-line);
+}
+.aoi-rail-through { inset-block: 0; }
+.aoi-rail-in, .aoi-rail-elbow {
+    inset-block-start: 0;
+    block-size: var(--aoi-avatar-center-y);
+}
+.aoi-rail-elbow {
+    inline-size: var(--aoi-indent);
+    box-sizing: border-box;
+    border-block-end: 1px solid var(--aoi-thread-line);
+    border-end-start-radius: .9rem;
+}
+.aoi-rail-out { inset-block: calc(.6rem + var(--aoi-avatar)) 0; }
+.aoi-comment-button.aoi-thread-toggle {
+    position: absolute;
+    z-index: 1;
+    inset-inline-start: calc(var(--aoi-avatar) / 2);
+    inset-block-start: var(--aoi-thread-toggle-y, calc(1.85rem + var(--aoi-avatar)));
+    translate: -50% -50%;
+    box-sizing: border-box;
+    width: 1.9rem;
+    height: 1.9rem;
+    min-height: 0;
+    padding: 0;
+    color: var(--aoi-muted);
+}
+.aoi-thread-toggle::before, .aoi-thread-toggle::after {
+    content: "";
+    position: absolute;
+    width: .75rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+}
+.aoi-thread-toggle::after { transform: rotate(90deg) scaleX(0); }
+.aoi-thread-toggle[aria-expanded="false"]::after { transform: rotate(90deg); }
+.aoi-comment-has-thread { min-block-size: calc(3.65rem + var(--aoi-avatar)); }
+.aoi-comment-folded { min-block-size: 0; }
+.aoi-comment-folded > .aoi-comment-avatar { opacity: 0; }
+.aoi-comment-folded > .aoi-thread-toggle {
+    inset-block-start: var(--aoi-avatar-center-y);
+}
+.aoi-comment-folded .aoi-rail-out,
+.aoi-comment-folded .aoi-comment-locate-badge,
+.aoi-comment-at-indent-limit:not(.aoi-comment-continues-straight) .aoi-rail-out,
+.aoi-comment-folded > .aoi-comment-detail > :is(.aoi-comment-parent-link, .aoi-comment-body, .aoi-comment-actions, .aoi-comment-reply-slot) { display: none; }
+.aoi-comment-folded.aoi-comment-continues-straight .aoi-rail-out {
+    display: block;
+    inset-block-start: var(--aoi-avatar-center-y);
+}
+.aoi-comment-folded-label { display: none; color: var(--aoi-muted); font-size: 1.2rem; }
+.aoi-comment-folded .aoi-comment-folded-label { display: inline; }
+.aoi-comment-deleted p { padding-top: .42rem; font-style: italic; }
+.aoi-comment-avatar {
+    position: relative;
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: var(--aoi-avatar);
+    height: var(--aoi-avatar);
+    border-radius: 50%;
+    background: color-mix(in srgb, hsl(var(--aoi-avatar-hue, 210) 55% 55%) 19%, var(--card-background, #fff));
+    color: var(--card-text-color-main, #16191d);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+.aoi-comment-avatar img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    opacity: 0;
+}
+.aoi-comment-avatar img[data-loaded] { opacity: 1; }
+.aoi-comment-locating {
+    --aoi-locate-duration: 3s;
+    --aoi-locate-ring: color-mix(in srgb, var(--aoi-profile-blue) 55%, transparent);
+}
+.aoi-comment-locating > .aoi-comment-avatar {
+    animation: aoi-avatar-locate-gentle var(--aoi-locate-duration);
+}
+.aoi-comment-identity { --aoi-avatar: 2.8rem; }
+.aoi-comment-author { font-size: 1.42rem; font-weight: 700; }
+.aoi-comments a.aoi-comment-author { color: inherit; text-decoration: none; }
+.aoi-comments a.aoi-comment-author:is(:hover, :focus-visible) { color: var(--aoi-profile-blue); }
+.aoi-comments a.aoi-comment-author:focus-visible { text-decoration: underline; text-underline-offset: .2em; }
+.aoi-comment-badge {
+    border: 1px solid color-mix(in srgb, var(--accent-color, #34495e) 65%, transparent);
+    border-radius: 999px;
+    padding: .07rem .55rem;
+    color: var(--accent-color, #34495e);
+    font-size: 1.03rem;
+    font-weight: 650;
+}
+.aoi-comment-muted, .aoi-comment-date { color: var(--aoi-muted); font-size: 1.28rem; }
+.aoi-comment-date { font-variant-numeric: tabular-nums; }
+.aoi-comment-locate-badge {
+    display: inline-block;
+    /* Reserve its space so a narrow byline never reflows when the badge appears. */
+    visibility: hidden;
+    padding: .1rem .6rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--aoi-profile-blue) 21%, var(--card-background, #fff));
+    color: var(--aoi-profile-blue);
+    font-size: 1.1rem;
+    font-weight: 650;
+    white-space: nowrap;
+}
+.aoi-comment-locating .aoi-comment-locate-badge {
+    animation: aoi-locate-badge-gentle var(--aoi-locate-duration);
+}
+.aoi-comment-locating :is(.aoi-comment-byline, .aoi-comment-body)::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    animation: aoi-locate-fade var(--aoi-locate-duration);
+    opacity: 0;
+}
+.aoi-comment-locating .aoi-comment-byline { position: relative; isolation: isolate; }
+.aoi-comment-locating .aoi-comment-byline::before {
+    z-index: -1;
+    inset-block: 1px;
+    inset-inline-start: -5px;
+    inline-size: min(28rem, calc(100% + 5px));
+    border-radius: 999px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--aoi-profile-blue) 16%, transparent), transparent);
+    transform-origin: left center;
+}
+.aoi-comments a.aoi-comment-parent-link {
+    color: var(--aoi-muted);
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+.aoi-comments a.aoi-comment-parent-link:is(:hover, :focus-visible) {
+    color: var(--aoi-profile-blue);
+    text-decoration: underline;
+    text-underline-offset: .2em;
+}
+.aoi-comment-body { margin: .44rem 0; white-space: pre-wrap; line-height: 1.75; }
+.aoi-comment-locating .aoi-comment-body { position: relative; }
+.aoi-comment-locating .aoi-comment-body::before {
+    inset-block: .27em;
+    inset-inline-start: -6px;
+    inline-size: 2px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--aoi-profile-blue) 45%, transparent);
+    transform-origin: top center;
+}
+.aoi-comment-actions { display: flex; align-items: center; gap: .45rem .65rem; min-width: 0; }
+.aoi-comment-actions:has(> .aoi-comment-reactions:only-child:empty),
+.aoi-comment-actions > .aoi-comment-reactions:empty { display: none; }
+.aoi-comment-actions :is(.aoi-comment-reactions, .aoi-comment-reaction-tray) { min-block-size: 24px; }
+.aoi-comment-actions .aoi-comment-reaction-tray {
+    --aoi-option: 24px;
+    min-block-size: 32px;
+    margin-block: -4px;
+}
+.aoi-comment-actions .aoi-comment-button {
+    box-sizing: border-box;
+    min-block-size: 24px;
+    min-inline-size: 24px;
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.aoi-comment-actions .aoi-comment-chip { padding: 2px 8px; font-size: 13px; line-height: 1.25; }
+.aoi-comment-actions .aoi-comment-picker { padding-inline: 5px; }
+.aoi-comment-actions .aoi-comment-picker :is(.aoi-comment-icon, svg) { width: 12px; height: 12px; }
+.aoi-comment-actions .aoi-comment-chip-count { font-size: 11px; }
+.aoi-comment-actions .aoi-comment-reaction-tray .aoi-comment-chip { padding-inline: 2px; }
+.aoi-comment-action-links { flex: 0 0 auto; flex-wrap: nowrap; gap: .2rem; }
+.aoi-comment-action-links .aoi-comment-button:focus-visible,
+.aoi-comment-reactions .aoi-comment-button:focus-visible { outline-offset: -2px; }
+.aoi-comment-feedback, .aoi-comment-actions {
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+}
+/* Leave room inside the scrollport for the chips' hover lift without adding row spacing. */
+.aoi-comment-actions { padding-block: 4px; margin-block: -4px; }
+.aoi-comment-actions .aoi-comment-quiet { white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) {
+    .aoi-comment-actions { --aoi-actions-visible: 0; opacity: var(--aoi-actions-visible); }
+    .aoi-comment-actions :is(button, a) { pointer-events: none; }
+    .aoi-comment:is(:hover, :has(:focus-visible), .aoi-comment-replying) .aoi-comment-actions,
+    .aoi-comment-actions:has(.aoi-comment-picker[aria-expanded="true"]) {
+        --aoi-actions-visible: 1;
+    }
+    /* Totals are part of the comment; only the secondary controls hide on mouseout. */
+    .aoi-comment-actions:has(.aoi-comment-reaction-counts) { opacity: 1; }
+    .aoi-comment-actions:has(.aoi-comment-reaction-counts) :is(.aoi-comment-picker, .aoi-comment-action-links) {
+        opacity: var(--aoi-actions-visible);
+    }
+    .aoi-comment:is(:hover, :has(:focus-visible), .aoi-comment-replying) .aoi-comment-actions :is(button, a),
+    .aoi-comment-actions:has(.aoi-comment-picker[aria-expanded="true"]) :is(button, a),
+    .aoi-comment-actions .aoi-comment-reaction-counts button { pointer-events: auto; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .aoi-comment-actions {
+        --aoi-actions-offset: 3px;
+        translate: 0 var(--aoi-actions-offset);
+        transition: opacity 170ms ease, translate 190ms cubic-bezier(.2,.7,.2,1);
+    }
+    .aoi-comment:hover .aoi-comment-actions {
+        --aoi-actions-offset: 0px;
+        transition-delay: 55ms;
+    }
+    .aoi-comment:is(:has(:focus-visible), .aoi-comment-replying) .aoi-comment-actions,
+    .aoi-comment-actions:has(.aoi-comment-picker[aria-expanded="true"]) {
+        --aoi-actions-offset: 0px;
+        transition-delay: 0s;
+    }
+    .aoi-comment-actions:has(.aoi-comment-reaction-counts) { translate: none; }
+    .aoi-comment-actions:has(.aoi-comment-reaction-counts) :is(.aoi-comment-picker, .aoi-comment-action-links) {
+        translate: 0 var(--aoi-actions-offset);
+        transition: opacity 170ms ease, translate 190ms cubic-bezier(.2,.7,.2,1);
+    }
+}
+
+.aoi-comment-form {
+    margin: 1rem 0 0;
+    border: 1px solid color-mix(in srgb, var(--card-text-color-main, #16191d) 20%, transparent);
+    border-radius: 21px;
+}
+.aoi-comment-form:focus-within {
+    border-color: color-mix(in srgb, var(--card-text-color-main, #16191d) 50%, transparent);
+}
+.aoi-comment-reply-slot { display: grid; grid-template-rows: 0fr; }
+.aoi-comment-reply-slot-inner { min-height: 0; overflow: hidden; opacity: 0; }
+.aoi-comment-reply-slot:is(.aoi-comment-reply-open, .aoi-comment-reply-minimized) { grid-template-rows: 1fr; }
+.aoi-comment-reply-slot:is(.aoi-comment-reply-open, .aoi-comment-reply-minimized) > .aoi-comment-reply-slot-inner { opacity: 1; }
+.aoi-comment-form textarea {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    block-size: calc(1lh + 16px);
+    max-block-size: 20em;
+    resize: none;
+    padding: 8px 16px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.75;
+    text-align: start;
+}
+.aoi-comment-form textarea::placeholder { color: var(--aoi-muted); opacity: 1; }
+.aoi-comment-form textarea:focus { outline: none; }
+.aoi-comment-form-foot-wrap { display: grid; grid-template-rows: 0fr; }
+.aoi-comment-form-foot {
+    min-height: 0;
+    overflow: hidden;
+    justify-content: flex-end;
+    visibility: hidden;
+    opacity: 0;
+    translate: 0 -5px;
+}
+.aoi-comment-form:not([data-reply-to]):is(:focus-within, .aoi-comment-has-draft, :has([data-aoi-cooldown]:not(:empty))) .aoi-comment-form-foot-wrap,
+.aoi-comment-reply-open .aoi-comment-form-foot-wrap {
+    grid-template-rows: 1fr;
+}
+.aoi-comment-form:not([data-reply-to]):is(:focus-within, .aoi-comment-has-draft, :has([data-aoi-cooldown]:not(:empty))) .aoi-comment-form-foot,
+.aoi-comment-reply-open .aoi-comment-form-foot {
+    visibility: visible;
+    opacity: 1;
+    translate: 0 0;
+}
+.aoi-comment-composer-controls {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    gap: 4px;
+    padding: 0 8px 8px;
+}
+.aoi-comment-button.aoi-comment-composer-button {
+    box-sizing: border-box;
+    min-block-size: 0;
+    block-size: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.aoi-comment-composer-button.aoi-comment-composer-secondary {
+    border-color: transparent;
+    background: var(--aoi-tint);
+}
+.aoi-comment-composer-button.aoi-comment-composer-secondary:not(:disabled):hover { background: var(--aoi-active); }
+.aoi-comment-cooldown { margin-inline-end: auto; color: var(--aoi-muted); font-size: 1.25rem; }
+.aoi-comment-cooldown:empty { display: none; }
+.aoi-comment-session-source {
+    margin-inline-start: .3rem;
+    color: var(--aoi-muted);
+    font-size: 1.22rem;
+}
+.aoi-comment-sort {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin-top: 1.35rem;
+    color: var(--aoi-muted);
+}
+.aoi-comment-sort-status {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    margin-inline-start: auto;
+    font-size: 1.15rem;
+}
+.aoi-comment-sort-status .aoi-comment-button {
+    padding-inline: .4rem;
+    font-size: inherit;
+    white-space: nowrap;
+}
+.aoi-comment-button.aoi-comment-sort-button {
+    padding-inline: 0;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    font-size: 1.3rem;
+}
+.aoi-comment-button.aoi-comment-sort-button:not(:disabled):hover { background: transparent; color: var(--accent-color, #34495e); }
+.aoi-comment-button.aoi-comment-sort-button[aria-pressed="true"] {
+    border-bottom-color: var(--accent-color, #34495e);
+    color: var(--card-text-color-main, #16191d);
+}
+.aoi-comment-bans, .aoi-comments [data-aoi-status] {
+    border: 1px solid var(--aoi-border);
+    border-radius: .9rem;
+    background: var(--aoi-tint);
+    padding: .75rem 1rem;
+    margin: .9rem 0;
+}
+.aoi-comment-bans h3 { font-size: 1.45rem; }
+.aoi-comment-bans .aoi-comment-row { justify-content: space-between; }
+.aoi-comment-error { color: var(--aoi-danger); font-weight: 600; }
+.aoi-comments [data-aoi-status] button { margin-top: .5rem; }
+.aoi-comment-more { display: flex; margin: 1rem auto 0; }
+.aoi-comment-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+@media (prefers-reduced-motion: no-preference) {
+    .aoi-comment-button {
+        transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 190ms ease;
+    }
+    .aoi-comment-form { transition: border-color 160ms ease; }
+    .aoi-comment-form textarea { transition: block-size 240ms cubic-bezier(.2,.7,.2,1); }
+    .aoi-comment-form-foot-wrap { transition: grid-template-rows 260ms cubic-bezier(.32,.72,0,1); }
+    .aoi-comment-form-foot { transition: opacity 200ms ease, translate 260ms cubic-bezier(.32,.72,0,1), visibility 0s 260ms; }
+    .aoi-comment-form:not([data-reply-to]):is(:focus-within, .aoi-comment-has-draft, :has([data-aoi-cooldown]:not(:empty))) .aoi-comment-form-foot,
+    .aoi-comment-reply-open .aoi-comment-form-foot { transition-delay: 0s; }
+    .aoi-comment-avatar img { transition: opacity 180ms ease; }
+    .aoi-comment > .aoi-comment-avatar { transition: opacity 160ms ease; }
+    .aoi-comment-locating > .aoi-comment-avatar {
+        animation-name: aoi-avatar-locate;
+        animation-timing-function: cubic-bezier(.2, .75, .3, 1);
+    }
+    .aoi-comment-locating .aoi-comment-byline::before { animation-name: aoi-locate-sweep; }
+    .aoi-comment-locating .aoi-comment-body::before { animation-name: aoi-locate-quote; }
+    .aoi-comment-locating .aoi-comment-locate-badge { animation-name: aoi-locate-badge; }
+    .aoi-comment-button.aoi-thread-toggle {
+        transition: inset-block-start 200ms cubic-bezier(.2,.7,.2,1), background-color 160ms ease, color 160ms ease;
+    }
+    .aoi-thread-toggle::after { transition: transform 150ms ease; }
+    .aoi-comment-button:not(.aoi-comment-composer-button):not(:disabled):active { transform: scale(.94); }
+    .aoi-comments a.aoi-comment-author { transition: color 160ms ease; }
+    .aoi-comment-reaction-tray {
+        transition: inline-size 220ms ease, margin-inline-start 220ms ease, opacity 150ms ease, visibility 0s 220ms;
+    }
+    .aoi-comment-tray-open { transition-delay: 0s; }
+    .aoi-comment-tray-open .aoi-comment-chip {
+        animation: aoi-comment-chip-in 310ms cubic-bezier(.22, .83, .33, 1.16)
+            calc(var(--aoi-reaction-index, 0) * 21ms) backwards;
+    }
+    .aoi-comment-chip-pop .aoi-comment-chip-glyph {
+        animation: aoi-comment-reaction-pop 360ms cubic-bezier(.24, .74, .31, 1);
+    }
+    .aoi-comment-reply-slot { transition: grid-template-rows 240ms cubic-bezier(.2,.7,.2,1); }
+    .aoi-comment-reply-slot-inner { transition: opacity 180ms ease; }
+    .aoi-comment-enter {
+        animation: aoi-comment-rise 240ms ease-out calc(var(--aoi-comment-index, 0) * 24ms) backwards;
+    }
+    .aoi-comment-list-sorted {
+        animation: aoi-comment-sort-in 250ms cubic-bezier(.2,.72,.25,1) backwards;
+    }
+    @media (hover: hover) {
+        .aoi-comment-chip:not(:disabled):hover { transform: translateY(-2px); }
+    }
+}
+@keyframes aoi-comment-chip-in {
+    from { opacity: 0; transform: translate(-.5rem, .28rem) scale(.78); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes aoi-comment-reaction-pop {
+    0%, 100% { transform: none; }
+    35% { transform: translateY(-.36rem) rotate(-9deg) scale(1.34); }
+    68% { transform: translateY(.04rem) rotate(4deg) scale(.95); }
+}
+@keyframes aoi-comment-rise {
+    from { opacity: 0; transform: translateY(.52rem); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes aoi-comment-sort-in {
+    from { opacity: .55; }
+    to { opacity: 1; }
+}
+@keyframes aoi-avatar-locate {
+    from { outline: 2px solid transparent; outline-offset: 0; }
+    7% { outline-color: var(--aoi-locate-ring); outline-offset: 4px; }
+    15%, 72% { outline-color: var(--aoi-locate-ring); outline-offset: 2px; }
+    to { outline: 2px solid transparent; outline-offset: 2px; }
+}
+@keyframes aoi-avatar-locate-gentle {
+    from, 72% { outline: 2px solid var(--aoi-locate-ring); outline-offset: 1px; }
+    to { outline: 2px solid transparent; outline-offset: 1px; }
+}
+@keyframes aoi-locate-sweep {
+    0%, 3% { opacity: 0; transform: scaleX(.12); animation-timing-function: cubic-bezier(.2,.8,.22,1); }
+    13%, 72% { opacity: 1; transform: none; }
+    to { opacity: 0; transform: none; }
+}
+@keyframes aoi-locate-badge {
+    0%, 5% { visibility: visible; opacity: 0; transform: translateX(-6px); }
+    14%, 72% { visibility: visible; opacity: 1; transform: none; }
+    to { visibility: visible; opacity: 0; transform: none; }
+}
+@keyframes aoi-locate-quote {
+    0%, 8% { opacity: 0; transform: scaleY(.18); }
+    19%, 72% { opacity: 1; transform: none; }
+    to { opacity: 0; transform: none; }
+}
+@keyframes aoi-locate-fade {
+    from, 72% { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes aoi-locate-badge-gentle {
+    from, 72% { visibility: visible; opacity: 1; }
+    to { visibility: visible; opacity: 0; }
+}
+@media (max-width: 480px) {
+    .aoi-comments { --aoi-avatar: 2.75rem; --aoi-indent: 1.55rem; }
+    .aoi-comment { gap: .65rem; }
+}
