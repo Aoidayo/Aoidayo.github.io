@@ -1,0 +1,58 @@
+.aoi-comments {
+    background: var(--card-background);
+    color: var(--card-text-color-main);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--shadow-l1);
+    padding: clamp(1.4rem, 4vw, 3rem);
+    margin-bottom: var(--section-separation);
+    overflow-wrap: anywhere;
+}
+
+.aoi-comments h2, .aoi-comments h3 { margin: 0 0 1rem; }
+.aoi-comment-row, .aoi-comment-reactions { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; }
+.aoi-comment-reactions { margin-block: .7rem; }
+.aoi-comment-reactions:empty, .aoi-comment-row:empty, .aoi-comments [data-aoi-status]:empty { display: none; }
+.aoi-comment-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.2rem;
+    padding: .35rem .8rem;
+    border: 1px solid var(--card-separator-color);
+    border-radius: .6rem;
+    background: var(--card-background);
+    color: var(--card-text-color-main);
+    cursor: pointer;
+    font: inherit;
+    text-decoration: none;
+}
+.aoi-comment-button:not(:disabled):hover, .aoi-comment-button[aria-pressed="true"] {
+    color: var(--accent-color-text);
+    background: var(--accent-color);
+}
+.aoi-comment-button:disabled { cursor: default; opacity: .65; }
+.aoi-comment-form { margin-block: 1.4rem; }
+.aoi-comment-form label { display: grid; gap: .5rem; margin-block: .6rem; }
+.aoi-comment-form textarea {
+    width: 100%;
+    resize: vertical;
+    padding: .8rem;
+    background: var(--body-background);
+    color: var(--card-text-color-main);
+    border: 1px solid var(--card-separator-color);
+    border-radius: .6rem;
+    font: inherit;
+}
+.aoi-comment-list { display: grid; gap: .8rem; margin-block: 1.2rem; }
+.aoi-comment {
+    margin-inline-start: calc(var(--aoi-depth, 0) * clamp(.35rem, 2vw, 1.25rem));
+    border-inline-start: 2px solid var(--card-separator-color);
+    border-block-end: 1px solid var(--card-separator-color);
+    padding: .65rem .9rem;
+    min-width: 0;
+}
+.aoi-comment-body { white-space: pre-wrap; }
+.aoi-comment-muted, .aoi-comment-badge { color: var(--card-text-color-secondary); font-size: .9em; }
+.aoi-comment-badge { border: 1px solid var(--card-separator-color); border-radius: .4rem; padding: .15rem .4rem; }
+.aoi-comment-bans { border: 1px solid var(--card-separator-color); border-radius: .6rem; padding: 1rem; margin-block: 1rem; }
+.aoi-comment-error { color: var(--card-text-color-main); font-weight: 600; }
