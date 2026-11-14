@@ -290,3 +290,64 @@
     .memo-reaction, .memo-actions button { transition: none; }
     .memo-reaction:active, .memo-actions button:active { scale: none; }
 }
+
+.memo-comment-toggle {
+    flex: none;
+    min-height: 3.4rem;
+    padding: .35rem .85rem;
+    border: 1px solid var(--card-separator-color);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--card-text-color-secondary);
+    font: inherit;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+.memo-comment-toggle:hover, .memo-comment-toggle[aria-expanded="true"] { color: var(--accent-color); }
+.memo-comment-panel { margin-top: 1.2rem; }
+.memo-comment-panel .aoi-comments { margin-bottom: 0; }
+.memo-comment-panel .aoi-comment-card { box-shadow: none; }
+.memo-comment-consent { display: none; color: var(--card-text-color-secondary); }
+.memo-comment-panel > .aoi-comment-card[hidden] ~ .memo-comment-consent { display: block; }
+
+.memo-card > .aoi-comments { margin-bottom: 0; }
+.memo-card > .aoi-comments .memo-card-footer {
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-block-start: 1.2rem;
+    gap: .65rem 1rem;
+}
+.memo-comment-feedback { min-width: 0; max-width: 100%; }
+.memo-card .memo-comment-toggle { min-height: 3.25rem; }
+.memo-card .memo-comment-toggle[aria-expanded="true"] {
+    color: var(--aoi-profile-blue);
+}
+.memo-comment-panel {
+    border-top: 1px solid var(--aoi-border);
+    padding-top: 1.15rem;
+}
+.memo-comment-panel .aoi-comment-card { padding: 0; border: 0; background: transparent; }
+.memo-comment-panel .aoi-comment-signin { border-radius: 999px; }
+.memo-comment-panel .aoi-comment-session { flex-wrap: wrap; }
+.memo-comment-skeletons { display: grid; gap: 1.5rem; margin: 2rem 0 .8rem; }
+.memo-comment-skeleton { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr); gap: 1.1rem; }
+.memo-comment-skeleton span, .memo-comment-skeleton i {
+    display: block;
+    border-radius: 999px;
+    background: var(--aoi-border);
+    opacity: .55;
+}
+.memo-comment-skeleton span { aspect-ratio: 1; }
+.memo-comment-skeleton i { height: .85rem; margin-bottom: .6rem; }
+.memo-comment-skeleton i:first-child { width: 34%; }
+.memo-comment-skeleton i:nth-child(2) { width: 90%; }
+.memo-comment-skeleton i:last-child { width: 62%; margin-bottom: 0; }
+@media (prefers-reduced-motion: no-preference) {
+    .memo-comment-skeletons { animation: memo-comment-pulse 1.35s ease-in-out infinite alternate; }
+}
+@keyframes memo-comment-pulse { to { opacity: .55; } }
+
+.memo-comment-panel [data-aoi-status]:has(> .aoi-comment-sr-only:only-child) {
+    border: 0; background: none; padding: 0; margin: 0;
+}
