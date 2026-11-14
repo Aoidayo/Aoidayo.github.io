@@ -351,3 +351,10 @@
 .memo-comment-panel [data-aoi-status]:has(> .aoi-comment-sr-only:only-child) {
     border: 0; background: none; padding: 0; margin: 0;
 }
+
+.memo-reaction-status { margin-top: .65rem; color: var(--aoi-muted); font-size: 1.28rem; }
+.memo-reaction-status:empty { display: none; }
+.memo-comment-feedback :is(.aoi-comment-reactions, .aoi-comment-reaction-counts) {
+    min-width: 0;
+    flex-wrap: wrap;
+}
